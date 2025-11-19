@@ -14,8 +14,8 @@ import { login, register } from "@/lib/auth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Mail } from "lucide-react";
-import backgroundVideo from "@assets/social_u8721598234_httpss.mj.run9PeHEv50RaI_Se_mueva_el_humo_--ar_16_859139eb-2b54-44ba-a70e-0b35e099a25c_3_1758640235341.mp4";
-import logo from "@assets/LOGO-FINAL-LOYALTY_1758659070059.png";
+import backgroundImage from "@assets/login.jpg";
+import logo from "@assets/logo-kaspersky-cup.png";
 
 const loginSchema = z.object({
   username: z.string().min(1, "Username is required"),
@@ -153,24 +153,27 @@ export default function Login() {
 
   return (
     <div className="relative min-h-screen flex items-center justify-center p-4 overflow-hidden">
-      {/* Video Background */}
-      <video
-        autoPlay
-        loop
-        muted
+      {/* Image Background */}
+      <img
+        src={backgroundImage}
+        alt="Background"
         className="absolute inset-0 w-full h-full object-cover z-0"
-      >
-        <source src={backgroundVideo} type="video/mp4" />
-      </video>
+      />
       
       {/* Overlay for better readability */}
       <div className="absolute inset-0 bg-black/20 z-10"></div>
       
-      <Card className="relative z-20 w-full max-w-md bg-white/95 backdrop-blur-sm">
+      <Card className="relative z-20 w-full max-w-md bg-white/95 backdrop-blur-sm background-form-login">
         <CardHeader className="text-center">
-          <div className="flex justify-center mb-2">
+          <div className="flex justify-center mb-2 logo-login">
             <img src={logo} alt="LoyaltyPro" className="h-16 w-auto" />
           </div>
+          <p className="text-black-600">
+            Welcome to the platform
+          </p>
+          <p className="text-green-600">
+            where your sales turn into goals
+          </p>          
           <p className="text-gray-600">
             {isLogin ? "Sign in to your account" : "Create your account"}
           </p>
@@ -224,7 +227,7 @@ export default function Login() {
                 />
                 <Button
                   type="submit"
-                  className="w-full"
+                  className="w-full button-green"
                   disabled={loginMutation.isPending}
                   data-testid="button-login"
                 >
