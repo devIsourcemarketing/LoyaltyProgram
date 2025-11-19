@@ -13,7 +13,7 @@
   --card-foreground: hsl(20, 14.3%, 4.1%);
   --border: hsl(20, 5.9%, 90%);
   --input: hsl(20, 5.9%, 90%);
-  --primary: hsl(253, 81%, 33%);
+  --primary: hsl(170, 80%, 80%);
   --primary-foreground: hsl(211, 100%, 99%);
   --secondary: hsl(134, 34%, 37%);
   --secondary-foreground: hsl(60, 9.1%, 97.8%);
@@ -99,4 +99,17 @@
   .shadow-material-lg {
     box-shadow: 0 4px 8px rgba(0,0,0,0.12), 0 16px 24px rgba(0,0,0,0.14);
   }
+}
+/*------new styles-----*/
+.logo-login img {
+  height: 139px;
+}
+.text-green-600 {
+  color: #29CCB1
+}
+.button-green {
+  background: #29CCB1;
+}
+.background-form-login {
+  background-color: rgb(255 255 255 / 80%);
 }
