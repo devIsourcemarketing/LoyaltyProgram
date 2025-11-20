@@ -101,6 +101,7 @@
   }
 }
 /*------new styles-----*/
+/*--login--*/
 .logo-login img {
   height: 139px;
 }
@@ -112,4 +113,30 @@
 }
 .background-form-login {
   background-color: rgb(255 255 255 / 80%);
+}
+/*--user--*/
+.gradient-green {
+  background: #3DE8CA;
+  background: linear-gradient(51deg,rgba(61, 232, 202, 1) 0%, rgba(51, 255, 119, 1) 100%);
+}
+.green-background {
+  background: #29CCB1;
+}
+.white-background {
+  background: #ffffff;
+}
+.white-text {
+  color: #ffffff;
+}
+.gray-background {
+  background: #F1F5F8;
+}
+.text-dark {
+  color: #1D1D1B;
+}
+.background-dark {
+  background: #1D1D1B;
+}
+.green-background-opacity15 {
+  background: rgba(41, 204, 177, .15)
 }
