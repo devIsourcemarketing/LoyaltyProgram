@@ -140,3 +140,22 @@
 .green-background-opacity15 {
   background: rgba(41, 204, 177, .15)
 }
+/*--reward-screen--*/
+.reward-info {
+    flex-direction: column;
+    gap: 20px;
+}
+.goal-number {
+    font-size: 30px;
+    font-weight: 600;
+    display: block;
+    margin: 10px 0;
+}
+.red-text {
+  color: #FF0000;
+}
+.reward-category {
+    margin: 0 auto 15px auto;
+    display: block;
+    width: fit-content;
+}
