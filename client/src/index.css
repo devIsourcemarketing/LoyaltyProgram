@@ -17,7 +17,7 @@
   --primary-foreground: hsl(211, 100%, 99%);
   --secondary: hsl(134, 34%, 37%);
   --secondary-foreground: hsl(60, 9.1%, 97.8%);
-  --accent: hsl(14, 84%, 53%);
+  --accent: #29CCB1;
   --accent-foreground: hsl(60, 9.1%, 97.8%);
   --destructive: hsl(0, 84.2%, 60.2%);
   --destructive-foreground: hsl(60, 9.1%, 97.8%);
@@ -37,8 +37,8 @@
   --secondary-700: hsl(134, 46%, 25%);
   
   --accent-50: hsl(14, 100%, 96%);
-  --accent-500: hsl(14, 84%, 53%);
-  --accent-600: hsl(14, 78%, 46%);
+  --accent-500: #29CCB1;
+  --accent-600: #29CCB1;
 }
 
 .dark {
@@ -139,4 +139,31 @@
 }
 .green-background-opacity15 {
   background: rgba(41, 204, 177, .15)
+}
+/*--reward-screen--*/
+.reward-info {
+    flex-direction: column;
+    gap: 20px;
+}
+.goal-number {
+    font-size: 30px;
+    font-weight: 600;
+    display: block;
+    margin: 10px 0;
+}
+.red-text {
+  color: #FF0000;
+}
+.reward-category {
+    margin: 0 auto 15px auto;
+    display: block;
+    width: fit-content;
+}
+/*--toolbar--*/
+.logo-toolbar {
+  height: 60px;
+  margin-top: -12px;
+}
+button#radix-\:r7\::hover {
+  background: #29CCB1;
 }

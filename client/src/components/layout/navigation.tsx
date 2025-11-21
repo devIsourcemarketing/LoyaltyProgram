@@ -11,7 +11,7 @@ import { logout } from "@/lib/auth";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "@/hooks/useTranslation";
 import type { AuthUser } from "@/lib/auth";
-import logo from "@assets/LOGO-FINAL-LOYALTY_1758720440342.png";
+import logo from "@assets/logo.png";
 import { NotificationBell } from "@/components/NotificationBell";
 import { isAdminRole } from "@/lib/roles";
 
@@ -38,7 +38,7 @@ export default function Navigation({ user }: NavigationProps) {
                 <img 
                   src={logo} 
                   alt="LoyaltyPro" 
-                  className="h-8 w-auto" 
+                  className="h-8 w-auto logo-toolbar" 
                 />
               </div>
               <div className="animate-pulse bg-gray-200 h-4 w-32 rounded"></div>
@@ -116,8 +116,8 @@ export default function Navigation({ user }: NavigationProps) {
                     <button
                       className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                         item.current
-                          ? "text-blue-600 bg-blue-50"
-                          : "text-gray-700 hover:text-blue-600"
+                          ? "text-blue-600 bg-blue-50 text-green-600 green-background-opacity15"
+                          : "text-gray-700 hover:text-green-600"
                       }`}
                       data-testid={`nav-${item.label.toLowerCase().replace(" ", "-")}`}
                     >
@@ -151,7 +151,7 @@ export default function Navigation({ user }: NavigationProps) {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="flex items-center space-x-2" data-testid="button-user-menu">
                   <Avatar className="h-8 w-8">
-                    <AvatarFallback className="bg-blue-100 text-blue-600">
+                    <AvatarFallback className="bg-blue-100 text-blue-600 green-background white-text">
                       {userInitials}
                     </AvatarFallback>
                   </Avatar>
