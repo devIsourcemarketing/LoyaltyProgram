@@ -11,7 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "@/hooks/useTranslation";
 import { apiRequest } from "@/lib/queryClient";
 import type { Reward, UserReward, PointsConfig } from "@shared/schema";
-import rewardsBackgroundImage from "@assets/BANNER-3_1758838053683.jpg";
+import rewardsBackgroundImage from "@assets/rewards-banner.png";
 
 interface UserStats {
   availablePoints: number;
@@ -190,14 +190,12 @@ export default function Rewards() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
           <div className="text-left space-y-4 max-w-lg">
             <h1 className="text-4xl lg:text-5xl font-bold leading-tight text-white" data-testid="text-page-title">
-              Rewards<br />Catalog
+              Make every play <br />
+              <strong>end in a goal</strong>
             </h1>
-            <p className="text-lg text-white leading-relaxed">
-              Redeem your points for amazing rewards
-            </p>
-            <div className="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2 inline-block">
+            <div className="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2 inline-block gradient-green">
               <span className="text-sm text-white font-medium">
-                Available Points: {stats?.availablePoints?.toLocaleString() || 0}
+                Goals: {stats?.availablePoints?.toLocaleString() || 0}
               </span>
             </div>
           </div>
@@ -264,7 +262,7 @@ export default function Rewards() {
               {rewards.map((reward) => (
                 <Card key={reward.id} className="shadow-material" data-testid={`card-reward-${reward.id}`}>
                   <CardContent className="p-6">
-                    <div className="flex items-center space-x-4 mb-4">
+                    <div className="flex items-center space-x-4 mb-4 reward-info">
                       {reward.imageUrl ? (
                         <img 
                           src={reward.imageUrl} 
@@ -279,27 +277,27 @@ export default function Rewards() {
                           }}
                         />
                       ) : null}
-                      <div className={`w-12 h-12 bg-gradient-to-br ${getCategoryColor(reward.category)} rounded-lg flex items-center justify-center ${reward.imageUrl ? 'hidden' : ''}`}>
+                      <div className={`w-12 h-12 bg-gradient-to-br ${getCategoryColor(reward.category)} rounded-lg flex items-center justify-center green-background ${reward.imageUrl ? 'hidden' : ''}`}>
                         {getRewardIcon(reward.category)}
                       </div>
                       <div className="flex-1">
                         <h3 className="font-semibold text-gray-900">{reward.name}</h3>
-                        <p className="text-sm text-gray-600">
-                          {reward.pointsCost.toLocaleString()} points
+                        <p className="text-sm text-gray-600 text-center">
+                          <span className="goal-number text-green-600">{reward.pointsCost.toLocaleString()}</span> Goals
                         </p>
                       </div>
                     </div>
                     
                     {reward.description && (
-                      <p className="text-sm text-gray-600 mb-4">{reward.description}</p>
+                      <p className="text-sm text-gray-600 mb-4 text-center">{reward.description}</p>
                     )}
                     
-                    <Badge variant="outline" className="mb-4">
+                    <Badge variant="outline" className="mb-4 reward-category">
                       {reward.category}
                     </Badge>
                     
                     <Button
-                      className="w-full"
+                      className="w-full gradient-green"
                       onClick={() => handleRedeem(reward)}
                       disabled={!stats || stats.availablePoints < reward.pointsCost || redeemMutation.isPending}
                       data-testid={`button-redeem-${reward.id}`}
@@ -352,7 +350,7 @@ export default function Rewards() {
               {availableRewards().map((reward) => (
                 <Card key={reward.id} className="shadow-material border-green-200" data-testid={`card-available-reward-${reward.id}`}>
                   <CardContent className="p-6">
-                    <div className="flex items-center space-x-4 mb-4">
+                    <div className="flex items-center space-x-4 mb-4 reward-info">
                       {reward.imageUrl ? (
                         <img 
                           src={reward.imageUrl} 
@@ -367,27 +365,27 @@ export default function Rewards() {
                           }}
                         />
                       ) : null}
-                      <div className={`w-12 h-12 bg-gradient-to-br ${getCategoryColor(reward.category)} rounded-lg flex items-center justify-center ${reward.imageUrl ? 'hidden' : ''}`}>
+                      <div className={`w-12 h-12 bg-gradient-to-br ${getCategoryColor(reward.category)} rounded-lg flex items-center justify-center green-background ${reward.imageUrl ? 'hidden' : ''}`}>
                         {getRewardIcon(reward.category)}
                       </div>
                       <div className="flex-1">
                         <h3 className="font-semibold text-gray-900">{reward.name}</h3>
-                        <p className="text-sm text-green-600 font-medium">
-                          {reward.pointsCost.toLocaleString()} points ✓
+                        <p className="text-sm text-green-600 font-medium text-center">
+                          <span className="goal-number">{reward.pointsCost.toLocaleString()}</span> Goals ✓
                         </p>
                       </div>
                     </div>
                     
                     {reward.description && (
-                      <p className="text-sm text-gray-600 mb-4">{reward.description}</p>
+                      <p className="text-sm text-gray-600 mb-4 text-center">{reward.description}</p>
                     )}
                     
-                    <Badge variant="outline" className="mb-4 border-green-200 text-green-700">
+                    <Badge variant="outline" className="mb-4 border-green-200 text-green-700 reward-category">
                       {reward.category}
                     </Badge>
                     
                     <Button
-                      className="w-full bg-green-600 hover:bg-green-700"
+                      className="w-full bg-green-600 gradient-green hover:bg-green-700"
                       onClick={() => handleRedeem(reward)}
                       disabled={redeemMutation.isPending}
                       data-testid={`button-redeem-available-${reward.id}`}
@@ -421,7 +419,7 @@ export default function Rewards() {
               {filteredRewards(category).map((reward) => (
                 <Card key={reward.id} className="shadow-material">
                   <CardContent className="p-6">
-                    <div className="flex items-center space-x-4 mb-4">
+                    <div className="flex items-center space-x-4 mb-4 reward-info">
                       {reward.imageUrl ? (
                         <img 
                           src={reward.imageUrl} 
@@ -436,23 +434,23 @@ export default function Rewards() {
                           }}
                         />
                       ) : null}
-                      <div className={`w-12 h-12 bg-gradient-to-br ${getCategoryColor(reward.category)} rounded-lg flex items-center justify-center ${reward.imageUrl ? 'hidden' : ''}`}>
+                      <div className={`w-12 h-12 bg-gradient-to-br ${getCategoryColor(reward.category)} rounded-lg flex items-center justify-center green-background ${reward.imageUrl ? 'hidden' : ''}`}>
                         {getRewardIcon(reward.category)}
                       </div>
                       <div className="flex-1">
                         <h3 className="font-semibold text-gray-900">{reward.name}</h3>
-                        <p className="text-sm text-gray-600">
-                          {reward.pointsCost.toLocaleString()} points
+                        <p className="text-sm text-gray-600 text-center">
+                          <span className="goal-number text-green-600">{reward.pointsCost.toLocaleString()}</span> Goals
                         </p>
                       </div>
                     </div>
                     
                     {reward.description && (
-                      <p className="text-sm text-gray-600 mb-4">{reward.description}</p>
+                      <p className="text-sm text-gray-600 mb-4 text-center">{reward.description}</p>
                     )}
                     
                     <Button
-                      className="w-full"
+                      className="w-full gradient-green"
                       onClick={() => handleRedeem(reward)}
                       disabled={!stats || stats.availablePoints < reward.pointsCost || redeemMutation.isPending}
                     >
@@ -476,7 +474,7 @@ export default function Rewards() {
                 <Card key={i} className="shadow-material">
                   <CardContent className="p-6">
                     <div className="flex items-center space-x-4 mb-4">
-                      <Skeleton className="h-12 w-12 rounded-lg" />
+                      <Skeleton className="h-12 w-12 rounded-lg green-background" />
                       <div className="flex-1">
                         <Skeleton className="h-5 w-3/4 mb-2" />
                         <Skeleton className="h-4 w-1/2" />
@@ -495,11 +493,11 @@ export default function Rewards() {
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-4">
-                        <div className={`w-12 h-12 ${
+                        <div className={`w-12 h-12 green-background ${
                           userReward.status === 'approved' ? 'bg-green-100' :
                           userReward.status === 'pending' ? 'bg-yellow-100' : 'bg-red-100'
                         } rounded-lg flex items-center justify-center`}>
-                          <Award className={`w-6 h-6 ${
+                          <Award className={`w-6 h-6 white-text ${
                             userReward.status === 'approved' ? 'text-green-600' :
                             userReward.status === 'pending' ? 'text-yellow-600' : 'text-red-600'
                           }`} />
@@ -553,7 +551,7 @@ export default function Rewards() {
                       </div>
                       <div className="text-right">
                         <Badge className={`${
-                          userReward.status === 'approved' ? 'bg-green-100 text-green-800' :
+                          userReward.status === 'approved' ? 'bg-green-100 text-green-800 green-background white-text' :
                           userReward.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'
                         }`} data-testid={`badge-status-${userReward.id}`}>
                           {userReward.status === 'approved' ? 'Approved' :
