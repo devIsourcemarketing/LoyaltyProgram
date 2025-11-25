@@ -4,7 +4,6 @@ import express, { type Request, Response, NextFunction } from "express";
 import session from "express-session";
 import path from "path";
 import { registerRoutes } from "./routes";
-import { setupVite, serveStatic, log } from "./vite";
 import { initializeSocket } from "./socket";
 
 // Polyfill for crypto.getRandomValues - MUST be before Vite imports
@@ -34,6 +33,17 @@ app.use(
     },
   }),
 );
+
+// Simple logging function
+function log(message: string, source = "express") {
+  const formattedTime = new Date().toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true,
+  });
+  console.log(`${formattedTime} [${source}] ${message}`);
+}
 
 app.use((req, res, next) => {
   const start = Date.now();
@@ -83,9 +93,14 @@ app.use((req, res, next) => {
   // setting up all the other routes so the catch-all route
   // doesn't interfere with the other routes
   if (app.get("env") === "development") {
+    const { setupVite } = await import("./vite.js");
     await setupVite(app, server);
   } else {
-    serveStatic(app);
+    // Serve static files in production
+    app.use(express.static(path.join(process.cwd(), "dist/public")));
+    app.get("*", (_req, res) => {
+      res.sendFile(path.join(process.cwd(), "dist/public/index.html"));
+    });
   }
 
   // ALWAYS serve the app on the port specified in the environment variable PORT
