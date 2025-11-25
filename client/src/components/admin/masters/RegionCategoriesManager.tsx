@@ -178,9 +178,9 @@ export default function RegionCategoriesManager() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div className="flex-1">
-          <h3 className="text-lg font-semibold">Categorías por Región</h3>
+          <h3 className="text-lg font-semibold">{t('admin.regionCategories')}</h3>
           <p className="text-sm text-gray-600">
-            Gestiona las categorías disponibles para cada región. Cada región puede tener sus propias categorías personalizadas (Ej: NOLA → ENTERPRISE/SMB/MSSP, SOLA → Diamond/Gold/Silver).
+            {t('admin.regionCategoriesDescription')}
           </p>
         </div>
         <div className="flex gap-2 items-center">
@@ -189,7 +189,7 @@ export default function RegionCategoriesManager() {
               <SelectValue placeholder="Filtrar región" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Todas las regiones</SelectItem>
+              <SelectItem value="all">{t('admin.allRegions')}</SelectItem>
               {AVAILABLE_REGIONS.map((region) => (
                 <SelectItem key={region} value={region}>{region}</SelectItem>
               ))}
@@ -199,7 +199,7 @@ export default function RegionCategoriesManager() {
           <DialogTrigger asChild>
             <Button onClick={() => resetForm()}>
               <Plus className="h-4 w-4 mr-2" />
-              Nueva Categoría
+              {t('admin.newRegionCategory')}
             </Button>
           </DialogTrigger>
           <DialogContent>
@@ -320,7 +320,7 @@ export default function RegionCategoriesManager() {
                   <CardContent>
                     <div className="text-2xl font-bold">{stats.total}</div>
                     <p className="text-xs text-gray-500">
-                      {stats.total === 1 ? "categoría" : "categorías"}
+                      {stats.total === 1 ? t('admin.category') : t('admin.categoriesCount')}
                     </p>
                   </CardContent>
                 </Card>
@@ -338,11 +338,11 @@ export default function RegionCategoriesManager() {
                       <Globe className="h-5 w-5" />
                       {region}
                       <Badge variant="outline" className="ml-2">
-                        {items.length} {items.length === 1 ? "categoría" : "categorías"}
+                        {items.length} {items.length === 1 ? t('admin.category') : t('admin.categoriesCount')}
                       </Badge>
                     </CardTitle>
                     <CardDescription>
-                      Categorías configuradas para la región {region}
+                      {t('admin.configuredCategoriesForRegion')} {region}
                     </CardDescription>
                   </CardHeader>
               <CardContent>
