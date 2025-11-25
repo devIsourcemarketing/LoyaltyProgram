@@ -15,7 +15,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Mail } from "lucide-react";
 import backgroundImage from "@assets/login.jpg";
-import logo from "@assets/logo-kaspersky-cup.png";
+import kasperskyLogo from "@/assets/kaspersky-logo.svg";
 
 const loginSchema = z.object({
   username: z.string().min(1, "Username is required"),

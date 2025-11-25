@@ -13,6 +13,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { User, Mail, MapPin, Lock, Loader2, CheckCircle } from "lucide-react";
+import rewardsBanner from "@/assets/rewards-banner.png";
 
 // Tipo de usuario desde la API
 interface UserProfile {
@@ -202,6 +203,15 @@ export default function ProfilePage() {
 
   return (
     <div className="container mx-auto py-8 px-4 max-w-4xl">
+      {/* Banner de Rewards */}
+      <div className="mb-8 rounded-xl overflow-hidden shadow-lg">
+        <img 
+          src={rewardsBanner} 
+          alt="Rewards Banner" 
+          className="w-full h-auto"
+        />
+      </div>
+
       <div className="mb-8">
         <h1 className="text-3xl font-bold">My Profile</h1>
         <p className="text-muted-foreground mt-2">

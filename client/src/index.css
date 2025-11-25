@@ -2,43 +2,70 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Kaspersky Sans Display Font */
+@font-face {
+  font-family: 'Kaspersky Sans Display';
+  src: url('/fonts/KasperskySansDisplay-Medium.woff2') format('woff2'),
+       url('/fonts/KasperskySansDisplay-Medium.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Kaspersky Sans Display';
+  src: url('/fonts/KasperskySansDisplay-Bold.woff2') format('woff2'),
+       url('/fonts/KasperskySansDisplay-Bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Kaspersky Sans Display';
+  src: url('/fonts/KasperskySansDisplay-Regular.woff2') format('woff2'),
+       url('/fonts/KasperskySansDisplay-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --background: hsl(0, 0%, 100%);
-  --foreground: hsl(20, 14.3%, 4.1%);
-  --muted: hsl(60, 4.8%, 95.9%);
-  --muted-foreground: hsl(25, 5.3%, 44.7%);
+  --foreground: hsl(0, 0%, 11%);
+  --muted: hsl(200, 18%, 95%);
+  --muted-foreground: hsl(0, 0%, 45%);
   --popover: hsl(0, 0%, 100%);
-  --popover-foreground: hsl(20, 14.3%, 4.1%);
+  --popover-foreground: hsl(0, 0%, 11%);
   --card: hsl(0, 0%, 100%);
-  --card-foreground: hsl(20, 14.3%, 4.1%);
-  --border: hsl(20, 5.9%, 90%);
-  --input: hsl(20, 5.9%, 90%);
-  --primary: hsl(170, 80%, 80%);
-  --primary-foreground: hsl(211, 100%, 99%);
-  --secondary: hsl(134, 34%, 37%);
-  --secondary-foreground: hsl(60, 9.1%, 97.8%);
-  --accent: hsl(14, 84%, 53%);
-  --accent-foreground: hsl(60, 9.1%, 97.8%);
+  --card-foreground: hsl(0, 0%, 11%);
+  --border: hsl(0, 0%, 89%);
+  --input: hsl(0, 0%, 89%);
+  --primary: hsl(171, 63%, 48%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(0, 0%, 11%);
+  --secondary-foreground: hsl(0, 0%, 100%);
+  --accent: hsl(195, 100%, 60%);
+  --accent-foreground: hsl(0, 0%, 100%);
   --destructive: hsl(0, 84.2%, 60.2%);
-  --destructive-foreground: hsl(60, 9.1%, 97.8%);
-  --ring: hsl(20, 14.3%, 4.1%);
+  --destructive-foreground: hsl(0, 0%, 100%);
+  --ring: hsl(171, 63%, 48%);
   --radius: 0.5rem;
 
-  /* Custom colors matching the design */
-  --primary-50: hsl(253, 81%, 96%);
-  --primary-100: hsl(253, 81%, 90%);
-  --primary-500: hsl(253, 81%, 33%);
-  --primary-600: hsl(253, 81%, 27%);
-  --primary-700: hsl(253, 81%, 20%);
+  /* KL Color Palette */
+  /* Primary - KL Green #29CCB1 */
+  --kl-green: #29CCB1;
+  --kl-green-dark: #00A88E;
+  --kl-green-light: #9DFFEF;
   
-  --secondary-50: hsl(134, 61%, 95%);
-  --secondary-500: hsl(134, 34%, 37%);
-  --secondary-600: hsl(134, 40%, 31%);
-  --secondary-700: hsl(134, 46%, 25%);
+  /* Secondary Colors */
+  --kl-black: #1D1D1B;
+  --kl-white: #FFFFFF;
   
-  --accent-50: hsl(14, 100%, 96%);
-  --accent-500: hsl(14, 84%, 53%);
-  --accent-600: hsl(14, 78%, 46%);
+  /* Accent Colors */
+  --kl-cyan: #33BBFF;
+  --kl-blue: #3355FF;
+  --kl-purple: #7633FF;
 }
 
 .dark {
@@ -70,7 +97,7 @@
 
   body {
     @apply font-sans antialiased bg-background text-foreground;
-    font-family: 'Raleway', sans-serif;
+    font-family: 'Kaspersky Sans Display', 'Raleway', sans-serif;
   }
 
   .champion-background {
