@@ -344,10 +344,10 @@ export default function ProfilePage() {
 
                 {/* Role (read-only) */}
                 <div>
-                  <Label htmlFor="role">Role</Label>
+                  <Label htmlFor="role">{t('common.role')}</Label>
                   <Input
                     id="role"
-                    value={user?.role === "admin" ? "Administrator" : "User"}
+                    value={user?.role === "admin" ? t('admin.roleAdmin') : t('admin.roleUser')}
                     disabled
                     className="bg-muted"
                   />

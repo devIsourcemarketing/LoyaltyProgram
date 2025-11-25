@@ -920,7 +920,7 @@ export default function Admin() {
               <X className="h-12 w-12 text-red-500 mx-auto mb-4" />
               <h2 className="text-xl font-bold text-gray-900 mb-2">Access Denied</h2>
               <p className="text-gray-600">
-                You don't have permission to access the admin panel.
+                {t('admin.noPermissionAdminPanel')}
               </p>
             </div>
           </CardContent>
@@ -941,7 +941,7 @@ export default function Admin() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-8 bg-white p-1 rounded-lg border border-gray-200 mb-6">
+        <TabsList className={`grid w-full ${currentUser?.role === 'super-admin' ? 'grid-cols-8' : 'grid-cols-7'} bg-white p-1 rounded-lg border border-gray-200 mb-6`}>
           <TabsTrigger value="overview" className="data-[state=active]:bg-[#29CCB1] data-[state=active]:text-white data-[state=inactive]:text-gray-600 rounded-md transition-all font-medium" data-testid="tab-overview">{t('admin.overview')}</TabsTrigger>
           <TabsTrigger value="invitations" className="data-[state=active]:bg-[#29CCB1] data-[state=active]:text-white data-[state=inactive]:text-gray-600 rounded-md transition-all font-medium" data-testid="tab-invitations">{t('admin.invitations')}</TabsTrigger>
           <TabsTrigger value="users" className="data-[state=active]:bg-[#29CCB1] data-[state=active]:text-white data-[state=inactive]:text-gray-600 rounded-md transition-all font-medium" data-testid="tab-users">{t('admin.users')}</TabsTrigger>
@@ -951,10 +951,12 @@ export default function Admin() {
             <Globe className="w-4 h-4 mr-2" />
             {t('admin.regions')}
           </TabsTrigger>
-          <TabsTrigger value="masters" className="data-[state=active]:bg-[#29CCB1] data-[state=active]:text-white data-[state=inactive]:text-gray-600 rounded-md transition-all font-medium" data-testid="tab-masters">
-            <Database className="w-4 h-4 mr-2" />
-            Maestros
-          </TabsTrigger>
+          {currentUser?.role === 'super-admin' && (
+            <TabsTrigger value="masters" className="data-[state=active]:bg-[#29CCB1] data-[state=active]:text-white data-[state=inactive]:text-gray-600 rounded-md transition-all font-medium" data-testid="tab-masters">
+              <Database className="w-4 h-4 mr-2" />
+              {t('admin.masters')}
+            </TabsTrigger>
+          )}
           <TabsTrigger value="settings" className="data-[state=active]:bg-[#29CCB1] data-[state=active]:text-white data-[state=inactive]:text-gray-600 rounded-md transition-all font-medium" data-testid="tab-settings">
             <Settings className="w-4 h-4 mr-2" />
             {t('admin.settings')}
@@ -1216,7 +1218,7 @@ export default function Admin() {
                     <CSVUploader
                       onGetUploadParameters={handleGetUsersCSVUploadParameters}
                       onComplete={handleUsersCSVUploadComplete}
-                      buttonclassName="bg-[#29CCB1] hover:bg-[#00A88E] text-white rounded-lg font-medium"
+                      buttonClassName="bg-[#29CCB1] hover:bg-[#00A88E] text-white rounded-lg font-medium"
                     >
                       <Upload className="w-4 h-4 mr-2" />
                       {t('admin.importUsersCSV')}
@@ -1243,7 +1245,7 @@ export default function Admin() {
                             name="firstName"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>First Name</FormLabel>
+                                <FormLabel>{t('auth.firstName')}</FormLabel>
                                 <FormControl>
                                   <Input placeholder="John" {...field} data-testid="input-first-name" />
                                 </FormControl>
@@ -1256,7 +1258,7 @@ export default function Admin() {
                             name="lastName"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Last Name</FormLabel>
+                                <FormLabel>{t('auth.lastName')}</FormLabel>
                                 <FormControl>
                                   <Input placeholder="Doe" {...field} data-testid="input-last-name" />
                                 </FormControl>
@@ -1271,7 +1273,7 @@ export default function Admin() {
                           name="username"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Username</FormLabel>
+                              <FormLabel>{t('common.username')}</FormLabel>
                               <FormControl>
                                 <Input placeholder="johndoe" {...field} data-testid="input-username" />
                               </FormControl>
@@ -1285,7 +1287,7 @@ export default function Admin() {
                           name="email"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Email</FormLabel>
+                              <FormLabel>{t('common.email')}</FormLabel>
                               <FormControl>
                                 <Input type="email" placeholder="john@example.com" {...field} data-testid="input-email" />
                               </FormControl>
@@ -1299,7 +1301,7 @@ export default function Admin() {
                           name="password"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Password</FormLabel>
+                              <FormLabel>{t('common.password')}</FormLabel>
                               <FormControl>
                                 <Input type="password" placeholder="••••••••" {...field} data-testid="input-password" />
                               </FormControl>
@@ -1313,7 +1315,7 @@ export default function Admin() {
                           name="country"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Country</FormLabel>
+                              <FormLabel>{t('common.country')}</FormLabel>
                               <FormControl>
                                 <Input placeholder="United States" {...field} data-testid="input-country" />
                               </FormControl>
@@ -1328,7 +1330,7 @@ export default function Admin() {
                             name="role"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Role</FormLabel>
+                                <FormLabel>{t('common.role')}</FormLabel>
                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                   <FormControl>
                                     <SelectTrigger data-testid="select-role">
@@ -1336,13 +1338,13 @@ export default function Admin() {
                                     </SelectTrigger>
                                   </FormControl>
                                   <SelectContent>
-                                    <SelectItem value="user">User</SelectItem>
-                                    <SelectItem value="admin">Admin</SelectItem>
+                                    <SelectItem value="user">{t('admin.roleUser')}</SelectItem>
+                                    <SelectItem value="admin">{t('admin.roleAdmin')}</SelectItem>
                                     {(currentUser?.role === "super-admin" || currentUser?.role === "regional-admin") && (
-                                      <SelectItem value="regional-admin">Regional Admin</SelectItem>
+                                      <SelectItem value="regional-admin">{t('admin.roleRegionalAdmin')}</SelectItem>
                                     )}
                                     {currentUser?.role === "super-admin" && (
-                                      <SelectItem value="super-admin">Super Admin</SelectItem>
+                                      <SelectItem value="super-admin">{t('admin.roleSuperAdmin')}</SelectItem>
                                     )}
                                   </SelectContent>
                                 </Select>
@@ -1439,7 +1441,7 @@ export default function Admin() {
                             name="firstName"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>First Name</FormLabel>
+                                <FormLabel>{t('auth.firstName')}</FormLabel>
                                 <FormControl>
                                   <Input placeholder="John" {...field} data-testid="input-edit-first-name" />
                                 </FormControl>
@@ -1452,7 +1454,7 @@ export default function Admin() {
                             name="lastName"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Last Name</FormLabel>
+                                <FormLabel>{t('auth.lastName')}</FormLabel>
                                 <FormControl>
                                   <Input placeholder="Doe" {...field} data-testid="input-edit-last-name" />
                                 </FormControl>
@@ -1467,7 +1469,7 @@ export default function Admin() {
                           name="username"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Username</FormLabel>
+                              <FormLabel>{t('common.username')}</FormLabel>
                               <FormControl>
                                 <Input placeholder="johndoe" {...field} data-testid="input-edit-username" />
                               </FormControl>
@@ -1481,7 +1483,7 @@ export default function Admin() {
                           name="email"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Email</FormLabel>
+                              <FormLabel>{t('common.email')}</FormLabel>
                               <FormControl>
                                 <Input type="email" placeholder="john@example.com" {...field} data-testid="input-edit-email" />
                               </FormControl>
@@ -1495,7 +1497,7 @@ export default function Admin() {
                           name="country"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Country</FormLabel>
+                              <FormLabel>{t('common.country')}</FormLabel>
                               <FormControl>
                                 <Input 
                                   placeholder="United States" 
@@ -1515,7 +1517,7 @@ export default function Admin() {
                             name="role"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Role</FormLabel>
+                                <FormLabel>{t('common.role')}</FormLabel>
                                 <Select onValueChange={field.onChange} value={field.value}>
                                   <FormControl>
                                     <SelectTrigger data-testid="select-edit-role">
@@ -1523,13 +1525,13 @@ export default function Admin() {
                                     </SelectTrigger>
                                   </FormControl>
                                   <SelectContent>
-                                    <SelectItem value="user">User</SelectItem>
-                                    <SelectItem value="admin">Admin</SelectItem>
+                                    <SelectItem value="user">{t('admin.roleUser')}</SelectItem>
+                                    <SelectItem value="admin">{t('admin.roleAdmin')}</SelectItem>
                                     {(currentUser?.role === "super-admin" || currentUser?.role === "regional-admin") && (
-                                      <SelectItem value="regional-admin">Regional Admin</SelectItem>
+                                      <SelectItem value="regional-admin">{t('admin.roleRegionalAdmin')}</SelectItem>
                                     )}
                                     {currentUser?.role === "super-admin" && (
-                                      <SelectItem value="super-admin">Super Admin</SelectItem>
+                                      <SelectItem value="super-admin">{t('admin.roleSuperAdmin')}</SelectItem>
                                     )}
                                   </SelectContent>
                                 </Select>
@@ -1646,25 +1648,25 @@ export default function Admin() {
                     <thead className="bg-[#F1F5F8]">
                       <tr>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          User
+                          {t('admin.user')}
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Username
+                          {t('common.username')}
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Role
+                          {t('common.role')}
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Country
+                          {t('common.country')}
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Status
+                          {t('common.status')}
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Joined
+                          {t('admin.joined')}
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Actions
+                          {t('common.actions')}
                         </th>
                       </tr>
                     </thead>
@@ -1707,9 +1709,9 @@ export default function Admin() {
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  <SelectItem value="user">User</SelectItem>
+                                  <SelectItem value="user">{t('admin.roleUser')}</SelectItem>
                                   {currentUser?.role !== "regional-admin" && (
-                                    <SelectItem value="admin">Admin</SelectItem>
+                                    <SelectItem value="admin">{t('admin.roleAdmin')}</SelectItem>
                                   )}
                                 </SelectContent>
                               </Select>
@@ -1720,7 +1722,7 @@ export default function Admin() {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <Badge className={user.isActive ? "text-white" : "bg-red-100 text-red-800"} style={{ backgroundColor: user.isActive ? '#29CCB1' : undefined }}>
-                              {user.isActive ? "Active" : "Inactive"}
+                              {user.isActive ? t('common.active') : t('common.inactive')}
                             </Badge>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -1897,7 +1899,7 @@ export default function Admin() {
                 <CSVUploader
                   onGetUploadParameters={handleGetCSVUploadParameters}
                   onComplete={handleCSVUploadComplete}
-                  buttonclassName="bg-[#29CCB1] hover:bg-[#00A88E] text-white rounded-lg font-medium"
+                  buttonClassName="bg-[#29CCB1] hover:bg-[#00A88E] text-white rounded-lg font-medium"
                 >
                   <Upload className="w-4 h-4 mr-2" />
                   Import Deals CSV

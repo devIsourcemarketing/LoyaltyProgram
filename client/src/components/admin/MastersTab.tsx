@@ -29,11 +29,11 @@ export default function MastersTab() {
             <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="categories-master" className="flex items-center gap-2">
                 <FolderTree className="h-4 w-4" />
-                Categorías Globales
+                {t('admin.categoriesGlobal')}
               </TabsTrigger>
               <TabsTrigger value="region-categories" className="flex items-center gap-2">
                 <Globe className="h-4 w-4" />
-                Por Región
+                {t('admin.byRegion')}
               </TabsTrigger>
               <TabsTrigger value="prize-templates" className="flex items-center gap-2">
                 <Trophy className="h-4 w-4" />

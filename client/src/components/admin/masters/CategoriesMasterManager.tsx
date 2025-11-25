@@ -52,14 +52,14 @@ export default function CategoriesMasterManager() {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/categories-master"] });
       toast({
         title: t("common.success"),
-        description: "Categoría creada exitosamente",
+        description: t("admin.categoryCreatedSuccess"),
       });
       resetForm();
     },
     onError: (error: any) => {
       toast({
         title: t("common.error"),
-        description: error.message || "Error al crear categoría",
+        description: error.message || t("admin.errorCreatingCategory"),
         variant: "destructive",
       });
     },
@@ -73,14 +73,14 @@ export default function CategoriesMasterManager() {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/categories-master"] });
       toast({
         title: t("common.success"),
-        description: "Categoría actualizada exitosamente",
+        description: t("admin.categoryUpdatedSuccess"),
       });
       resetForm();
     },
     onError: (error: any) => {
       toast({
         title: t("common.error"),
-        description: error.message || "Error al actualizar categoría",
+        description: error.message || t("admin.errorUpdatingCategory"),
         variant: "destructive",
       });
     },
@@ -94,13 +94,13 @@ export default function CategoriesMasterManager() {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/categories-master"] });
       toast({
         title: t("common.success"),
-        description: "Categoría eliminada exitosamente",
+        description: t("admin.categoryDeletedSuccess"),
       });
     },
     onError: (error: any) => {
       toast({
         title: t("common.error"),
-        description: error.message || "Error al eliminar categoría",
+        description: error.message || t("admin.errorDeletingCategory"),
         variant: "destructive",
       });
     },
@@ -114,7 +114,7 @@ export default function CategoriesMasterManager() {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/categories-master"] });
       toast({
         title: t("common.success"),
-        description: "Estado actualizado exitosamente",
+        description: t("admin.statusUpdatedSuccess"),
       });
     },
   });
@@ -182,18 +182,18 @@ export default function CategoriesMasterManager() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div className="flex-1">
-          <h3 className="text-lg font-semibold">Categorías Maestras</h3>
+          <h3 className="text-lg font-semibold">{t('admin.categoriesMaster')}</h3>
           <p className="text-sm text-gray-600">
-            Catálogo global de categorías disponibles en el sistema (ENTERPRISE, SMB, MSSP, Diamond, Gold, Silver, etc.)
+            {t('admin.categoriesMasterDescription')}
           </p>
         </div>
         <div className="flex gap-2 items-center">
           <Select value={filterType} onValueChange={setFilterType}>
             <SelectTrigger className="w-40">
-              <SelectValue placeholder="Tipo" />
+              <SelectValue placeholder={t('admin.typeLabel')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Todos los tipos</SelectItem>
+              <SelectItem value="all">{t('admin.allTypes')}</SelectItem>
               {uniqueTypes.map((type) => (
                 <SelectItem key={type} value={type!}>{type}</SelectItem>
               ))}
@@ -201,64 +201,64 @@ export default function CategoriesMasterManager() {
           </Select>
           <Select value={filterStatus} onValueChange={setFilterStatus}>
             <SelectTrigger className="w-40">
-              <SelectValue placeholder="Estado" />
+              <SelectValue placeholder={t('common.status')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Todos</SelectItem>
-              <SelectItem value="active">Activas</SelectItem>
-              <SelectItem value="inactive">Inactivas</SelectItem>
+              <SelectItem value="all">{t('admin.all')}</SelectItem>
+              <SelectItem value="active">{t('admin.actives')}</SelectItem>
+              <SelectItem value="inactive">{t('admin.inactives')}</SelectItem>
             </SelectContent>
           </Select>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button onClick={() => resetForm()}>
                 <Plus className="h-4 w-4 mr-2" />
-                Nueva Categoría
+                {t('admin.newCategory')}
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>
-                  {editingItem ? "Editar Categoría" : "Nueva Categoría Maestra"}
+                  {editingItem ? t('admin.editCategory') : t('admin.newMasterCategory')}
                 </DialogTitle>
                 <DialogDescription>
-                  Define una categoría global que estará disponible para asignar a las regiones del sistema.
+                  {t('admin.defineGlobalCategory')}
                 </DialogDescription>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <Label htmlFor="name">Nombre *</Label>
+                  <Label htmlFor="name">{t('admin.categoryName')}</Label>
                   <Input
                     id="name"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    placeholder="Ej: ENTERPRISE, Diamond, Gold"
+                    placeholder={t('admin.categoryNamePlaceholder')}
                     required
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    Nombre único de la categoría
+                    {t('admin.uniqueCategoryName')}
                   </p>
                 </div>
                 <div>
-                  <Label htmlFor="description">Descripción</Label>
+                  <Label htmlFor="description">{t('admin.descriptionLabel')}</Label>
                   <Textarea
                     id="description"
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    placeholder="Descripción de la categoría"
+                    placeholder={t('admin.categoryDescriptionPlaceholder')}
                     rows={3}
                   />
                 </div>
                 <div>
-                  <Label htmlFor="type">Tipo</Label>
+                  <Label htmlFor="type">{t('admin.typeLabel')}</Label>
                   <Input
                     id="type"
                     value={formData.type}
                     onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                    placeholder="Ej: business_type, tier, segment"
+                    placeholder={t('admin.typePlaceholder')}
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    Clasificación de la categoría
+                    {t('admin.categoryClassification')}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -269,14 +269,14 @@ export default function CategoriesMasterManager() {
                     onChange={(e) => setFormData({ ...formData, active: e.target.checked })}
                     className="h-4 w-4"
                   />
-                  <Label htmlFor="active">Categoría activa</Label>
+                  <Label htmlFor="active">{t('admin.activeCategory')}</Label>
                 </div>
                 <div className="flex justify-end gap-2 pt-4">
                   <Button type="button" variant="outline" onClick={resetForm}>
-                    Cancelar
+                    {t('admin.cancel')}
                   </Button>
                   <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending}>
-                    {(createMutation.isPending || updateMutation.isPending) ? "Guardando..." : "Guardar"}
+                    {(createMutation.isPending || updateMutation.isPending) ? t('admin.savingCategory') : t('admin.save')}
                   </Button>
                 </div>
               </form>
@@ -289,7 +289,7 @@ export default function CategoriesMasterManager() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-500">Total Categorías</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-500">{t('admin.totalCategories')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.total}</div>
@@ -297,7 +297,7 @@ export default function CategoriesMasterManager() {
         </Card>
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-green-600">Activas</CardTitle>
+            <CardTitle className="text-sm font-medium text-green-600">{t('admin.actives')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">{stats.active}</div>
@@ -305,7 +305,7 @@ export default function CategoriesMasterManager() {
         </Card>
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-400">Inactivas</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-400">{t('admin.inactives')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-gray-400">{stats.inactive}</div>
@@ -314,7 +314,7 @@ export default function CategoriesMasterManager() {
       </div>
 
       {isLoading ? (
-        <div className="text-center py-8">Cargando...</div>
+        <div className="text-center py-8">{t('admin.loading')}</div>
       ) : filteredCategories && filteredCategories.length > 0 ? (
         <div className="grid gap-4">
           {filteredCategories.map((item) => (
@@ -333,12 +333,12 @@ export default function CategoriesMasterManager() {
                           {item.active ? (
                             <Badge variant="default" className="bg-green-500">
                               <CheckCircle className="h-3 w-3 mr-1" />
-                              Activa
+                              {t('common.active')}
                             </Badge>
                           ) : (
                             <Badge variant="secondary">
                               <XCircle className="h-3 w-3 mr-1" />
-                              Inactiva
+                              {t('common.inactive')}
                             </Badge>
                           )}
                         </div>
@@ -354,7 +354,7 @@ export default function CategoriesMasterManager() {
                       variant={item.active ? "outline" : "default"}
                       onClick={() => handleToggleActive(item.id, item.active)}
                     >
-                      {item.active ? "Desactivar" : "Activar"}
+                      {item.active ? t('admin.deactivate') : t('admin.activate')}
                     </Button>
                     <Button
                       size="sm"
@@ -371,19 +371,18 @@ export default function CategoriesMasterManager() {
                       </AlertDialogTrigger>
                       <AlertDialogContent>
                         <AlertDialogHeader>
-                          <AlertDialogTitle>¿Eliminar categoría?</AlertDialogTitle>
+                          <AlertDialogTitle>{t('admin.deleteCategory')}</AlertDialogTitle>
                           <AlertDialogDescription>
-                            Esta acción no se puede deshacer. Se eliminará la categoría "{item.name}".
-                            Esto puede afectar las configuraciones de región que usan esta categoría.
+                            {t('admin.deleteCategoryWarning').replace('{name}', item.name)}
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
-                          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                          <AlertDialogCancel>{t('admin.cancel')}</AlertDialogCancel>
                           <AlertDialogAction
                             onClick={() => handleDelete(item.id)}
                             className="bg-red-600 hover:bg-red-700"
                           >
-                            Eliminar
+                            {t('admin.delete')}
                           </AlertDialogAction>
                         </AlertDialogFooter>
                       </AlertDialogContent>
@@ -398,7 +397,7 @@ export default function CategoriesMasterManager() {
         <Card>
           <CardContent className="py-8">
             <p className="text-center text-gray-500">
-              No hay categorías configuradas. Crea la primera categoría maestra (Ej: ENTERPRISE, SMB, MSSP, Diamond, Gold, Silver).
+              {t('admin.noCategoriesConfigured')}
             </p>
           </CardContent>
         </Card>

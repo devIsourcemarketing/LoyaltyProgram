@@ -136,12 +136,32 @@ export default function RegionsOverview() {
 
   const getRegionColor = (region: string) => {
     const colors = {
-      NOLA: "from-blue-500 to-blue-600",
-      SOLA: "from-green-500 to-green-600", 
-      BRASIL: "from-yellow-500 to-yellow-600",
-      MEXICO: "from-red-500 to-red-600",
+      NOLA: "from-[#4169E1] to-[#2E5FD6]",
+      SOLA: "from-[#00BFA5] to-[#00A88E]", 
+      BRASIL: "from-[#FF9800] to-[#F57C00]",
+      MEXICO: "from-[#E53935] to-[#C62828]",
     };
-    return colors[region as keyof typeof colors] || "from-gray-500 to-gray-600";
+    return colors[region as keyof typeof colors] || "from-[#7B1FA2] to-[#6A1B9A]";
+  };
+
+  const getRegionIconColor = (region: string) => {
+    const colors = {
+      NOLA: "text-[#4169E1]",
+      SOLA: "text-[#00BFA5]",
+      BRASIL: "text-[#FF9800]",
+      MEXICO: "text-[#E53935]",
+    };
+    return colors[region as keyof typeof colors] || "text-[#7B1FA2]";
+  };
+
+  const getRegionBgColor = (region: string) => {
+    const colors = {
+      NOLA: "bg-[#E3F2FD]",
+      SOLA: "bg-[#E0F2F1]",
+      BRASIL: "bg-[#FFF3E0]",
+      MEXICO: "bg-[#FFEBEE]",
+    };
+    return colors[region as keyof typeof colors] || "bg-[#F3E5F5]";
   };
 
   const getRegionFlag = (region: string) => {
@@ -291,25 +311,25 @@ export default function RegionsOverview() {
                 className="cursor-pointer transition-all hover:shadow-xl border-2 border-primary/20 hover:border-primary/40"
                 onClick={() => setSelectedRegion(selectedRegion === regionName ? null : regionName)}
               >
-                <CardHeader className={`bg-gradient-to-r ${getRegionColor(regionName)} text-white rounded-t-lg p-8`}>
+                <CardHeader className="bg-gray-50 rounded-t-lg p-8 border-b">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                      <div className="p-3 bg-white/20 rounded-xl">
+                      <div className={`p-3 rounded-xl ${getRegionBgColor(regionName)}`}>
                         {getRegionFlag(regionName)}
                       </div>
                       <div>
-                        <CardTitle className="text-3xl font-bold">{regionName}</CardTitle>
-                        <CardDescription className="text-white/80 text-lg mt-1">
+                        <CardTitle className={`text-3xl font-bold ${getRegionIconColor(regionName)}`}>{regionName}</CardTitle>
+                        <CardDescription className="text-gray-600 text-lg mt-1">
                           {t('admin.yourAssignedRegion')} - {configs.length} {t('admin.activeConfigurations')}
                         </CardDescription>
                       </div>
                     </div>
                     <div className="flex flex-col items-end gap-2">
-                      <Badge variant="secondary" className="bg-white/30 text-white text-lg px-4 py-2">
+                      <Badge variant="secondary" className={`${getRegionBgColor(regionName)} ${getRegionIconColor(regionName)} text-lg px-4 py-2 border`}>
                         <Trophy className="h-5 w-5 mr-2" />
                         {configs.length} {t('admin.configs')}
                       </Badge>
-                      <Badge variant="secondary" className="bg-green-500/80 text-white">
+                      <Badge variant="secondary" className="bg-green-500/20 text-green-700 border-green-200">
                         <Medal className="h-4 w-4 mr-1" />
                         {t('admin.regionalAdmin')}
                       </Badge>

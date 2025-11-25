@@ -228,7 +228,7 @@ export default function Dashboard() {
                   Win in the Kaspersky Cup
                 </h2>
                 <p className="text-lg text-gray-700 max-w-3xl mx-auto">
-                  Here, your sales turn into goals that earn you monthly prizes and reward your passion / recognize your effort.
+                  {t('admin.salesTurnIntoGoals')}
                 </p>
               </div>
 
@@ -262,7 +262,7 @@ export default function Dashboard() {
                       <Gift className="text-white h-6 w-6" />
                     </div>
                     <h3 className="text-xl font-bold" data-testid="text-grand-prize-title">
-                      Prizes
+                      {t('admin.prizes')}
                     </h3>
                   </div>
                   <div className="space-y-3">
@@ -273,7 +273,7 @@ export default function Dashboard() {
                       Win an official World Cup jersey
                     </h3>
                     <div className="bg-white/20 rounded-lg p-4 backdrop-blur-sm">
-                      <div className="text-4xl font-bold mb-2">Grand Prize:</div>
+                      <div className="text-4xl font-bold mb-2">{t('admin.grandPrize')}:</div>
                       <p className="text-sm opacity-90">
                         The top scorer by April 2026 will win an all-expenses-paid trip to the World Cup.
                       </p>
@@ -384,7 +384,7 @@ export default function Dashboard() {
         <div className="mb-12">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold text-blue-600 mb-2 text-green-600" data-testid="text-available-rewards-title">
-              Prize of the month
+              {t('admin.prizeOfTheMonth')}
             </h2>
           </div>
           
