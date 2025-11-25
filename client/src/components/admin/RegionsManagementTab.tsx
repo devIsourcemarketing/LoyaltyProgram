@@ -115,6 +115,16 @@ export default function RegionsManagementTab() {
     queryKey: ["/api/rewards"],
     select: (data: any[]) => data.filter(reward => reward.isActive),
   });
+
+  // Query para obtener las categorías disponibles por región
+  const { data: regionCategories } = useQuery<any[]>({
+    queryKey: ["/api/admin/region-categories"],
+  });
+
+  // Query para obtener las categorías maestras
+  const { data: categoriesMaster } = useQuery<any[]>({
+    queryKey: ["/api/admin/categories-master"],
+  });
   
   // Form state for creating new region - se inicializará con valores del sistema
   const [newRegion, setNewRegion] = useState({
@@ -145,8 +155,17 @@ export default function RegionsManagementTab() {
       const countries = Object.keys(REGION_HIERARCHY[newRegion.region]);
       setAvailableCountries(countries);
       
-      // Actualizar categorías disponibles según la región
-      setAvailableCategories(REGION_CATEGORIES[newRegion.region] || []);
+      // Obtener categorías disponibles para esta región desde la BD
+      const categoriesForRegion = regionCategories
+        ?.filter(rc => rc.region === newRegion.region)
+        .map(rc => rc.category) || [];
+      
+      // Si hay categorías en BD, usarlas; si no, usar las del enum como fallback
+      setAvailableCategories(
+        categoriesForRegion.length > 0 
+          ? categoriesForRegion 
+          : (REGION_CATEGORIES[newRegion.region] || [])
+      );
       
       // Para BRASIL y MEXICO que tienen ciudades directas (key vacía "")
       if (countries.length === 1 && countries[0] === "") {

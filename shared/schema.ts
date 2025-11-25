@@ -251,6 +251,55 @@ export const grandPrizeWinners = pgTable("grand_prize_winners", {
   notes: text("notes"),
 });
 
+// ========================================
+// Master Data Management Tables
+// ========================================
+
+export const regionCategories = pgTable("region_categories", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  region: text("region").notNull(), // NOLA, SOLA, BRASIL, MEXICO
+  category: text("category").notNull(), // Diamond, Gold, Silver, etc.
+  subcategory: text("subcategory"), // Premier, Standard, etc.
+  level: text("level"), // Nivel 1, 2, 3, etc.
+  createdAt: timestamp("created_at").notNull().default(sql`now()`),
+  updatedAt: timestamp("updated_at").notNull().default(sql`now()`),
+});
+
+// Tabla maestra de categorías globales
+export const categoriesMaster = pgTable("categories_master", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull().unique(), // ENTERPRISE, SMB, MSSP, Diamond, Gold, Silver, etc.
+  description: text("description"), // Descripción de la categoría
+  type: text("type"), // Tipo de categoría: "business_type", "tier", "segment", etc.
+  active: boolean("active").notNull().default(true),
+  createdAt: timestamp("created_at").notNull().default(sql`now()`),
+  updatedAt: timestamp("updated_at").notNull().default(sql`now()`),
+});
+
+export const prizeTemplates = pgTable("prize_templates", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(), // Nombre del premio
+  description: text("description").notNull(), // Descripción
+  imageUrl: text("image_url"), // URL de la imagen
+  prizeRule: text("prize_rule").notNull(), // Regla del premio (JSON o texto)
+  size: text("size"), // Talla: XS, S, M, L, XL, XXL, N/A
+  validFrom: timestamp("valid_from"), // Vigencia desde
+  validTo: timestamp("valid_to"), // Vigencia hasta
+  type: text("type").notNull(), // "recurring" o "grand"
+  createdAt: timestamp("created_at").notNull().default(sql`now()`),
+  updatedAt: timestamp("updated_at").notNull().default(sql`now()`),
+});
+
+export const productTypesTable = pgTable("product_types", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(), // Nombre del tipo de producto
+  description: text("description"), // Descripción
+  category: text("category"), // Categoría: Tecnología, Moda, Consumo, etc.
+  active: boolean("active").notNull().default(true), // Activo/Inactivo
+  createdAt: timestamp("created_at").notNull().default(sql`now()`),
+  updatedAt: timestamp("updated_at").notNull().default(sql`now()`),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   deals: many(deals),

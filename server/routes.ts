@@ -3382,6 +3382,278 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ========================================
+  // Master Data Management Routes
+  // ========================================
+
+  // Categories Master (Maestro Global de Categorías)
+  app.get("/api/admin/categories-master", async (req, res) => {
+    const userRole = req.session?.userRole;
+    
+    if (!isAdminRole(userRole)) {
+      return res.status(403).json({ message: "Admin access required" });
+    }
+
+    try {
+      const categories = await storage.getCategoriesMaster();
+      res.json(categories);
+    } catch (error) {
+      console.error("Get categories master error:", error);
+      res.status(500).json({ message: "Failed to get categories master" });
+    }
+  });
+
+  app.post("/api/admin/categories-master", async (req, res) => {
+    const userRole = req.session?.userRole;
+    
+    if (!isAdminRole(userRole)) {
+      return res.status(403).json({ message: "Admin access required" });
+    }
+
+    try {
+      const category = await storage.createCategoryMaster(req.body);
+      res.json(category);
+    } catch (error) {
+      console.error("Create category master error:", error);
+      res.status(500).json({ message: "Failed to create category master" });
+    }
+  });
+
+  app.patch("/api/admin/categories-master/:id", async (req, res) => {
+    const userRole = req.session?.userRole;
+    
+    if (!isAdminRole(userRole)) {
+      return res.status(403).json({ message: "Admin access required" });
+    }
+
+    try {
+      const { id } = req.params;
+      const category = await storage.updateCategoryMaster(id, req.body);
+      res.json(category);
+    } catch (error) {
+      console.error("Update category master error:", error);
+      res.status(500).json({ message: "Failed to update category master" });
+    }
+  });
+
+  app.delete("/api/admin/categories-master/:id", async (req, res) => {
+    const userRole = req.session?.userRole;
+    
+    if (!isAdminRole(userRole)) {
+      return res.status(403).json({ message: "Admin access required" });
+    }
+
+    try {
+      const { id } = req.params;
+      await storage.deleteCategoryMaster(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Delete category master error:", error);
+      res.status(500).json({ message: "Failed to delete category master" });
+    }
+  });
+
+  // Region Categories
+  app.get("/api/admin/region-categories", async (req, res) => {
+    const userRole = req.session?.userRole;
+    
+    if (!isAdminRole(userRole)) {
+      return res.status(403).json({ message: "Admin access required" });
+    }
+
+    try {
+      const categories = await storage.getRegionCategories();
+      res.json(categories);
+    } catch (error) {
+      console.error("Get region categories error:", error);
+      res.status(500).json({ message: "Failed to get region categories" });
+    }
+  });
+
+  app.post("/api/admin/region-categories", async (req, res) => {
+    const userRole = req.session?.userRole;
+    
+    if (!isAdminRole(userRole)) {
+      return res.status(403).json({ message: "Admin access required" });
+    }
+
+    try {
+      const category = await storage.createRegionCategory(req.body);
+      res.json(category);
+    } catch (error) {
+      console.error("Create region category error:", error);
+      res.status(500).json({ message: "Failed to create region category" });
+    }
+  });
+
+  app.patch("/api/admin/region-categories/:id", async (req, res) => {
+    const userRole = req.session?.userRole;
+    
+    if (!isAdminRole(userRole)) {
+      return res.status(403).json({ message: "Admin access required" });
+    }
+
+    try {
+      const { id } = req.params;
+      const category = await storage.updateRegionCategory(id, req.body);
+      res.json(category);
+    } catch (error) {
+      console.error("Update region category error:", error);
+      res.status(500).json({ message: "Failed to update region category" });
+    }
+  });
+
+  app.delete("/api/admin/region-categories/:id", async (req, res) => {
+    const userRole = req.session?.userRole;
+    
+    if (!isAdminRole(userRole)) {
+      return res.status(403).json({ message: "Admin access required" });
+    }
+
+    try {
+      const { id } = req.params;
+      await storage.deleteRegionCategory(id);
+      res.json({ message: "Region category deleted successfully" });
+    } catch (error) {
+      console.error("Delete region category error:", error);
+      res.status(500).json({ message: "Failed to delete region category" });
+    }
+  });
+
+  // Prize Templates
+  app.get("/api/admin/prize-templates", async (req, res) => {
+    const userRole = req.session?.userRole;
+    
+    if (!isAdminRole(userRole)) {
+      return res.status(403).json({ message: "Admin access required" });
+    }
+
+    try {
+      const templates = await storage.getPrizeTemplates();
+      res.json(templates);
+    } catch (error) {
+      console.error("Get prize templates error:", error);
+      res.status(500).json({ message: "Failed to get prize templates" });
+    }
+  });
+
+  app.post("/api/admin/prize-templates", async (req, res) => {
+    const userRole = req.session?.userRole;
+    
+    if (!isAdminRole(userRole)) {
+      return res.status(403).json({ message: "Admin access required" });
+    }
+
+    try {
+      const template = await storage.createPrizeTemplate(req.body);
+      res.json(template);
+    } catch (error) {
+      console.error("Create prize template error:", error);
+      res.status(500).json({ message: "Failed to create prize template" });
+    }
+  });
+
+  app.patch("/api/admin/prize-templates/:id", async (req, res) => {
+    const userRole = req.session?.userRole;
+    
+    if (!isAdminRole(userRole)) {
+      return res.status(403).json({ message: "Admin access required" });
+    }
+
+    try {
+      const { id } = req.params;
+      const template = await storage.updatePrizeTemplate(id, req.body);
+      res.json(template);
+    } catch (error) {
+      console.error("Update prize template error:", error);
+      res.status(500).json({ message: "Failed to update prize template" });
+    }
+  });
+
+  app.delete("/api/admin/prize-templates/:id", async (req, res) => {
+    const userRole = req.session?.userRole;
+    
+    if (!isAdminRole(userRole)) {
+      return res.status(403).json({ message: "Admin access required" });
+    }
+
+    try {
+      const { id } = req.params;
+      await storage.deletePrizeTemplate(id);
+      res.json({ message: "Prize template deleted successfully" });
+    } catch (error) {
+      console.error("Delete prize template error:", error);
+      res.status(500).json({ message: "Failed to delete prize template" });
+    }
+  });
+
+  // Product Types
+  app.get("/api/admin/product-types", async (req, res) => {
+    const userRole = req.session?.userRole;
+    
+    if (!isAdminRole(userRole)) {
+      return res.status(403).json({ message: "Admin access required" });
+    }
+
+    try {
+      const productTypes = await storage.getProductTypes();
+      res.json(productTypes);
+    } catch (error) {
+      console.error("Get product types error:", error);
+      res.status(500).json({ message: "Failed to get product types" });
+    }
+  });
+
+  app.post("/api/admin/product-types", async (req, res) => {
+    const userRole = req.session?.userRole;
+    
+    if (!isAdminRole(userRole)) {
+      return res.status(403).json({ message: "Admin access required" });
+    }
+
+    try {
+      const productType = await storage.createProductType(req.body);
+      res.json(productType);
+    } catch (error) {
+      console.error("Create product type error:", error);
+      res.status(500).json({ message: "Failed to create product type" });
+    }
+  });
+
+  app.patch("/api/admin/product-types/:id", async (req, res) => {
+    const userRole = req.session?.userRole;
+    
+    if (!isAdminRole(userRole)) {
+      return res.status(403).json({ message: "Admin access required" });
+    }
+
+    try {
+      const { id } = req.params;
+      const productType = await storage.updateProductType(id, req.body);
+      res.json(productType);
+    } catch (error) {
+      console.error("Update product type error:", error);
+      res.status(500).json({ message: "Failed to update product type" });
+    }
+  });
+
+  app.delete("/api/admin/product-types/:id", async (req, res) => {
+    const userRole = req.session?.userRole;
+    
+    if (!isAdminRole(userRole)) {
+      return res.status(403).json({ message: "Admin access required" });
+    }
+
+    try {
+      const { id } = req.params;
+      await storage.deleteProductType(id);
+      res.json({ message: "Product type deleted successfully" });
+    } catch (error) {
+      console.error("Delete product type error:", error);
+      res.status(500).json({ message: "Failed to delete product type" });
+    }
+  });
+
 
   const httpServer = createServer(app);
   return httpServer;

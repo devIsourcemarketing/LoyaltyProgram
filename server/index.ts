@@ -1,9 +1,16 @@
 import "dotenv/config";
+import { webcrypto } from "crypto";
 import express, { type Request, Response, NextFunction } from "express";
 import session from "express-session";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { initializeSocket } from "./socket";
+
+// Polyfill for crypto.getRandomValues - MUST be before Vite imports
+if (!globalThis.crypto) {
+  // @ts-ignore
+  globalThis.crypto = webcrypto;
+}
 
 
 const app = express();

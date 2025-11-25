@@ -31,7 +31,8 @@ import {
   Trash2,
   Edit,
   Settings,
-  Globe
+  Globe,
+  Database
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
@@ -46,6 +47,7 @@ import RegionsManagementTab from "@/components/admin/RegionsManagementTab";
 import ProgramConfigTab from "@/components/admin/ProgramConfigTab";
 import GrandPrizeTab from "@/components/admin/GrandPrizeTab";
 import MonthlyPrizesTab from "@/components/admin/MonthlyPrizesTab";
+import MastersTab from "@/components/admin/MastersTab";
 import type { User, Deal, Reward } from "@shared/schema";
 import type { AuthUser } from "@/lib/auth";
 import type { UploadResult } from '@uppy/core';
@@ -939,7 +941,7 @@ export default function Admin() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-7">
+        <TabsList className="grid w-full grid-cols-8">
           <TabsTrigger value="overview" data-testid="tab-overview">{t('admin.overview')}</TabsTrigger>
           <TabsTrigger value="invitations" data-testid="tab-invitations">{t('admin.invitations')}</TabsTrigger>
           <TabsTrigger value="users" data-testid="tab-users">{t('admin.users')}</TabsTrigger>
@@ -948,6 +950,10 @@ export default function Admin() {
           <TabsTrigger value="regions" data-testid="tab-regions">
             <Globe className="w-4 h-4 mr-2" />
             {t('admin.regions')}
+          </TabsTrigger>
+          <TabsTrigger value="masters" data-testid="tab-masters">
+            <Database className="w-4 h-4 mr-2" />
+            Maestros
           </TabsTrigger>
           <TabsTrigger value="settings" data-testid="tab-settings">
             <Settings className="w-4 h-4 mr-2" />
@@ -2423,6 +2429,11 @@ export default function Admin() {
         {/* Regions Tab */}
         <TabsContent value="regions" className="mt-6">
           <RegionsManagementTab />
+        </TabsContent>
+
+        {/* Masters Tab - Master Data Management */}
+        <TabsContent value="masters" className="mt-6">
+          <MastersTab />
         </TabsContent>
 
         {/* Settings Tab - with sub-tabs for Support, Points Config, and Program Configuration */}
