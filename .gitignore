@@ -9,6 +9,9 @@ yarn.lock
 .env
 .env.local
 .env.*.local
+.env.production
+.env.development
+deploy-images.ps1
 .idea
 .vscode
 *.log

@@ -2,6 +2,7 @@ import "dotenv/config";
 import { webcrypto } from "crypto";
 import express, { type Request, Response, NextFunction } from "express";
 import session from "express-session";
+import path from "path";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { initializeSocket } from "./socket";
@@ -16,6 +17,9 @@ if (!globalThis.crypto) {
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+// Servir imágenes estáticas para emails
+app.use('/email-assets', express.static(path.join(process.cwd(), 'client/src/assets')));
 
 // Session configuration
 app.use(
