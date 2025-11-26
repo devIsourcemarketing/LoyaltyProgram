@@ -17,6 +17,10 @@ import {
   goalsHistory,
   grandPrizeCriteria,
   grandPrizeWinners,
+  regionCategories,
+  prizeTemplates,
+  productTypesTable,
+  categoriesMaster,
   type Campaign,
   type Deal,
   type DealWithUser,
@@ -56,6 +60,7 @@ import {
 // ───────────────────────────────────────────────
 import { db } from "./db";
 import { and, asc, desc, eq, ne, count, sum, gte, gt, lte, isNotNull, isNull, sql } from "drizzle-orm";
+import { nanoid } from "nanoid";
 
 // ───────────────────────────────────────────────
 // Utilities
@@ -2422,6 +2427,162 @@ export class DatabaseStorage implements IStorage {
 
   async deleteMonthlyPrize(id: string): Promise<void> {
     await db.delete(monthlyRegionPrizes).where(eq(monthlyRegionPrizes.id, id));
+  }
+
+  // ========================================
+  // Master Data Management Methods
+  // ========================================
+
+  // Region Categories
+  async getRegionCategories(): Promise<any[]> {
+    const categories = await db
+      .select()
+      .from(regionCategories)
+      .orderBy(asc(regionCategories.region), asc(regionCategories.category));
+    return categories;
+  }
+
+  async createRegionCategory(data: any): Promise<any> {
+    const [category] = await db
+      .insert(regionCategories)
+      .values({
+        id: nanoid(),
+        ...data,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .returning();
+    return category;
+  }
+
+  async updateRegionCategory(id: string, updates: any): Promise<any> {
+    const [updated] = await db
+      .update(regionCategories)
+      .set({
+        ...updates,
+        updatedAt: new Date(),
+      })
+      .where(eq(regionCategories.id, id))
+      .returning();
+    return updated;
+  }
+
+  async deleteRegionCategory(id: string): Promise<void> {
+    await db.delete(regionCategories).where(eq(regionCategories.id, id));
+  }
+
+  // Categories Master (Maestro de Categorías Globales)
+  async getCategoriesMaster(): Promise<any[]> {
+    const categories = await db
+      .select()
+      .from(categoriesMaster)
+      .orderBy(asc(categoriesMaster.name));
+    return categories;
+  }
+
+  async createCategoryMaster(data: any): Promise<any> {
+    const [category] = await db
+      .insert(categoriesMaster)
+      .values({
+        id: nanoid(),
+        ...data,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .returning();
+    return category;
+  }
+
+  async updateCategoryMaster(id: string, updates: any): Promise<any> {
+    const [updated] = await db
+      .update(categoriesMaster)
+      .set({
+        ...updates,
+        updatedAt: new Date(),
+      })
+      .where(eq(categoriesMaster.id, id))
+      .returning();
+    return updated;
+  }
+
+  async deleteCategoryMaster(id: string): Promise<void> {
+    await db.delete(categoriesMaster).where(eq(categoriesMaster.id, id));
+  }
+
+  // Prize Templates
+  async getPrizeTemplates(): Promise<any[]> {
+    const templates = await db
+      .select()
+      .from(prizeTemplates)
+      .orderBy(asc(prizeTemplates.type), asc(prizeTemplates.name));
+    return templates;
+  }
+
+  async createPrizeTemplate(data: any): Promise<any> {
+    const [template] = await db
+      .insert(prizeTemplates)
+      .values({
+        id: nanoid(),
+        ...data,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .returning();
+    return template;
+  }
+
+  async updatePrizeTemplate(id: string, updates: any): Promise<any> {
+    const [updated] = await db
+      .update(prizeTemplates)
+      .set({
+        ...updates,
+        updatedAt: new Date(),
+      })
+      .where(eq(prizeTemplates.id, id))
+      .returning();
+    return updated;
+  }
+
+  async deletePrizeTemplate(id: string): Promise<void> {
+    await db.delete(prizeTemplates).where(eq(prizeTemplates.id, id));
+  }
+
+  // Product Types
+  async getProductTypes(): Promise<any[]> {
+    const productTypes = await db
+      .select()
+      .from(productTypesTable)
+      .orderBy(asc(productTypesTable.category), asc(productTypesTable.name));
+    return productTypes;
+  }
+
+  async createProductType(data: any): Promise<any> {
+    const [productType] = await db
+      .insert(productTypesTable)
+      .values({
+        id: nanoid(),
+        ...data,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .returning();
+    return productType;
+  }
+
+  async updateProductType(id: string, updates: any): Promise<any> {
+    const [updated] = await db
+      .update(productTypesTable)
+      .set({
+        ...updates,
+        updatedAt: new Date(),
+      })
+      .where(eq(productTypesTable.id, id))
+      .returning();
+    return updated;
+  }
+
+  async deleteProductType(id: string): Promise<void> {
+    await db.delete(productTypesTable).where(eq(productTypesTable.id, id));
   }
 }
 

@@ -15,7 +15,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Mail } from "lucide-react";
 import backgroundImage from "@assets/login.jpg";
-import logo from "@assets/logo-kaspersky-cup.png";
+import kasperskyLogo from "@/assets/kaspersky-logo.svg";
 
 const loginSchema = z.object({
   username: z.string().min(1, "Username is required"),
@@ -165,17 +165,17 @@ export default function Login() {
       
       <Card className="relative z-20 w-full max-w-md bg-white/95 backdrop-blur-sm background-form-login">
         <CardHeader className="text-center">
-          <div className="flex justify-center mb-2 logo-login">
-            <img src={logo} alt="LoyaltyPro" className="h-16 w-auto" />
+          <div className="flex justify-center mb-4">
+            <img src={kasperskyLogo} alt="Kaspersky Cup" className="h-20 w-auto" />
           </div>
-          <p className="text-black-600">
-            Welcome to the platform
-          </p>
-          <p className="text-green-600">
-            where your sales turn into goals
+          <h2 className="text-2xl font-bold text-[#1D1D1B] mb-2">
+            Bienvenido a la plataforma donde
+          </h2>
+          <p className="text-lg font-semibold text-[#29CCB1]">
+            tus ventas se transforman en goles
           </p>          
-          <p className="text-gray-600">
-            {isLogin ? "Sign in to your account" : "Create your account"}
+          <p className="text-gray-600 mt-2">
+            {isLogin ? "Inicia sesión en tu cuenta" : "Crea tu cuenta"}
           </p>
         </CardHeader>
         <CardContent>

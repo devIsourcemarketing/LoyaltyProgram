@@ -11,7 +11,7 @@ import { logout } from "@/lib/auth";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "@/hooks/useTranslation";
 import type { AuthUser } from "@/lib/auth";
-import logo from "@assets/logo.png";
+import kasperskyLogo from "@/assets/kaspersky-logo.svg";
 import { NotificationBell } from "@/components/NotificationBell";
 import { isAdminRole } from "@/lib/roles";
 
@@ -30,21 +30,21 @@ export default function Navigation({ user }: NavigationProps) {
   // Improved safety check - show loading state instead of null
   if (!user || !user.id) {
     return (
-      <header className="bg-white shadow-sm border-b border-gray-200 fixed top-0 left-0 right-0 z-[9999] w-full min-h-[64px]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-4">
+      <header className="bg-white shadow-md fixed top-0 left-0 right-0 z-[9999] w-full">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex justify-between items-center h-14">
+            <div className="flex items-center space-x-3">
               <div className="flex-shrink-0">
                 <img 
-                  src={logo} 
-                  alt="LoyaltyPro" 
-                  className="h-8 w-auto logo-toolbar" 
+                  src={kasperskyLogo} 
+                  alt="Kaspersky Cup" 
+                  className="h-10 w-auto" 
                 />
               </div>
-              <div className="animate-pulse bg-gray-200 h-4 w-32 rounded"></div>
+              <div className="animate-pulse bg-white/30 h-4 w-32 rounded"></div>
             </div>
-            <div className="flex items-center space-x-4">
-              <div className="animate-pulse bg-gray-200 h-8 w-24 rounded"></div>
+            <div className="flex items-center space-x-3">
+              <div className="animate-pulse bg-white/30 h-8 w-24 rounded"></div>
             </div>
           </div>
         </div>
@@ -92,26 +92,32 @@ export default function Navigation({ user }: NavigationProps) {
   const userInitials = `${user.firstName?.charAt(0) || 'U'}${user.lastName?.charAt(0) || 'U'}`.toUpperCase();
 
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200 fixed top-0 left-0 right-0 z-[9999] w-full min-h-[64px]" style={{ display: 'block', visibility: 'visible' }}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+    <header className="bg-white shadow-md fixed top-0 left-0 right-0 z-[9999] w-full" style={{ display: 'block', visibility: 'visible' }}>
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="flex justify-between items-center h-14">
           {/* Logo and Navigation */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-3">
             <div className="flex-shrink-0">
               <Link href="/">
                 <img 
-                  src={logo} 
-                  alt="LoyaltyPro" 
-                  className="h-8 w-auto cursor-pointer" 
+                  src={kasperskyLogo} 
+                  alt="Kaspersky Cup" 
+                  className="h-12 w-auto cursor-pointer" 
                   data-testid="logo"
                 />
               </Link>
             </div>
+            {isAdminRole(user.role) && (
+              <div className="bg-[#9DFFEF] px-4 py-1.5 rounded-md">
+                <span className="text-sm font-medium text-[#1D1D1B]">{t('admin.panel')}</span>
+              </div>
+            )}
             
-            {/* Desktop Navigation */}
-            <div className="hidden md:block">
-              <div className="ml-10 flex items-baseline space-x-4">
-                {navItems.map((item) => (
+            {/* Desktop Navigation - Only for non-admin users */}
+            {!isAdminRole(user.role) && (
+              <div className="hidden md:block">
+                <div className="ml-10 flex items-baseline space-x-4">
+                  {navItems.map((item) => (
                   <Link key={item.href} href={item.href}>
                     <button
                       className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
@@ -127,13 +133,14 @@ export default function Navigation({ user }: NavigationProps) {
                 ))}
               </div>
             </div>
+            )}
           </div>
 
           {/* Right side - Language, Notifications, User Menu */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-3">
             {/* Language Selector */}
             <Select value={currentLanguage} onValueChange={handleLanguageChange}>
-              <SelectTrigger className="w-auto border-gray-300" data-testid="select-language">
+              <SelectTrigger className="w-24 h-9 border border-gray-200 bg-gray-50 text-[#1D1D1B] hover:bg-gray-100" data-testid="select-language">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -149,18 +156,18 @@ export default function Navigation({ user }: NavigationProps) {
             {/* User Menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="flex items-center space-x-2" data-testid="button-user-menu">
+                <Button variant="ghost" className="flex items-center space-x-2 text-[#1D1D1B] hover:bg-gray-100 h-9 px-3" data-testid="button-user-menu">
                   <Avatar className="h-8 w-8">
                     <AvatarFallback className="bg-blue-100 text-blue-600 green-background white-text">
                       {userInitials}
                     </AvatarFallback>
                   </Avatar>
                   <div className="hidden md:block text-left">
-                    <div className="text-sm font-medium text-gray-900" data-testid="text-user-name">
-                      {user.firstName} {user.lastName}
+                    <div className="text-sm font-medium text-[#1D1D1B]" data-testid="text-user-name">
+                      {user.role === 'regional-admin' || user.role === 'admin' ? `${user.role === 'admin' ? 'Admin' : 'Sales'} ${user.lastName || user.firstName}` : `${user.firstName} ${user.lastName}`}
                     </div>
                   </div>
-                  <ChevronDown className="h-4 w-4" />
+                  <ChevronDown className="h-4 w-4 text-[#1D1D1B]" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
@@ -180,7 +187,7 @@ export default function Navigation({ user }: NavigationProps) {
             <Button
               variant="ghost"
               size="sm"
-              className="md:hidden"
+              className="md:hidden text-[#1D1D1B] hover:bg-gray-100"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               data-testid="button-mobile-menu"
             >
@@ -191,15 +198,15 @@ export default function Navigation({ user }: NavigationProps) {
 
         {/* Mobile Navigation */}
         {isMobileMenuOpen && (
-          <div className="md:hidden">
+          <div className="md:hidden bg-gray-50 border-t">
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
               {navItems.map((item) => (
                 <Link key={item.href} href={item.href}>
                   <button
                     className={`block px-3 py-2 rounded-md text-base font-medium w-full text-left ${
                       item.current
-                        ? "text-blue-600 bg-blue-50"
-                        : "text-gray-700 hover:text-blue-600 hover:bg-gray-50"
+                        ? "text-white bg-[#29CCB1]"
+                        : "text-[#1D1D1B] hover:text-white hover:bg-[#29CCB1]"
                     }`}
                     onClick={() => setIsMobileMenuOpen(false)}
                     data-testid={`mobile-nav-${item.label.toLowerCase().replace(" ", "-")}`}

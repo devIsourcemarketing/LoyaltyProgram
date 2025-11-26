@@ -115,6 +115,16 @@ export default function RegionsManagementTab() {
     queryKey: ["/api/rewards"],
     select: (data: any[]) => data.filter(reward => reward.isActive),
   });
+
+  // Query para obtener TODAS las categorías de región (necesitamos todas para la tabla)
+  const { data: allRegionCategories } = useQuery<any[]>({
+    queryKey: ["/api/admin/region-categories"],
+  });
+
+  // Query para obtener las categorías maestras globales
+  const { data: categoriesMaster } = useQuery<any[]>({
+    queryKey: ["/api/admin/categories-master"],
+  });
   
   // Form state for creating new region - se inicializará con valores del sistema
   const [newRegion, setNewRegion] = useState({
@@ -145,8 +155,40 @@ export default function RegionsManagementTab() {
       const countries = Object.keys(REGION_HIERARCHY[newRegion.region]);
       setAvailableCountries(countries);
       
-      // Actualizar categorías disponibles según la región
-      setAvailableCategories(REGION_CATEGORIES[newRegion.region] || []);
+      console.log("🔍 DEBUG - Región seleccionada:", newRegion.region);
+      console.log("📦 DEBUG - Todas las categorías de región desde BD:", allRegionCategories);
+      
+      // Obtener categorías ESPECÍFICAS de esta región desde la BD
+      const categoriesForThisRegion = allRegionCategories
+        ?.filter(rc => {
+          console.log(`  Evaluando: rc.region="${rc.region}" === "${newRegion.region}"?`, rc.region === newRegion.region);
+          return rc.region === newRegion.region;
+        })
+        .map(rc => rc.category) || [];
+      
+      console.log("✅ Categorías específicas para", newRegion.region, ":", categoriesForThisRegion);
+      
+      // Obtener categorías maestras GLOBALES activas (disponibles para TODAS las regiones)
+      const globalCategories = categoriesMaster
+        ?.filter(cm => cm.active && cm.name && cm.name.trim() !== '')
+        .map(cm => cm.name.trim()) || [];
+      
+      console.log("🌍 Categorías globales activas:", globalCategories);
+      
+      // Combinar: categorías específicas de esta región + categorías globales (eliminar duplicados)
+      const combinedCategories = Array.from(new Set([
+        ...categoriesForThisRegion,
+        ...globalCategories
+      ]));
+      
+      console.log("🎯 Categorías finales combinadas:", combinedCategories);
+      
+      // Si hay categorías (específicas o globales), usarlas; si no, usar las del enum como fallback
+      setAvailableCategories(
+        combinedCategories.length > 0 
+          ? combinedCategories 
+          : (REGION_CATEGORIES[newRegion.region] || [])
+      );
       
       // Para BRASIL y MEXICO que tienen ciudades directas (key vacía "")
       if (countries.length === 1 && countries[0] === "") {
@@ -161,7 +203,7 @@ export default function RegionsManagementTab() {
       setAvailableCities([]);
       setAvailableCategories([]);
     }
-  }, [newRegion.region]);
+  }, [newRegion.region, allRegionCategories, categoriesMaster]);
 
   // Actualizar ciudades cuando se selecciona un país (solo para NOLA con países)
   useEffect(() => {

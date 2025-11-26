@@ -31,7 +31,8 @@ import {
   Trash2,
   Edit,
   Settings,
-  Globe
+  Globe,
+  Database
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
@@ -46,6 +47,7 @@ import RegionsManagementTab from "@/components/admin/RegionsManagementTab";
 import ProgramConfigTab from "@/components/admin/ProgramConfigTab";
 import GrandPrizeTab from "@/components/admin/GrandPrizeTab";
 import MonthlyPrizesTab from "@/components/admin/MonthlyPrizesTab";
+import MastersTab from "@/components/admin/MastersTab";
 import type { User, Deal, Reward } from "@shared/schema";
 import type { AuthUser } from "@/lib/auth";
 import type { UploadResult } from '@uppy/core';
@@ -918,7 +920,7 @@ export default function Admin() {
               <X className="h-12 w-12 text-red-500 mx-auto mb-4" />
               <h2 className="text-xl font-bold text-gray-900 mb-2">Access Denied</h2>
               <p className="text-gray-600">
-                You don't have permission to access the admin panel.
+                {t('admin.noPermissionAdminPanel')}
               </p>
             </div>
           </CardContent>
@@ -928,8 +930,8 @@ export default function Admin() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="mb-8">
+    <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900 mb-2" data-testid="text-admin-title">
           {t('admin.panel')}
         </h1>
@@ -939,17 +941,23 @@ export default function Admin() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-7">
-          <TabsTrigger value="overview" data-testid="tab-overview">{t('admin.overview')}</TabsTrigger>
-          <TabsTrigger value="invitations" data-testid="tab-invitations">{t('admin.invitations')}</TabsTrigger>
-          <TabsTrigger value="users" data-testid="tab-users">{t('admin.users')}</TabsTrigger>
-          <TabsTrigger value="deals" data-testid="tab-deals">{t('admin.deals')}</TabsTrigger>
-          <TabsTrigger value="rewards" data-testid="tab-rewards">{t('admin.rewards')}</TabsTrigger>
-          <TabsTrigger value="regions" data-testid="tab-regions">
+        <TabsList className={`grid w-full ${currentUser?.role === 'super-admin' ? 'grid-cols-8' : 'grid-cols-7'} bg-white p-1 rounded-lg border border-gray-200 mb-6`}>
+          <TabsTrigger value="overview" className="data-[state=active]:bg-[#29CCB1] data-[state=active]:text-white data-[state=inactive]:text-gray-600 rounded-md transition-all font-medium" data-testid="tab-overview">{t('admin.overview')}</TabsTrigger>
+          <TabsTrigger value="invitations" className="data-[state=active]:bg-[#29CCB1] data-[state=active]:text-white data-[state=inactive]:text-gray-600 rounded-md transition-all font-medium" data-testid="tab-invitations">{t('admin.invitations')}</TabsTrigger>
+          <TabsTrigger value="users" className="data-[state=active]:bg-[#29CCB1] data-[state=active]:text-white data-[state=inactive]:text-gray-600 rounded-md transition-all font-medium" data-testid="tab-users">{t('admin.users')}</TabsTrigger>
+          <TabsTrigger value="deals" className="data-[state=active]:bg-[#29CCB1] data-[state=active]:text-white data-[state=inactive]:text-gray-600 rounded-md transition-all font-medium" data-testid="tab-deals">{t('admin.deals')}</TabsTrigger>
+          <TabsTrigger value="rewards" className="data-[state=active]:bg-[#29CCB1] data-[state=active]:text-white data-[state=inactive]:text-gray-600 rounded-md transition-all font-medium" data-testid="tab-rewards">{t('admin.rewards')}</TabsTrigger>
+          <TabsTrigger value="regions" className="data-[state=active]:bg-[#29CCB1] data-[state=active]:text-white data-[state=inactive]:text-gray-600 rounded-md transition-all font-medium" data-testid="tab-regions">
             <Globe className="w-4 h-4 mr-2" />
             {t('admin.regions')}
           </TabsTrigger>
-          <TabsTrigger value="settings" data-testid="tab-settings">
+          {currentUser?.role === 'super-admin' && (
+            <TabsTrigger value="masters" className="data-[state=active]:bg-[#29CCB1] data-[state=active]:text-white data-[state=inactive]:text-gray-600 rounded-md transition-all font-medium" data-testid="tab-masters">
+              <Database className="w-4 h-4 mr-2" />
+              {t('admin.masters')}
+            </TabsTrigger>
+          )}
+          <TabsTrigger value="settings" className="data-[state=active]:bg-[#29CCB1] data-[state=active]:text-white data-[state=inactive]:text-gray-600 rounded-md transition-all font-medium" data-testid="tab-settings">
             <Settings className="w-4 h-4 mr-2" />
             {t('admin.settings')}
           </TabsTrigger>
@@ -958,11 +966,11 @@ export default function Admin() {
         {/* Overview Tab */}
         <TabsContent value="overview" className="mt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <Card className="shadow-material">
+            <Card className="shadow-sm hover:shadow-md transition-shadow border border-gray-200 rounded-xl overflow-hidden">
               <CardContent className="p-6">
                 <div className="flex items-center">
-                  <div className="p-3 rounded-full bg-primary-50">
-                    <Users className="text-primary-600 h-6 w-6" />
+                  <div className="p-3 rounded-full" style={{ backgroundColor: '#9DFFEF' }}>
+                    <Users className="h-6 w-6" style={{ color: '#00A88E' }} />
                   </div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600">{t('admin.totalUsers')}</p>
@@ -978,11 +986,11 @@ export default function Admin() {
               </CardContent>
             </Card>
 
-            <Card className="shadow-material">
+            <Card className="shadow-sm hover:shadow-md transition-shadow border border-gray-200 rounded-xl overflow-hidden">
               <CardContent className="p-6">
                 <div className="flex items-center">
-                  <div className="p-3 rounded-full bg-secondary-50">
-                    <ClipboardCheck className="text-secondary-600 h-6 w-6" />
+                  <div className="p-3 rounded-full" style={{ backgroundColor: '#9DFFEF' }}>
+                    <ClipboardCheck className="h-6 w-6" style={{ color: '#00A88E' }} />
                   </div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600">{t('admin.totalDeals')}</p>
@@ -998,11 +1006,11 @@ export default function Admin() {
               </CardContent>
             </Card>
 
-            <Card className="shadow-material">
+            <Card className="shadow-sm hover:shadow-md transition-shadow border border-gray-200 rounded-xl overflow-hidden">
               <CardContent className="p-6">
                 <div className="flex items-center">
-                  <div className="p-3 rounded-full bg-green-50">
-                    <BarChart3 className="text-green-600 h-6 w-6" />
+                  <div className="p-3 rounded-full" style={{ backgroundColor: '#9DFFEF' }}>
+                    <BarChart3 className="h-6 w-6" style={{ color: '#00A88E' }} />
                   </div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600">{t('admin.totalRevenue')}</p>
@@ -1018,11 +1026,11 @@ export default function Admin() {
               </CardContent>
             </Card>
 
-            <Card className="shadow-material">
+            <Card className="shadow-sm hover:shadow-md transition-shadow border border-gray-200 rounded-xl overflow-hidden">
               <CardContent className="p-6">
                 <div className="flex items-center">
-                  <div className="p-3 rounded-full bg-accent-50">
-                    <Gift className="text-accent-600 h-6 w-6" />
+                  <div className="p-3 rounded-full" style={{ backgroundColor: '#E6F7FF' }}>
+                    <Gift className="h-6 w-6" style={{ color: '#33BBFF' }} />
                   </div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600">{t('admin.redeemedRewards')}</p>
@@ -1045,7 +1053,7 @@ export default function Admin() {
           </div>
 
           {/* Reports Section */}
-          <Card className="shadow-material">
+          <Card className="shadow-sm hover:shadow-md transition-shadow border border-gray-200 rounded-xl overflow-hidden">
             <CardHeader>
               <CardTitle>{t('admin.generateReports')}</CardTitle>
             </CardHeader>
@@ -1183,7 +1191,7 @@ export default function Admin() {
 
         {/* Users Tab - Consolidated with sub-tabs */}
         <TabsContent value="users" className="mt-6">
-          <Card className="shadow-material">
+          <Card className="shadow-sm hover:shadow-md transition-shadow border border-gray-200 rounded-xl overflow-hidden">
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Users className="w-5 h-5 mr-2" />
@@ -1210,14 +1218,14 @@ export default function Admin() {
                     <CSVUploader
                       onGetUploadParameters={handleGetUsersCSVUploadParameters}
                       onComplete={handleUsersCSVUploadComplete}
-                      buttonClassName="bg-green-600 hover:bg-green-700 text-white"
+                      buttonClassName="bg-[#29CCB1] hover:bg-[#00A88E] text-white rounded-lg font-medium"
                     >
                       <Upload className="w-4 h-4 mr-2" />
                       {t('admin.importUsersCSV')}
                     </CSVUploader>
                     <Dialog open={isCreateUserModalOpen} onOpenChange={setIsCreateUserModalOpen}>
                       <DialogTrigger asChild>
-                        <Button className="bg-blue-600 hover:bg-blue-700 text-white" data-testid="button-create-user">
+                        <Button className="bg-[#29CCB1] hover:bg-[#00A88E] text-white rounded-lg" data-testid="button-create-user">
                           <UserPlus className="w-4 h-4 mr-2" />
                           {t('admin.createUser')}
                         </Button>
@@ -1237,7 +1245,7 @@ export default function Admin() {
                             name="firstName"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>First Name</FormLabel>
+                                <FormLabel>{t('auth.firstName')}</FormLabel>
                                 <FormControl>
                                   <Input placeholder="John" {...field} data-testid="input-first-name" />
                                 </FormControl>
@@ -1250,7 +1258,7 @@ export default function Admin() {
                             name="lastName"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Last Name</FormLabel>
+                                <FormLabel>{t('auth.lastName')}</FormLabel>
                                 <FormControl>
                                   <Input placeholder="Doe" {...field} data-testid="input-last-name" />
                                 </FormControl>
@@ -1265,7 +1273,7 @@ export default function Admin() {
                           name="username"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Username</FormLabel>
+                              <FormLabel>{t('common.username')}</FormLabel>
                               <FormControl>
                                 <Input placeholder="johndoe" {...field} data-testid="input-username" />
                               </FormControl>
@@ -1279,7 +1287,7 @@ export default function Admin() {
                           name="email"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Email</FormLabel>
+                              <FormLabel>{t('common.email')}</FormLabel>
                               <FormControl>
                                 <Input type="email" placeholder="john@example.com" {...field} data-testid="input-email" />
                               </FormControl>
@@ -1293,7 +1301,7 @@ export default function Admin() {
                           name="password"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Password</FormLabel>
+                              <FormLabel>{t('common.password')}</FormLabel>
                               <FormControl>
                                 <Input type="password" placeholder="••••••••" {...field} data-testid="input-password" />
                               </FormControl>
@@ -1307,7 +1315,7 @@ export default function Admin() {
                           name="country"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Country</FormLabel>
+                              <FormLabel>{t('common.country')}</FormLabel>
                               <FormControl>
                                 <Input placeholder="United States" {...field} data-testid="input-country" />
                               </FormControl>
@@ -1322,7 +1330,7 @@ export default function Admin() {
                             name="role"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Role</FormLabel>
+                                <FormLabel>{t('common.role')}</FormLabel>
                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                   <FormControl>
                                     <SelectTrigger data-testid="select-role">
@@ -1330,13 +1338,13 @@ export default function Admin() {
                                     </SelectTrigger>
                                   </FormControl>
                                   <SelectContent>
-                                    <SelectItem value="user">User</SelectItem>
-                                    <SelectItem value="admin">Admin</SelectItem>
+                                    <SelectItem value="user">{t('admin.roleUser')}</SelectItem>
+                                    <SelectItem value="admin">{t('admin.roleAdmin')}</SelectItem>
                                     {(currentUser?.role === "super-admin" || currentUser?.role === "regional-admin") && (
-                                      <SelectItem value="regional-admin">Regional Admin</SelectItem>
+                                      <SelectItem value="regional-admin">{t('admin.roleRegionalAdmin')}</SelectItem>
                                     )}
                                     {currentUser?.role === "super-admin" && (
-                                      <SelectItem value="super-admin">Super Admin</SelectItem>
+                                      <SelectItem value="super-admin">{t('admin.roleSuperAdmin')}</SelectItem>
                                     )}
                                   </SelectContent>
                                 </Select>
@@ -1380,7 +1388,7 @@ export default function Admin() {
                           {currentUser?.role === "regional-admin" && createUserForm.watch("role") === "regional-admin" && (
                             <FormItem>
                               <FormLabel>{t("auth.assignedRegion")}</FormLabel>
-                              <div className="flex items-center gap-2 p-2 bg-blue-50 border border-blue-200 rounded-md">
+                              <div className="flex items-center gap-2 p-2 border rounded-md" style={{ backgroundColor: '#E6F7FF', borderColor: '#33BBFF' }}>
                                 <MapPin className="h-4 w-4 text-blue-600" />
                                 <div className="text-sm text-blue-900">
                                   <div className="font-medium">{currentUser.regionInfo?.region}</div>
@@ -1433,7 +1441,7 @@ export default function Admin() {
                             name="firstName"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>First Name</FormLabel>
+                                <FormLabel>{t('auth.firstName')}</FormLabel>
                                 <FormControl>
                                   <Input placeholder="John" {...field} data-testid="input-edit-first-name" />
                                 </FormControl>
@@ -1446,7 +1454,7 @@ export default function Admin() {
                             name="lastName"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Last Name</FormLabel>
+                                <FormLabel>{t('auth.lastName')}</FormLabel>
                                 <FormControl>
                                   <Input placeholder="Doe" {...field} data-testid="input-edit-last-name" />
                                 </FormControl>
@@ -1461,7 +1469,7 @@ export default function Admin() {
                           name="username"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Username</FormLabel>
+                              <FormLabel>{t('common.username')}</FormLabel>
                               <FormControl>
                                 <Input placeholder="johndoe" {...field} data-testid="input-edit-username" />
                               </FormControl>
@@ -1475,7 +1483,7 @@ export default function Admin() {
                           name="email"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Email</FormLabel>
+                              <FormLabel>{t('common.email')}</FormLabel>
                               <FormControl>
                                 <Input type="email" placeholder="john@example.com" {...field} data-testid="input-edit-email" />
                               </FormControl>
@@ -1489,7 +1497,7 @@ export default function Admin() {
                           name="country"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Country</FormLabel>
+                              <FormLabel>{t('common.country')}</FormLabel>
                               <FormControl>
                                 <Input 
                                   placeholder="United States" 
@@ -1509,7 +1517,7 @@ export default function Admin() {
                             name="role"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Role</FormLabel>
+                                <FormLabel>{t('common.role')}</FormLabel>
                                 <Select onValueChange={field.onChange} value={field.value}>
                                   <FormControl>
                                     <SelectTrigger data-testid="select-edit-role">
@@ -1517,13 +1525,13 @@ export default function Admin() {
                                     </SelectTrigger>
                                   </FormControl>
                                   <SelectContent>
-                                    <SelectItem value="user">User</SelectItem>
-                                    <SelectItem value="admin">Admin</SelectItem>
+                                    <SelectItem value="user">{t('admin.roleUser')}</SelectItem>
+                                    <SelectItem value="admin">{t('admin.roleAdmin')}</SelectItem>
                                     {(currentUser?.role === "super-admin" || currentUser?.role === "regional-admin") && (
-                                      <SelectItem value="regional-admin">Regional Admin</SelectItem>
+                                      <SelectItem value="regional-admin">{t('admin.roleRegionalAdmin')}</SelectItem>
                                     )}
                                     {currentUser?.role === "super-admin" && (
-                                      <SelectItem value="super-admin">Super Admin</SelectItem>
+                                      <SelectItem value="super-admin">{t('admin.roleSuperAdmin')}</SelectItem>
                                     )}
                                   </SelectContent>
                                 </Select>
@@ -1589,7 +1597,7 @@ export default function Admin() {
                         {currentUser?.role === "regional-admin" && selectedUser?.role === "regional-admin" && selectedUser?.adminRegionId && (
                           <FormItem>
                             <FormLabel>{t("auth.assignedRegion")}</FormLabel>
-                            <div className="flex items-center gap-2 p-2 bg-gray-50 border border-gray-200 rounded-md">
+                            <div className="flex items-center gap-2 p-2 border rounded-md" style={{ backgroundColor: '#F1F5F8', borderColor: '#D1D5DB' }}>
                               <MapPin className="h-4 w-4 text-gray-600" />
                               <div className="text-sm text-gray-700">
                                 <div className="font-medium">{t("auth.assignedRegionNotModifiable")}</div>
@@ -1637,28 +1645,28 @@ export default function Admin() {
               ) : users && users.length > 0 ? (
                 <div className="overflow-x-auto">
                   <table className="w-full">
-                    <thead className="bg-gray-50">
+                    <thead className="bg-[#F1F5F8]">
                       <tr>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          User
+                          {t('admin.user')}
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Username
+                          {t('common.username')}
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Role
+                          {t('common.role')}
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Country
+                          {t('common.country')}
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Status
+                          {t('common.status')}
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Joined
+                          {t('admin.joined')}
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Actions
+                          {t('common.actions')}
                         </th>
                       </tr>
                     </thead>
@@ -1701,9 +1709,9 @@ export default function Admin() {
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  <SelectItem value="user">User</SelectItem>
+                                  <SelectItem value="user">{t('admin.roleUser')}</SelectItem>
                                   {currentUser?.role !== "regional-admin" && (
-                                    <SelectItem value="admin">Admin</SelectItem>
+                                    <SelectItem value="admin">{t('admin.roleAdmin')}</SelectItem>
                                   )}
                                 </SelectContent>
                               </Select>
@@ -1713,8 +1721,8 @@ export default function Admin() {
                             {user.country}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <Badge className={user.isActive ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}>
-                              {user.isActive ? "Active" : "Inactive"}
+                            <Badge className={user.isActive ? "text-white" : "bg-red-100 text-red-800"} style={{ backgroundColor: user.isActive ? '#29CCB1' : undefined }}>
+                              {user.isActive ? t('common.active') : t('common.inactive')}
                             </Badge>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -1804,7 +1812,7 @@ export default function Admin() {
                   ) : pendingUsers && pendingUsers.length > 0 ? (
                     <div className="overflow-x-auto">
                       <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
+                        <thead className="bg-[#F1F5F8]">
                           <tr>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                               User
@@ -1835,7 +1843,7 @@ export default function Admin() {
                                 </div>
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap">
-                                <Badge className={user.role === "admin" ? "bg-purple-100 text-purple-800" : "bg-blue-100 text-blue-800"}>
+                                <Badge className={user.role === "admin" ? "text-white" : "text-white"} style={{ backgroundColor: user.role === "admin" ? "#7633FF" : "#33BBFF" }}>
                                   {user.role}
                                 </Badge>
                               </td>
@@ -1850,7 +1858,7 @@ export default function Admin() {
                                   <Button
                                     onClick={() => handleApproveUser(user.id)}
                                     disabled={approveUserMutation.isPending || rejectUserMutation.isPending}
-                                    className="bg-green-600 hover:bg-green-700 text-white"
+                                    className="bg-[#29CCB1] hover:bg-[#00A88E] text-white rounded-lg font-medium"
                                     data-testid={`button-approve-${user.id}`}
                                   >
                                     {approveUserMutation.isPending ? "Approving..." : "Approve"}
@@ -1884,14 +1892,14 @@ export default function Admin() {
 
         {/* Deals Tab */}
         <TabsContent value="deals" className="mt-6">
-          <Card className="shadow-material">
+          <Card className="shadow-sm hover:shadow-md transition-shadow border border-gray-200 rounded-xl overflow-hidden">
             <CardHeader>
               <div className="flex justify-between items-center">
                 <CardTitle>Deal Management</CardTitle>
                 <CSVUploader
                   onGetUploadParameters={handleGetCSVUploadParameters}
                   onComplete={handleCSVUploadComplete}
-                  buttonClassName="bg-blue-600 hover:bg-blue-700 text-white"
+                  buttonClassName="bg-[#29CCB1] hover:bg-[#00A88E] text-white rounded-lg font-medium"
                 >
                   <Upload className="w-4 h-4 mr-2" />
                   Import Deals CSV
@@ -1911,7 +1919,7 @@ export default function Admin() {
               ) : dealsData?.deals && dealsData.deals.length > 0 ? (
                 <div className="overflow-x-auto">
                   <table className="w-full">
-                    <thead className="bg-gray-50">
+                    <thead className="bg-[#F1F5F8]">
                       <tr>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           User
@@ -2001,7 +2009,7 @@ export default function Admin() {
                                 size="sm"
                                 variant="outline"
                                 onClick={() => handleEditDeal(deal)}
-                                className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                                className="hover:bg-[#E6F7FF]" style={{ color: '#33BBFF' }}
                                 data-testid={`button-edit-deal-${deal.id}`}
                               >
                                 <Edit className="w-4 h-4" />
@@ -2056,7 +2064,7 @@ export default function Admin() {
 
         {/* Rewards Tab - Consolidated with sub-tabs */}
         <TabsContent value="rewards" className="mt-6">
-          <Card className="shadow-material">
+          <Card className="shadow-sm hover:shadow-md transition-shadow border border-gray-200 rounded-xl overflow-hidden">
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Gift className="w-5 h-5 mr-2" />
@@ -2129,7 +2137,7 @@ export default function Admin() {
                             )}
                             
                             <div className="flex justify-between items-center">
-                              <Badge className={reward.isActive ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}>
+                              <Badge className={reward.isActive ? "text-white" : "bg-red-100 text-red-800"} style={{ backgroundColor: reward.isActive ? '#29CCB1' : undefined }}>
                                 {reward.isActive ? t('rewards.active') : t('rewards.inactive')}
                               </Badge>
                               <div className="flex space-x-2">
@@ -2197,7 +2205,7 @@ export default function Admin() {
                   ) : pendingRedemptions && pendingRedemptions.length > 0 ? (
                     <div className="overflow-x-auto">
                       <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
+                        <thead className="bg-[#F1F5F8]">
                           <tr>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                               {t('admin.user')}
@@ -2245,7 +2253,7 @@ export default function Admin() {
                                   <Button
                                     onClick={() => handleApproveRedemption(redemption.id)}
                                     disabled={approveRedemptionMutation.isPending}
-                                    className="bg-green-600 hover:bg-green-700 text-white"
+                                    className="bg-[#29CCB1] hover:bg-[#00A88E] text-white rounded-lg font-medium"
                                     size="sm"
                                     data-testid={`button-approve-redemption-${redemption.id}`}
                                   >
@@ -2290,7 +2298,7 @@ export default function Admin() {
                   ) : allRedemptions && allRedemptions.length > 0 ? (
                     <div className="overflow-x-auto">
                       <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
+                        <thead className="bg-[#F1F5F8]">
                           <tr>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                               {t('admin.user')}
@@ -2378,7 +2386,7 @@ export default function Admin() {
                                           shipmentStatus: 'shipped' 
                                         })}
                                         disabled={updateShipmentStatusMutation.isPending}
-                                        className="bg-blue-600 hover:bg-blue-700"
+                                        className="bg-[#33BBFF] hover:bg-[#3355FF] text-white rounded-lg font-medium"
                                         data-testid={`button-ship-${redemption.id}`}
                                       >
                                         {updateShipmentStatusMutation.isPending ? t('admin.updating') : t('admin.markShipped')}
@@ -2392,7 +2400,7 @@ export default function Admin() {
                                           shipmentStatus: 'delivered' 
                                         })}
                                         disabled={updateShipmentStatusMutation.isPending}
-                                        className="bg-green-600 hover:bg-green-700"
+                                        className="bg-[#29CCB1] hover:bg-[#00A88E]"
                                         data-testid={`button-deliver-${redemption.id}`}
                                       >
                                         {updateShipmentStatusMutation.isPending ? t('admin.updating') : t('admin.markDelivered')}
@@ -2425,9 +2433,14 @@ export default function Admin() {
           <RegionsManagementTab />
         </TabsContent>
 
+        {/* Masters Tab - Master Data Management */}
+        <TabsContent value="masters" className="mt-6">
+          <MastersTab />
+        </TabsContent>
+
         {/* Settings Tab - with sub-tabs for Support, Points Config, and Program Configuration */}
         <TabsContent value="settings" className="mt-6">
-          <Card className="shadow-material">
+          <Card className="shadow-sm hover:shadow-md transition-shadow border border-gray-200 rounded-xl overflow-hidden">
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Settings className="w-5 h-5 mr-2" />
@@ -2504,3 +2517,9 @@ export default function Admin() {
     </div>
   );
 }
+
+
+
+
+
+

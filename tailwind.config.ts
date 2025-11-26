@@ -61,6 +61,16 @@ export default {
           border: "var(--sidebar-border)",
           ring: "var(--sidebar-ring)",
         },
+        kl: {
+          green: "var(--kl-green)",
+          "green-dark": "var(--kl-green-dark)",
+          "green-light": "var(--kl-green-light)",
+          black: "var(--kl-black)",
+          white: "var(--kl-white)",
+          cyan: "var(--kl-cyan)",
+          blue: "var(--kl-blue)",
+          purple: "var(--kl-purple)",
+        },
       },
       keyframes: {
         "accordion-down": {
