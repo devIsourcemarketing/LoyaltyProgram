@@ -122,8 +122,8 @@ export default function Navigation({ user }: NavigationProps) {
                     <button
                       className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                         item.current
-                          ? "text-white bg-[#29CCB1]"
-                          : "text-[#1D1D1B] hover:text-white hover:bg-[#29CCB1]"
+                          ? "text-blue-600 bg-blue-50 text-green-600 green-background-opacity15"
+                          : "text-gray-700 hover:text-green-600"
                       }`}
                       data-testid={`nav-${item.label.toLowerCase().replace(" ", "-")}`}
                     >
@@ -158,7 +158,7 @@ export default function Navigation({ user }: NavigationProps) {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="flex items-center space-x-2 text-[#1D1D1B] hover:bg-gray-100 h-9 px-3" data-testid="button-user-menu">
                   <Avatar className="h-8 w-8">
-                    <AvatarFallback className="bg-[#29CCB1] font-semibold text-white">
+                    <AvatarFallback className="bg-blue-100 text-blue-600 green-background white-text">
                       {userInitials}
                     </AvatarFallback>
                   </Avatar>

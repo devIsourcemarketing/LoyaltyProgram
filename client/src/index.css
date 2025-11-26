@@ -38,15 +38,15 @@
   --popover: hsl(0, 0%, 100%);
   --popover-foreground: hsl(0, 0%, 11%);
   --card: hsl(0, 0%, 100%);
-  --card-foreground: hsl(0, 0%, 11%);
-  --border: hsl(0, 0%, 89%);
-  --input: hsl(0, 0%, 89%);
-  --primary: hsl(171, 63%, 48%);
-  --primary-foreground: hsl(0, 0%, 100%);
-  --secondary: hsl(0, 0%, 11%);
-  --secondary-foreground: hsl(0, 0%, 100%);
-  --accent: hsl(195, 100%, 60%);
-  --accent-foreground: hsl(0, 0%, 100%);
+  --card-foreground: hsl(20, 14.3%, 4.1%);
+  --border: hsl(20, 5.9%, 90%);
+  --input: hsl(20, 5.9%, 90%);
+  --primary: hsl(170, 80%, 80%);
+  --primary-foreground: hsl(211, 100%, 99%);
+  --secondary: hsl(134, 34%, 37%);
+  --secondary-foreground: hsl(60, 9.1%, 97.8%);
+  --accent: #29CCB1;
+  --accent-foreground: hsl(60, 9.1%, 97.8%);
   --destructive: hsl(0, 84.2%, 60.2%);
   --destructive-foreground: hsl(0, 0%, 100%);
   --ring: hsl(171, 63%, 48%);
@@ -62,10 +62,9 @@
   --kl-black: #1D1D1B;
   --kl-white: #FFFFFF;
   
-  /* Accent Colors */
-  --kl-cyan: #33BBFF;
-  --kl-blue: #3355FF;
-  --kl-purple: #7633FF;
+  --accent-50: hsl(14, 100%, 96%);
+  --accent-500: #29CCB1;
+  --accent-600: #29CCB1;
 }
 
 .dark {
@@ -185,4 +184,12 @@
     margin: 0 auto 15px auto;
     display: block;
     width: fit-content;
+}
+/*--toolbar--*/
+.logo-toolbar {
+  height: 60px;
+  margin-top: -12px;
+}
+button#radix-\:r7\::hover {
+  background: #29CCB1;
 }
