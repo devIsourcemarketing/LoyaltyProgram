@@ -152,8 +152,11 @@ export default function Dashboard() {
               {/* Left side - Welcome Message */}
               <div className="flex-1 flex flex-col justify-center">
                 <h1 className="text-4xl lg:text-5xl font-bold mb-2 text-white leading-tight" data-testid="text-welcome">
-                  Welcome back<br />{user.firstName} {user.lastName}!
+                  {t('dashboard.welcome')}<br />{user.firstName} {user.lastName}!
                 </h1>
+                <p className="sub-text-welcome font-normal text-[#ffffff]">
+                  {t('dashboard.subtitleWelcome')}            
+                </p> 
               </div>
               
               {/* Right side - Stats Cards */}
@@ -224,12 +227,12 @@ export default function Dashboard() {
             <CardContent className="p-8">
               {/* Welcome Text */}
               <div className="text-center mb-8">
-                <h2 className="text-3xl font-bold text-blue-900 mb-3 text-green-600" data-testid="text-contest-title">
-                  Win in the Kaspersky Cup
-                </h2>
                 <p className="text-lg text-gray-700 max-w-3xl mx-auto">
                   {t('admin.salesTurnIntoGoals')}
                 </p>
+                <h2 className="text-3xl font-bold text-blue-900 mb-3 text-green-600" data-testid="text-contest-title">
+                  {t('dashboard.goodLuck')}
+                </h2>
               </div>
 
               <div className="grid md:grid-cols-2 gap-6">
@@ -240,17 +243,17 @@ export default function Dashboard() {
                       <Coins className="text-white h-6 w-6" />
                     </div>
                     <h3 className="text-xl font-bold text-gray-900" data-testid="text-points-calculation-title">
-                      Goal Accumulation
+                      {t('dashboard.goalAccumulation')}
                     </h3>
                   </div>
                   <div className="space-y-3">
                     <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg gray-background">
-                      <span className="font-normal text-gray-800">For every US$1,000 in new customer orders</span>
-                      <span className="text-blue-600 font-bold text-green-600">= 1 Goal</span>
+                      <span className="font-normal text-gray-800">{t('dashboard.goalFormula1')}</span>
+                      <span className="text-blue-600 font-bold text-green-600">= {t('dashboard.oneGoal')}</span>
                     </div>
                     <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg gray-background">
-                      <span className="font-normal text-gray-800">For every US$2,000 in renewal orders</span>
-                      <span className="text-purple-600 font-bold text-green-600">= 1 Goal</span>
+                      <span className="font-normal text-gray-800">{t('dashboard.goalFormula2')}</span>
+                      <span className="text-purple-600 font-bold text-green-600">= {t('dashboard.oneGoal')}</span>
                     </div>                    
                   </div>
                 </div>
@@ -267,15 +270,15 @@ export default function Dashboard() {
                   </div>
                   <div className="space-y-3">
                     <p className="text-sm opacity-90 leading-relaxed">
-                      Accumulate 10 Goals in November
+                      {t('dashboard.monthlyPrizeCondition')}
                     </p>
                     <h3 className="text-xl font-bold" data-testid="text-grand-prize-subtitle">
-                      Win an official World Cup jersey
+                      {t('dashboard.monthlyPrizeReward')}
                     </h3>
                     <div className="bg-white/20 rounded-lg p-4 backdrop-blur-sm">
                       <div className="text-4xl font-bold mb-2">{t('admin.grandPrize')}:</div>
                       <p className="text-sm opacity-90">
-                        The top scorer by April 2026 will win an all-expenses-paid trip to the World Cup.
+                        {t('dashboard.topScorerReward')}
                       </p>
                     </div>                    
                   </div>
@@ -299,8 +302,7 @@ export default function Dashboard() {
                   <div>
                     <h2 className="text-2xl font-bold text-gray-900" data-testid="text-leaderboard-title">
                       {t('dashboard.topPerformers')}
-                    </h2>
-                    <p className="text-sm text-gray-600">{t('dashboard.usersWithMostPoints')}</p>
+                    </h2>                    
                   </div>
                 </div>
               </div>              {leaderboardLoading ? (
@@ -498,15 +500,8 @@ export default function Dashboard() {
           <div className="bg-blue-900 rounded-2xl shadow-xl overflow-hidden background-dark">
             <div className="px-6 py-5">
               <div className="flex justify-between items-center">
-                <h3 className="text-xl font-semibold text-white">{t('dashboard.recentDeals')}</h3>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="text-white hover:bg-blue-800 hover:text-white" 
-                  data-testid="button-view-all-deals"
-                >
-                  {t('common.viewAll') || 'View All'}
-                </Button>
+                <h3 className="text-xl font-semibold text-white">{t('dashboard.plays')}</h3>
+                <p className="white-text">{t('dashboard.accumulated')} <strong><span className="text-green-600">{statsLoading ? "..." : stats?.availablePoints?.toLocaleString() || "0"} {t('deals.points').toLowerCase()}</span></strong></p>
               </div>
             </div>
             <div className="overflow-x-auto">
@@ -527,16 +522,16 @@ export default function Dashboard() {
                   <thead className="bg-blue-950 green-background-opacity15">
                     <tr>
                       <th className="px-6 py-4 text-left text-sm font-semibold text-white uppercase tracking-wider">
-                        PRODUCT
+                        {t('dashboard.product').toUpperCase()}
                       </th>
                       <th className="px-6 py-4 text-left text-sm font-semibold text-white uppercase tracking-wider">
-                        VALUE
+                        {t('dashboard.value').toUpperCase()}
                       </th>
                       <th className="px-6 py-4 text-left text-sm font-semibold text-white uppercase tracking-wider">
-                        POINTS
+                        {t('deals.points').toUpperCase()}
                       </th>
                       <th className="px-6 py-4 text-left text-sm font-semibold text-white uppercase tracking-wider">
-                        STATUS
+                        {t('deals.status').toUpperCase()}
                       </th>
                     </tr>
                   </thead>

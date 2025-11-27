@@ -190,16 +190,14 @@ export default function Rewards() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
           <div className="text-left space-y-4 max-w-lg">
             <h1 className="text-4xl lg:text-5xl font-bold leading-tight text-white" data-testid="text-page-title">
-              Make every play <br />
-              <strong>end in a goal</strong>
+              {t('rewards.textHeroRewards')}
             </h1>
-            <div className="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2 inline-block gradient-green">
-              <span className="text-sm text-white font-medium">
-                Goals: {stats?.availablePoints?.toLocaleString() || 0}
-              </span>
-            </div>
+            <p className="white-text">
+              {t('rewards.subTextHeroRewards')}
+            </p>
+            
           </div>
-        </div>
+        </div>        
       </div>
       
       {/* Content Area */}
