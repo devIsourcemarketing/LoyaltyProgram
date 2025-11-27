@@ -16,6 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Mail } from "lucide-react";
 import backgroundImage from "@assets/login.jpg";
 import kasperskyLogo from "@/assets/kaspersky-logo.svg";
+import { t } from '@/lib/i18n';
 
 const loginSchema = z.object({
   username: z.string().min(1, "Username is required"),
@@ -169,10 +170,10 @@ export default function Login() {
             <img src={kasperskyLogo} alt="Kaspersky Cup" className="h-20 w-auto" />
           </div>
           <h2 className="text-2xl font-bold text-[#1D1D1B] mb-2">
-            Bienvenido a la plataforma donde
+            {t('loginScreen.loginMainTitle')}
           </h2>
           <p className="text-lg font-semibold text-[#29CCB1]">
-            tus ventas se transforman en goles
+            {t('loginScreen.loginMainSubtitle')}            
           </p>          
           <p className="text-gray-600 mt-2">
             {isLogin ? "Inicia sesión en tu cuenta" : "Crea tu cuenta"}
