@@ -21,6 +21,7 @@ import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import type { AuthUser } from "@/lib/auth";
 import backgroundImage from "@assets/hero-usuario.png";
+import logoHero from "@assets/logo-kaspersky-cup.png";
 import { useTranslation } from "@/hooks/useTranslation";
 import { isAdminRole } from "@/lib/roles";
 
@@ -137,7 +138,7 @@ export default function Dashboard() {
   if (!user) return null;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 padding-top-60">
       {/* Dashboard Header */}
       <div className="mb-8">
         <div 
@@ -148,7 +149,7 @@ export default function Dashboard() {
           <div className="absolute inset-0 bg-black/20"></div>
           
           {user.role !== "admin" ? (
-            <div className="relative z-10 flex flex-col lg:flex-row justify-between items-start p-8 min-h-[400px]">
+            <div className="relative z-10 flex flex-col lg:flex-row justify-between items-start p-8 min-h-[400px] display-hero-dashboard">
               {/* Left side - Welcome Message */}
               <div className="flex-1 flex flex-col justify-center">
                 <h1 className="text-4xl lg:text-5xl font-bold mb-2 text-white leading-tight" data-testid="text-welcome">
@@ -156,22 +157,22 @@ export default function Dashboard() {
                 </h1>
                 <p className="sub-text-welcome font-normal text-[#ffffff]">
                   {t('dashboard.subtitleWelcome')}            
-                </p> 
+                </p>
+                <img src={logoHero} alt="Kaspersky Cup" className="logo-hero-dashboard"/>
               </div>
               
               {/* Right side - Stats Cards */}
               <div className="flex flex-col space-y-4 mt-8 lg:mt-0 lg:ml-8 min-w-[280px]">
                 {/* Available Points Card */}
-                <div className="bg-white/80 backdrop-blur-sm rounded-lg p-4 flex items-center space-x-4 points-card gradient-green">
+                <div className="bg-white/80 backdrop-blur-sm rounded-lg p-4 flex items-center space-x-4 points-card green-background">
                   <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
                     <Coins className="text-gray-700 h-6 w-6 text-green-600" />
                   </div>
                   <div className="flex-1">
-                    <div className="text-gray-600 text-sm white-text">{t('dashboard.availablePoints')}</div>
-                    <div className="text-2xl font-bold text-gray-900 white-text" data-testid="text-available-points">
+                    <div className="text-gray-600 text-sm">{t('dashboard.availablePoints')}</div>
+                    <div className="text-2xl font-bold text-gray-900" data-testid="text-available-points">
                       {statsLoading ? "..." : stats?.availablePoints?.toLocaleString() || "0"}
-                    </div>
-                    <div className="text-gray-500 text-xs white-text">{t('dashboard.readyToRedeem')}</div>
+                    </div>                    
                   </div>
                 </div>
 
@@ -259,25 +260,25 @@ export default function Dashboard() {
                 </div>
 
                 {/* Grand Prize Box */}
-                <div className="bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl p-6 shadow-md text-white gradient-green">
+                <div className="bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl p-6 shadow-md text-white green-background">
                   <div className="flex items-center space-x-3 mb-4">
-                    <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
-                      <Gift className="text-white h-6 w-6" />
+                    <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center white-background">
+                      <Gift className="text-gray-900 h-6 w-6" />
                     </div>
-                    <h3 className="text-xl font-bold" data-testid="text-grand-prize-title">
+                    <h3 className="text-xl font-bold text-gray-900" data-testid="text-grand-prize-title">
                       {t('admin.prizes')}
                     </h3>
                   </div>
                   <div className="space-y-3">
-                    <p className="text-sm opacity-90 leading-relaxed">
+                    <p className="text-sm opacity-90 leading-relaxed text-gray-900">
                       {t('dashboard.monthlyPrizeCondition')}
                     </p>
-                    <h3 className="text-xl font-bold" data-testid="text-grand-prize-subtitle">
+                    <h3 className="text-xl font-bold text-gray-900" data-testid="text-grand-prize-subtitle">
                       {t('dashboard.monthlyPrizeReward')}
                     </h3>
                     <div className="bg-white/20 rounded-lg p-4 backdrop-blur-sm">
-                      <div className="text-4xl font-bold mb-2">{t('admin.grandPrize')}:</div>
-                      <p className="text-sm opacity-90">
+                      <div className="text-4xl font-bold mb-2 text-gray-900">{t('admin.grandPrize')}:</div>
+                      <p className="text-sm opacity-90 text-gray-900">
                         {t('dashboard.topScorerReward')}
                       </p>
                     </div>                    
