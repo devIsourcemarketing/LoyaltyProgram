@@ -176,7 +176,7 @@ export default function Login() {
             {t('loginScreen.loginMainSubtitle')}            
           </p>          
           <p className="text-gray-600 mt-2">
-            {isLogin ? "Inicia sesión en tu cuenta" : "Crea tu cuenta"}
+            {isLogin ? "Log in to your account" : "Crea tu cuenta"}
           </p>
         </CardHeader>
         <CardContent>
@@ -241,7 +241,7 @@ export default function Login() {
                   </div>
                   <div className="relative flex justify-center text-xs uppercase">
                     <span className="bg-white px-2 text-muted-foreground">
-                      O continúa con
+                      Or continue with
                     </span>
                   </div>
                 </div>
@@ -253,7 +253,7 @@ export default function Login() {
                   onClick={() => setShowMagicLinkDialog(true)}
                 >
                   <Mail className="mr-2 h-4 w-4" />
-                  Acceder sin contraseña
+                  Login without a password
                 </Button>
               </form>
             </Form>

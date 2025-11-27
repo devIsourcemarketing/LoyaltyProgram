@@ -920,7 +920,7 @@ const translations = {
       saving: "Guardando...",
     },
     auth: {
-      signIn: "Inicia sesión en tu cuenta",
+      signIn: "Log in to your account",
       signUp: "Crea tu cuenta",
       signInButton: "Iniciar Sesión",
       signUpButton: "Registrarse",

@@ -2,11 +2,28 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Kaspersky Sans Display Font */
+/* Kaspersky Sans Display Font - All Formats */
 @font-face {
   font-family: 'Kaspersky Sans Display';
-  src: url('/fonts/KasperskySansDisplay-Medium.woff2') format('woff2'),
-       url('/fonts/KasperskySansDisplay-Medium.woff') format('woff');
+  src: url('/fonts/KasperskySansDisplay-Regular.eot');
+  src: url('/fonts/KasperskySansDisplay-Regular.eot?#iefix') format('embedded-opentype'),
+       url('/fonts/KasperskySansDisplay-Regular.woff2') format('woff2'),
+       url('/fonts/KasperskySansDisplay-Regular.woff') format('woff'),
+       url('/fonts/KasperskySansDisplay-Regular.ttf') format('truetype'),
+       url('/fonts/KasperskySansDisplay-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Kaspersky Sans Display';
+  src: url('/fonts/KasperskySansDisplay-Medium.eot');
+  src: url('/fonts/KasperskySansDisplay-Medium.eot?#iefix') format('embedded-opentype'),
+       url('/fonts/KasperskySansDisplay-Medium.woff2') format('woff2'),
+       url('/fonts/KasperskySansDisplay-Medium.woff') format('woff'),
+       url('/fonts/KasperskySansDisplay-Medium.ttf') format('truetype'),
+       url('/fonts/KasperskySansDisplay-Medium.otf') format('opentype');
   font-weight: 500;
   font-style: normal;
   font-display: swap;
@@ -14,18 +31,13 @@
 
 @font-face {
   font-family: 'Kaspersky Sans Display';
-  src: url('/fonts/KasperskySansDisplay-Bold.woff2') format('woff2'),
-       url('/fonts/KasperskySansDisplay-Bold.woff') format('woff');
+  src: url('/fonts/KasperskySansDisplay-Bold.eot');
+  src: url('/fonts/KasperskySansDisplay-Bold.eot?#iefix') format('embedded-opentype'),
+       url('/fonts/KasperskySansDisplay-Bold.woff2') format('woff2'),
+       url('/fonts/KasperskySansDisplay-Bold.woff') format('woff'),
+       url('/fonts/KasperskySansDisplay-Bold.ttf') format('truetype'),
+       url('/fonts/KasperskySansDisplay-Bold.otf') format('opentype');
   font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Kaspersky Sans Display';
-  src: url('/fonts/KasperskySansDisplay-Regular.woff2') format('woff2'),
-       url('/fonts/KasperskySansDisplay-Regular.woff') format('woff');
-  font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
