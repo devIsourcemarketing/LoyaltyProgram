@@ -1,4 +1,11 @@
 import * as brevo from '@getbrevo/brevo';
+import * as fs from 'fs';
+import * as path from 'path';
+import { fileURLToPath } from 'url';
+
+// Obtener __dirname en ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Configurar Brevo API key
 const BREVO_API_KEY = process.env.BREVO_API_KEY || '';
@@ -9,6 +16,27 @@ const APP_URL = process.env.APP_URL || 'http://localhost:5000';
 const apiInstance = new brevo.TransactionalEmailsApi();
 if (BREVO_API_KEY) {
   apiInstance.setApiKey(brevo.TransactionalEmailsApiApiKeys.apiKey, BREVO_API_KEY);
+}
+
+/**
+ * Convierte una imagen a Base64 para embeber en emails
+ */
+function imageToBase64(imagePath: string): string {
+  try {
+    const fullPath = path.resolve(__dirname, '..', imagePath);
+    if (fs.existsSync(fullPath)) {
+      const imageBuffer = fs.readFileSync(fullPath);
+      const base64Image = imageBuffer.toString('base64');
+      const ext = path.extname(imagePath).toLowerCase();
+      const mimeType = ext === '.png' ? 'image/png' : ext === '.jpg' || ext === '.jpeg' ? 'image/jpeg' : 'image/png';
+      return `data:${mimeType};base64,${base64Image}`;
+    }
+    console.warn(`⚠️ Image not found: ${fullPath}`);
+    return '';
+  } catch (error) {
+    console.error(`❌ Error converting image to base64: ${imagePath}`, error);
+    return '';
+  }
 }
 
 export interface InviteEmailData {
@@ -1473,6 +1501,324 @@ export interface MagicLinkEmailData {
   firstName: string;
   lastName: string;
   loginToken: string;
+}
+
+export interface ExpectationEmailData {
+  email: string;
+  firstName?: string;
+  lastName?: string;
+}
+
+/**
+ * Envía un email de expectativa para generar interés en el programa
+ * Este email se envía antes del lanzamiento o como campaña promocional
+ */
+export async function sendExpectationEmail(data: ExpectationEmailData): Promise<boolean> {
+  try {
+    if (!BREVO_API_KEY) {
+      console.warn('⚠️  BREVO_API_KEY no configurada. Email no enviado.');
+      console.log('📧 Simulated expectation email to:', data.email);
+      return true; // Simular éxito en desarrollo
+    }
+
+    console.log('📤 Intentando enviar email de expectativa...');
+    console.log('   Destinatario:', data.email);
+    console.log('   Remitente:', FROM_EMAIL);
+    
+    // Imágenes alojadas en Cloudinary (Europa)
+    const heroImageUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764337224/loyalty-program/emails/expectativa/hero.png';
+    const heroImage2xUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764337226/loyalty-program/emails/expectativa/hero-2x.png';
+    const footerImageUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764337229/loyalty-program/emails/expectativa/footer.png';
+    
+    const sendSmtpEmail = new brevo.SendSmtpEmail();
+    sendSmtpEmail.to = [{ 
+      email: data.email, 
+      name: data.firstName && data.lastName ? `${data.firstName} ${data.lastName}` : undefined 
+    }];
+    sendSmtpEmail.sender = { email: FROM_EMAIL, name: 'Kaspersky Cup' };
+    sendSmtpEmail.subject = '⚽ Ventas que se celebran como goles - Kaspersky Cup 2025';
+    sendSmtpEmail.htmlContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+          * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+          }
+          
+          body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #FFFFFF;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+          }
+          
+          .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #FFFFFF;
+          }
+          
+          .header-section {
+            text-align: left;
+            padding: 32px 40px 24px 40px;
+            background-color: #FFFFFF;
+          }
+          
+          .header-title {
+            font-size: 22px;
+            color: #1D1D1B;
+            margin: 0 0 4px 0;
+            font-weight: 400;
+            line-height: 1.3;
+          }
+          
+          .header-subtitle {
+            font-size: 20px;
+            color: #1D1D1B;
+            margin: 0;
+            font-weight: 300;
+            line-height: 1.3;
+          }
+          
+          .logo-section {
+            text-align: center;
+            padding: 12px 0;
+            background-color: #FFFFFF;
+          }
+          
+          .hero-image-section {
+            position: relative;
+            text-align: center;
+            background-color: #FFFFFF;
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+          }
+          
+          .hero-image {
+            width: 100%;
+            max-width: 600px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+          }
+          
+          .footer-section {
+            background-color: #1D1D1B;
+            color: #FFFFFF;
+            padding: 48px 40px;
+            text-align: center;
+          }
+          
+          .footer-cup-badge {
+            margin: 0 auto 28px;
+            text-align: center;
+          }
+          
+          .footer-cup-image {
+            width: 250px;
+            height: auto;
+            display: inline-block;
+          }
+          
+          .footer-title {
+            font-size: 28px;
+            font-weight: 400;
+            color: #FFFFFF;
+            margin: 0 0 8px 0;
+            line-height: 1.3;
+          }
+          
+          .footer-highlight {
+            color: #29CCB1;
+            font-weight: 700;
+            display: block;
+            font-size: 30px;
+            margin-bottom: 20px;
+          }
+          
+          .footer-cta {
+            font-size: 18px;
+            color: #FFFFFF;
+            margin: 24px 0 32px 0;
+            font-weight: 400;
+            line-height: 1.4;
+          }
+          
+          .social-section {
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+          }
+          
+          .social-title {
+            font-size: 14px;
+            color: #FFFFFF;
+            margin-bottom: 16px;
+            font-weight: 400;
+          }
+          
+          .social-links {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+          }
+          
+          .social-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #FFFFFF;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+          }
+          
+          .social-link:hover {
+            background-color: rgba(41, 204, 177, 0.3);
+          }
+          
+          @media only screen and (max-width: 600px) {
+            .header-section {
+              padding: 24px 24px 16px 24px;
+            }
+            
+            .header-title {
+              font-size: 20px;
+            }
+            
+            .header-subtitle {
+              font-size: 18px;
+            }
+            
+            .footer-section {
+              padding: 36px 24px;
+            }
+            
+            .footer-title {
+              font-size: 24px;
+            }
+            
+            .footer-highlight {
+              font-size: 26px;
+            }
+            
+            .footer-cta {
+              font-size: 16px;
+            }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="email-container">
+          <!-- Imagen Hero -->
+          <div class="hero-image-section">
+            <img src="${heroImageUrl}" 
+                 srcset="${heroImageUrl} 1x, ${heroImage2xUrl} 2x"
+                 alt="Ventas que se celebran como goles" 
+                 class="hero-image" 
+                 style="width: 100%; max-width: 600px; height: auto; display: block;" />
+          </div>
+          
+          <!-- Footer Section -->
+          <div class="footer-section">
+            
+            <!-- Badge Kaspersky Cup -->
+            <div class="footer-cup-badge">
+              <img src="${footerImageUrl}" 
+                   alt="Kaspersky Cup" 
+                   class="footer-cup-image" 
+                   style="width: 250px; height: auto; display: inline-block;" />
+            </div>
+            
+            <!-- Título Footer -->
+            <div class="footer-title">
+              Desde el 2025,
+              <span class="footer-highlight">deja todo en la cancha</span>
+            </div>
+            
+            <!-- CTA -->
+            <p class="footer-cta">
+              Descúbrelo muy pronto
+            </p>
+            
+            <!-- Redes Sociales -->
+            <div class="social-section">
+              <div class="social-title">Siga a Kaspersky :</div>
+              <div class="social-links">
+                <a href="https://www.facebook.com/Kaspersky" style="display: inline-block; margin: 0 6px; text-decoration: none;" title="Facebook">
+                  <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338210/loyalty-program/emails/common/social-icons/Group%2023.png" alt="Facebook" style="width: 16px; height: 16px;" />
+                </a>
+                <a href="https://twitter.com/kaspersky" style="display: inline-block; margin: 0 6px; text-decoration: none;" title="Twitter">
+                  <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338220/loyalty-program/emails/common/social-icons/Subtraction%201.png" alt="Twitter" style="width: 16px; height: 16px;" />
+                </a>
+                <a href="https://www.linkedin.com/company/kaspersky-lab" style="display: inline-block; margin: 0 6px; text-decoration: none;" title="LinkedIn">
+                  <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338212/loyalty-program/emails/common/social-icons/Group%2025.png" alt="LinkedIn" style="width: 16px; height: 16px;" />
+                </a>
+                <a href="https://www.instagram.com/kaspersky/" style="display: inline-block; margin: 0 6px; text-decoration: none;" title="Instagram">
+                  <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338213/loyalty-program/emails/common/social-icons/Group%2027.png" alt="Instagram" style="width: 16px; height: 16px;" />
+                </a>
+                <a href="https://www.youtube.com/user/Kaspersky" style="display: inline-block; margin: 0 6px; text-decoration: none;" title="YouTube">
+                  <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338215/loyalty-program/emails/common/social-icons/Group%2028.png" alt="YouTube" style="width: 16px; height: 16px;" />
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+    sendSmtpEmail.textContent = `
+Kaspersky Cup - Email de Expectativa
+
+Ventas que se celebran como goles
+
+Desde el 2025, deja todo en la cancha
+
+Descúbrelo muy pronto
+
+Siga a Kaspersky en nuestras redes sociales:
+- Facebook: https://www.facebook.com/Kaspersky
+- Twitter: https://twitter.com/kaspersky
+- LinkedIn: https://www.linkedin.com/company/kaspersky-lab
+- Instagram: https://www.instagram.com/kaspersky/
+- YouTube: https://www.youtube.com/user/Kaspersky
+
+Saludos,
+Kaspersky Cup
+    `.trim();
+
+    await apiInstance.sendTransacEmail(sendSmtpEmail);
+    console.log('✅ Expectation email sent successfully to:', data.email);
+    return true;
+  } catch (error: any) {
+    console.error('❌ Error sending expectation email:', error);
+    
+    if (error.response) {
+      console.error('   Response status:', error.response.status);
+      console.error('   Response data:', JSON.stringify(error.response.data, null, 2));
+    }
+    
+    if (error.body) {
+      console.error('   Error body:', JSON.stringify(error.body, null, 2));
+    }
+    
+    console.error('   Error message:', error.message);
+    
+    return false;
+  }
 }
 
 /**

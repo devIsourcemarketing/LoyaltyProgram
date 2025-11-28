@@ -14,7 +14,8 @@ import {
   sendRedemptionApprovedEmail,
   sendRedemptionRequestToAdmin,
   sendSupportTicketToAdmin,
-  sendMagicLinkEmail
+  sendMagicLinkEmail,
+  sendExpectationEmail
 } from "./email.js";
 
 // Extend session data interface
@@ -3651,6 +3652,126 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Delete product type error:", error);
       res.status(500).json({ message: "Failed to delete product type" });
+    }
+  });
+
+  /**
+   * Endpoint para enviar el email de expectativa
+   * Este email se utiliza para campañas promocionales o pre-lanzamiento
+   * Solo accesible para admins
+   */
+  app.post("/api/admin/send-expectation-email", async (req, res) => {
+    const userRole = req.session?.userRole;
+    
+    if (!isAdminRole(userRole)) {
+      return res.status(403).json({ message: "Admin access required" });
+    }
+
+    try {
+      const { email, firstName, lastName } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ message: "Email is required" });
+      }
+
+      // Validar formato de email
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({ message: "Invalid email format" });
+      }
+
+      const emailSent = await sendExpectationEmail({
+        email,
+        firstName,
+        lastName
+      });
+
+      if (emailSent) {
+        res.json({ 
+          success: true, 
+          message: "Expectation email sent successfully" 
+        });
+      } else {
+        res.status(500).json({ 
+          success: false, 
+          message: "Failed to send expectation email" 
+        });
+      }
+    } catch (error) {
+      console.error("Send expectation email error:", error);
+      res.status(500).json({ 
+        success: false, 
+        message: "Failed to send expectation email" 
+      });
+    }
+  });
+
+  /**
+   * Endpoint para enviar el email de expectativa a múltiples destinatarios
+   * Útil para campañas masivas
+   */
+  app.post("/api/admin/send-expectation-email-batch", async (req, res) => {
+    const userRole = req.session?.userRole;
+    
+    if (!isAdminRole(userRole)) {
+      return res.status(403).json({ message: "Admin access required" });
+    }
+
+    try {
+      const { recipients } = req.body;
+      
+      if (!recipients || !Array.isArray(recipients) || recipients.length === 0) {
+        return res.status(400).json({ message: "Recipients array is required" });
+      }
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const results = {
+        total: recipients.length,
+        sent: 0,
+        failed: 0,
+        errors: [] as string[]
+      };
+
+      for (const recipient of recipients) {
+        try {
+          if (!recipient.email || !emailRegex.test(recipient.email)) {
+            results.failed++;
+            results.errors.push(`Invalid email: ${recipient.email || 'missing'}`);
+            continue;
+          }
+
+          const emailSent = await sendExpectationEmail({
+            email: recipient.email,
+            firstName: recipient.firstName,
+            lastName: recipient.lastName
+          });
+
+          if (emailSent) {
+            results.sent++;
+          } else {
+            results.failed++;
+            results.errors.push(`Failed to send to: ${recipient.email}`);
+          }
+
+          // Pequeña pausa para no saturar el servicio de email
+          await new Promise(resolve => setTimeout(resolve, 100));
+        } catch (error) {
+          results.failed++;
+          results.errors.push(`Error sending to ${recipient.email}: ${error}`);
+        }
+      }
+
+      res.json({ 
+        success: true, 
+        message: "Batch email sending completed",
+        results
+      });
+    } catch (error) {
+      console.error("Send batch expectation email error:", error);
+      res.status(500).json({ 
+        success: false, 
+        message: "Failed to send batch expectation emails" 
+      });
     }
   });
 

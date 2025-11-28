@@ -17,3 +17,13 @@ deploy-images.ps1
 *.log
 coverage
 .cache
+
+# Imágenes de emails (se suben a Cloudinary)
+client/public/email-assets/**/*.png
+client/public/email-assets/**/*.jpg
+client/public/email-assets/**/*.jpeg
+client/public/email-assets/**/*.svg
+client/public/email-assets/**/*.gif
+
+# URLs generadas por los scripts de upload (opcional: puedes commitearlas si quieres)
+*-urls.json
