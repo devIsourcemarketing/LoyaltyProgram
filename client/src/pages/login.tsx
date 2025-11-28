@@ -15,7 +15,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Mail } from "lucide-react";
 import backgroundImage from "@assets/login.jpg";
-import kasperskyLogo from "@/assets/kaspersky-logo.svg";
+import kasperskyLogo from "@/assets/logo-kaspersky-cup.png";
 import { t } from '@/lib/i18n';
 
 const loginSchema = z.object({
@@ -167,7 +167,7 @@ export default function Login() {
       <Card className="relative z-20 w-full max-w-md bg-white/95 backdrop-blur-sm background-form-login">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <img src={kasperskyLogo} alt="Kaspersky Cup" className="h-20 w-auto" />
+            <img src={kasperskyLogo} alt="Kaspersky Cup" className="w-auto" />
           </div>
           <h2 className="text-2xl font-bold text-[#1D1D1B] mb-2">
             {t('loginScreen.loginMainTitle')}
