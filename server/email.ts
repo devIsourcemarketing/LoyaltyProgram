@@ -3161,6 +3161,366 @@ export interface GanadorPremioMayorEmailData {
 /**
  * Envía un email cuando se anuncia el ganador del premio mayor (viaje a la Copa Mundial)
  */
+export interface PendienteAprobacionEmailData {
+  email: string;
+  firstName: string;
+  lastName: string;
+  nombrePremio: string;
+  golesCanje: number;
+}
+
+/**
+ * Email 8: Pendiente Aprobación Redención de Goles (Premio)
+ * Se envía cuando un usuario solicita canjear sus goles por un premio
+ * y queda pendiente de aprobación por el administrador
+ */
+export async function sendPendienteAprobacionEmail(data: PendienteAprobacionEmailData): Promise<boolean> {
+  try {
+    const sendSmtpEmail = new brevo.SendSmtpEmail();
+    sendSmtpEmail.sender = { name: 'Kaspersky Cup', email: FROM_EMAIL };
+    sendSmtpEmail.to = [{ email: data.email, name: `${data.firstName} ${data.lastName}` }];
+    sendSmtpEmail.subject = 'Kaspersky Cup - Solicitud de Canje en Proceso';
+
+    const userName = data.firstName.toUpperCase();
+
+    // URLs de las imágenes en Cloudinary
+    const heroImageUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764347282/loyalty-program/emails/pendiente-aprobacion/Group%2063.png';
+    const heroImage2xUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764347284/loyalty-program/emails/pendiente-aprobacion/Group%2063%402x.png';
+    const ballImageUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764347280/loyalty-program/emails/pendiente-aprobacion/ball.jpg';
+    const badgeImageUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764336799/loyalty-program/emails/common/Kaspersky%20Cup%20-%20badge%20250.png';
+    const logoKasperskyUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764336795/loyalty-program/emails/common/Kaspersky%20Logo.png';
+
+    sendSmtpEmail.htmlContent = `
+      <!DOCTYPE html>
+      <html lang="es">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Solicitud de Canje en Proceso - Kaspersky Cup</title>
+        <style>
+          * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+          }
+          
+          body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+          }
+          
+          .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            overflow: hidden;
+          }
+          
+          /* Header con logo Kaspersky */
+          .header-logo {
+            text-align: center;
+            padding: 30px 20px 20px;
+            background-color: #ffffff;
+          }
+          
+          .header-logo img {
+            width: 120px;
+            height: auto;
+          }
+          
+          /* Imagen Hero con fondo negro */
+          .hero-section {
+            text-align: center;
+            background-color: #1D1D1B;
+            padding: 0;
+            position: relative;
+          }
+          
+          .hero-image {
+            width: 100%;
+            height: auto;
+            display: block;
+          }
+          
+          /* Contenido principal */
+          .content-section {
+            padding: 40px 40px 30px;
+            background-color: #ffffff;
+            text-align: center;
+          }
+          
+          .greeting {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1D1D1B;
+            margin-bottom: 5px;
+            line-height: 1.2;
+          }
+          
+          .user-name {
+            font-size: 32px;
+            font-weight: 700;
+            color: #29CCB1;
+            margin-bottom: 25px;
+            line-height: 1.2;
+          }
+          
+          .message-text {
+            font-size: 16px;
+            color: #4A4A4A;
+            line-height: 1.8;
+            margin-bottom: 30px;
+          }
+          
+          .highlight-text {
+            color: #29CCB1;
+            font-weight: 700;
+          }
+          
+          .ball-section {
+            text-align: center;
+            margin: 30px 0;
+          }
+          
+          .ball-image {
+            width: 180px;
+            height: auto;
+            margin-bottom: 15px;
+          }
+          
+          .ball-label {
+            font-size: 14px;
+            color: #1D1D1B;
+            font-weight: 600;
+            margin-top: 10px;
+          }
+          
+          .status-box {
+            background-color: #F8F8F8;
+            border-radius: 8px;
+            padding: 25px;
+            margin: 30px 0;
+            text-align: left;
+          }
+          
+          .status-box p {
+            font-size: 15px;
+            color: #4A4A4A;
+            line-height: 1.8;
+            margin: 0;
+          }
+          
+          .cta-button {
+            display: inline-block;
+            background-color: #29CCB1;
+            color: #ffffff;
+            padding: 14px 32px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            margin: 25px 0 20px;
+          }
+          
+          .footer-text {
+            font-size: 15px;
+            color: #4A4A4A;
+            line-height: 1.6;
+            margin-top: 20px;
+          }
+          
+          .footer-highlight {
+            color: #29CCB1;
+            font-weight: 700;
+          }
+          
+          /* Footer Section */
+          .footer-section {
+            padding: 30px 40px 40px;
+            background-color: #ffffff;
+            text-align: center;
+          }
+          
+          .social-title {
+            font-size: 14px;
+            color: #666666;
+            margin-bottom: 15px;
+            font-weight: 600;
+          }
+          
+          .social-links {
+            margin-bottom: 25px;
+          }
+          
+          .social-links a {
+            display: inline-block;
+            margin: 0 6px;
+            text-decoration: none;
+            background-color: #1D1D1B;
+            padding: 8px;
+            border-radius: 4px;
+          }
+          
+          .social-links img {
+            width: 16px;
+            height: 16px;
+            display: block;
+          }
+          
+          .footer-logo {
+            margin-top: 25px;
+          }
+          
+          .footer-logo img {
+            width: 80px;
+            height: auto;
+          }
+          
+          /* Responsive */
+          @media only screen and (max-width: 600px) {
+            .content-section,
+            .footer-section {
+              padding-left: 20px;
+              padding-right: 20px;
+            }
+            
+            .greeting,
+            .user-name {
+              font-size: 26px;
+            }
+            
+            .message-text {
+              font-size: 14px;
+            }
+            
+            .ball-image {
+              width: 140px;
+            }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="email-container">
+          <!-- Header Logo -->
+          <div class="header-logo">
+            <img src="${logoKasperskyUrl}" 
+                 alt="Kaspersky" />
+          </div>
+          
+          <!-- Hero Image -->
+          <div class="hero-section">
+            <img src="${heroImageUrl}" 
+                 srcset="${heroImageUrl} 1x, ${heroImage2xUrl} 2x"
+                 alt="¡Felicidades! Ha redimido el premio del mes" 
+                 class="hero-image" />
+          </div>
+          
+          <!-- Content Section -->
+          <div class="content-section">
+            <div class="greeting">HOLA</div>
+            <div class="user-name">(${userName})</div>
+            
+            <p class="message-text">
+              Sus goles le permitieron <span class="highlight-text">redimir su premio</span> en<br>
+              <span class="highlight-text">Kaspersky Cup.</span>
+            </p>
+            
+            <!-- Balón -->
+            <div class="ball-section">
+              <img src="${ballImageUrl}" 
+                   alt="Balón del Oficial del mundial" 
+                   class="ball-image" />
+              <div class="ball-label">Balón del Oficial del mundial</div>
+            </div>
+            
+            <!-- Status Box -->
+            <div class="status-box">
+              <p>
+                Nuestro equipo organizador está procesando su solicitud. Muy 
+                pronto recibirá la confirmación del envío por correo electrónico 
+                o a través de la plataforma.
+              </p>
+            </div>
+            
+            <!-- CTA Button -->
+            <a href="${APP_URL}/rewards" class="cta-button">Revisar el estado de mi premio</a>
+            
+            <!-- Footer Text -->
+            <p class="footer-text">
+              Pronto estaremos en contacto con usted.<br>
+              <span class="footer-highlight">¡Nos vemos en el próximo partido!</span>
+            </p>
+          </div>
+          
+          <!-- Footer Section -->
+          <div class="footer-section">
+            <!-- Texto Siga a Kaspersky -->
+            <div class="social-title">Siga a Kaspersky :</div>
+            
+            <!-- Redes Sociales -->
+            <div class="social-links">
+              <a href="https://www.facebook.com/Kaspersky" title="Facebook" style="display: inline-block; margin: 0 6px; text-decoration: none; background-color: #1D1D1B; padding: 8px; border-radius: 4px;">
+                <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338210/loyalty-program/emails/common/social-icons/Group%2023.png" alt="Facebook" style="width: 16px; height: 16px;" />
+              </a>
+              <a href="https://twitter.com/kaspersky" title="Twitter" style="display: inline-block; margin: 0 6px; text-decoration: none; background-color: #1D1D1B; padding: 8px; border-radius: 4px;">
+                <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338220/loyalty-program/emails/common/social-icons/Subtraction%201.png" alt="Twitter" style="width: 16px; height: 16px;" />
+              </a>
+              <a href="https://www.linkedin.com/company/kaspersky-lab" title="LinkedIn" style="display: inline-block; margin: 0 6px; text-decoration: none; background-color: #1D1D1B; padding: 8px; border-radius: 4px;">
+                <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338212/loyalty-program/emails/common/social-icons/Group%2025.png" alt="LinkedIn" style="width: 16px; height: 16px;" />
+              </a>
+              <a href="https://www.instagram.com/kaspersky/" title="Instagram" style="display: inline-block; margin: 0 6px; text-decoration: none; background-color: #1D1D1B; padding: 8px; border-radius: 4px;">
+                <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338213/loyalty-program/emails/common/social-icons/Group%2027.png" alt="Instagram" style="width: 16px; height: 16px;" />
+              </a>
+              <a href="https://www.youtube.com/user/Kaspersky" title="YouTube" style="display: inline-block; margin: 0 6px; text-decoration: none; background-color: #1D1D1B; padding: 8px; border-radius: 4px;">
+                <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338215/loyalty-program/emails/common/social-icons/Group%2028.png" alt="YouTube" style="width: 16px; height: 16px;" />
+              </a>
+            </div>
+            
+            <!-- Logo Kaspersky al final -->
+            <div class="footer-logo">
+              <img src="${logoKasperskyUrl}" alt="Kaspersky" />
+            </div>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    sendSmtpEmail.textContent = `
+Kaspersky Cup - Solicitud de Canje en Proceso
+
+HOLA (${userName})
+
+Sus goles le permitieron redimir su premio en Kaspersky Cup.
+
+Balón del Oficial del mundial
+
+Nuestro equipo organizador está procesando su solicitud. Muy pronto recibirá la confirmación del envío por correo electrónico o a través de la plataforma.
+
+Pronto estaremos en contacto con usted.
+¡Nos vemos en el próximo partido!
+
+Siga a Kaspersky en nuestras redes sociales:
+- Facebook: https://www.facebook.com/Kaspersky
+- Twitter: https://twitter.com/kaspersky
+- LinkedIn: https://www.linkedin.com/company/kaspersky-lab
+- Instagram: https://www.instagram.com/kaspersky/
+- YouTube: https://www.youtube.com/user/Kaspersky
+
+Saludos,
+Kaspersky Cup
+    `.trim();
+
+    await apiInstance.sendTransacEmail(sendSmtpEmail);
+    console.log('Pendiente aprobación email sent successfully to:', data.email);
+    return true;
+  } catch (error) {
+    console.error('Error sending pendiente aprobación email:', error);
+    return false;
+  }
+}
+
 export async function sendGanadorPremioMayorEmail(data: GanadorPremioMayorEmailData): Promise<boolean> {
   try {
     if (!BREVO_API_KEY) {

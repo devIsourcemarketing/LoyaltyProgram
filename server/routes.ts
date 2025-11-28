@@ -18,6 +18,7 @@ import {
   sendExpectationEmail,
   sendRegistroExitosoEmail,
   sendBienvenidaEmail,
+  sendPendienteAprobacionEmail,
   sendGanadorPremioMayorEmail
 } from "./email.js";
 
@@ -791,11 +792,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userReward = await storage.redeemReward(userId, req.params.id);
       
-      // Obtener información del usuario y recompensa para notificar al admin
+      // Obtener información del usuario y recompensa para notificar al admin y al usuario
       const user = await storage.getUser(userId);
       const reward = await storage.getReward(req.params.id);
       
       if (user && reward) {
+        // Enviar email al usuario confirmando que su solicitud está pendiente
+        await sendPendienteAprobacionEmail({
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          nombrePremio: reward.name,
+          golesCanje: reward.pointsCost
+        });
+        
         // Obtener email del primer admin para enviar notificación
         const allUsers = await storage.getAllUsers();
         const admins = allUsers.filter(u => u.role === 'admin');
