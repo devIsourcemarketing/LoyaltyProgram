@@ -59,7 +59,7 @@ import {
 // Database connection and ORM helpers
 // ───────────────────────────────────────────────
 import { db } from "./db";
-import { and, asc, desc, eq, ne, count, sum, gte, gt, lte, isNotNull, isNull, sql } from "drizzle-orm";
+import { and, asc, desc, eq, ne, count, sum, gte, gt, lte, isNotNull, isNull, sql, inArray } from "drizzle-orm";
 import { nanoid } from "nanoid";
 
 // ───────────────────────────────────────────────
@@ -1246,7 +1246,26 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteUser(userId: string): Promise<User | undefined> {
-    // First, delete all points history associated with this user
+    // First, get all deal IDs associated with this user
+    const userDeals = await db
+      .select({ id: deals.id })
+      .from(deals)
+      .where(eq(deals.userId, userId));
+    
+    const dealIds = userDeals.map(deal => deal.id);
+
+    // Delete all goals history that references these deals
+    if (dealIds.length > 0) {
+      await db.delete(goalsHistory).where(inArray(goalsHistory.dealId, dealIds));
+    }
+
+    // Delete all support tickets associated with this user
+    await db.delete(supportTickets).where(eq(supportTickets.userId, userId));
+
+    // Delete all notifications associated with this user
+    await db.delete(notifications).where(eq(notifications.userId, userId));
+
+    // Delete all points history associated with this user
     await db.delete(pointsHistory).where(eq(pointsHistory.userId, userId));
 
     // Delete all user rewards associated with this user
