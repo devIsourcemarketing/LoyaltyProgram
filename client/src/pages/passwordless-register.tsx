@@ -247,13 +247,13 @@ export default function PasswordlessRegister() {
             <img src={kasperskyLogo} alt="Kaspersky Cup" className="w-auto" />
           </div>
           <h2 className="text-2xl font-bold text-[#1D1D1B] mb-2">
-            Registro sin Contraseña
+            Passwordless Registration
           </h2>
           <p className="text-lg font-semibold text-[#29CCB1]">
-            Completa tus datos para acceder a Kaspersky Cup
+            Complete your information to access Kaspersky Cup
           </p>
           <p className="text-sm text-gray-600 mt-2">
-            Recibirás un email con un enlace para acceder a tu cuenta
+            You will receive an email with a link to access your account
           </p>
         </CardHeader>
         
@@ -266,14 +266,15 @@ export default function PasswordlessRegister() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Correo Electrónico *</FormLabel>
+                    <FormLabel>Email *</FormLabel>
                     <FormControl>
                       <Input 
                         type="email" 
-                        placeholder="correo@ejemplo.com" 
+                        placeholder="email@example.com" 
                         {...field}
                         readOnly={!!prefilledEmail}
-                        className={prefilledEmail ? "bg-gray-100" : ""}
+                        disabled={!!prefilledEmail}
+                        className={prefilledEmail ? "bg-gray-100 cursor-not-allowed" : ""}
                       />
                     </FormControl>
                     <FormMessage />
@@ -288,9 +289,9 @@ export default function PasswordlessRegister() {
                   name="firstName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Nombre *</FormLabel>
+                      <FormLabel>First Name *</FormLabel>
                       <FormControl>
-                        <Input placeholder="Juan" {...field} />
+                        <Input placeholder="John" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -302,9 +303,9 @@ export default function PasswordlessRegister() {
                   name="lastName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Apellido *</FormLabel>
+                      <FormLabel>Last Name *</FormLabel>
                       <FormControl>
-                        <Input placeholder="Pérez" {...field} />
+                        <Input placeholder="Smith" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -318,7 +319,7 @@ export default function PasswordlessRegister() {
                 name="region"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Región *</FormLabel>
+                    <FormLabel>Region *</FormLabel>
                     <Select
                       value={selectedRegion}
                       onValueChange={(value) => {
@@ -332,7 +333,7 @@ export default function PasswordlessRegister() {
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Selecciona tu región" />
+                          <SelectValue placeholder="Select your region" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -492,8 +493,8 @@ export default function PasswordlessRegister() {
               <Alert>
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription className="text-sm">
-                  <strong>Importante:</strong> Recibirás un email de bienvenida con un enlace de acceso. 
-                  Tu cuenta será activada una vez aprobada por un administrador.
+                  <strong>Important:</strong> You will receive a welcome email with an access link. 
+                  Your account will be activated once approved by an administrator.
                 </AlertDescription>
               </Alert>
 
@@ -506,10 +507,10 @@ export default function PasswordlessRegister() {
                 {registerMutation.isPending ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Registrando...
+                    Registering...
                   </>
                 ) : (
-                  "Completar Registro"
+                  "Complete Registration"
                 )}
               </Button>
 
@@ -521,7 +522,7 @@ export default function PasswordlessRegister() {
                   className="text-[#29CCB1] hover:text-[#23B39E]"
                   onClick={() => setLocation("/login")}
                 >
-                  ← Volver al inicio de sesión
+                  ← Back to login
                 </Button>
               </div>
             </form>
