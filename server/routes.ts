@@ -130,6 +130,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
         isApproved: false, // New users need approval
       });
 
+      // Enviar notificaciones a los admins correspondientes
+      if (user.region) {
+        const userName = `${user.firstName} ${user.lastName}`;
+        
+        // 1. Notificar al super admin
+        const superAdmins = await storage.getAllUsers();
+        const superAdminList = superAdmins.filter(u => u.role === 'super-admin');
+        
+        for (const admin of superAdminList) {
+          await NotificationHelpers.newUserRegistered(
+            admin.id,
+            userName,
+            user.region
+          );
+        }
+
+        // 2. Notificar al regional admin de la región del usuario
+        const regionalAdmins = superAdmins.filter(u => 
+          u.role === 'regional-admin' && 
+          u.adminRegionId && 
+          u.region === user.region
+        );
+        
+        for (const regionalAdmin of regionalAdmins) {
+          await NotificationHelpers.newUserRegistered(
+            regionalAdmin.id,
+            userName,
+            user.region
+          );
+        }
+      }
+
       res.status(201).json({ 
         id: user.id, 
         username: user.username,
@@ -159,6 +191,108 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Register without password (passwordless flow)
+  app.post("/api/auth/register-passwordless", async (req, res) => {
+    try {
+      const { email, firstName, lastName, country, region, category, subcategory } = req.body;
+      
+      if (!email || !firstName || !lastName || !country || !region || !category) {
+        return res.status(400).json({ 
+          message: "Email, nombre, apellido, país, región y categoría son requeridos" 
+        });
+      }
+
+      // Verificar si el usuario ya existe
+      const existingUser = await storage.getUserByEmail(email);
+      if (existingUser) {
+        return res.status(400).json({ 
+          message: "Ya existe una cuenta con este email." 
+        });
+      }
+
+      // Crear usuario sin contraseña (se genera una temporal)
+      const tempPassword = await bcrypt.hash(nanoid(32), 10);
+      
+      const user = await storage.createUser({
+        username: `user_${nanoid(8)}`, // Username temporal
+        email,
+        password: tempPassword,
+        firstName,
+        lastName,
+        country,
+        region: region as "NOLA" | "SOLA" | "BRASIL" | "MEXICO",
+        regionCategory: category as "ENTERPRISE" | "SMB" | "MSSP",
+        regionSubcategory: subcategory || null,
+        role: "user",
+        isActive: true,
+        isApproved: false, // Requiere aprobación
+      });
+
+      // Generar magic link para primer acceso
+      const loginToken = nanoid(32);
+      const expiryDate = new Date();
+      expiryDate.setDate(expiryDate.getDate() + 7); // Expira en 7 días para primer acceso
+
+      await storage.updateUser(user.id, {
+        loginToken,
+        loginTokenExpiry: expiryDate,
+      });
+
+      // Enviar email de bienvenida con magic link
+      await sendBienvenidaEmail({
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        loginToken, // Incluir loginToken para acceso directo
+      });
+
+      // Enviar notificaciones a los admins correspondientes
+      if (user.region) {
+        const userName = `${user.firstName} ${user.lastName}`;
+        
+        // 1. Notificar al super admin
+        const allUsers = await storage.getAllUsers();
+        const superAdmins = allUsers.filter(u => u.role === 'super-admin');
+        
+        for (const admin of superAdmins) {
+          await NotificationHelpers.newUserRegistered(
+            admin.id,
+            userName,
+            user.region
+          );
+        }
+
+        // 2. Notificar al regional admin de la región del usuario
+        const regionalAdmins = allUsers.filter(u => 
+          u.role === 'regional-admin' && 
+          u.adminRegionId && 
+          u.region === user.region
+        );
+        
+        for (const regionalAdmin of regionalAdmins) {
+          await NotificationHelpers.newUserRegistered(
+            regionalAdmin.id,
+            userName,
+            user.region
+          );
+        }
+      }
+
+      res.status(201).json({ 
+        message: "Registro exitoso. Te hemos enviado un email de bienvenida. Tu cuenta será activada una vez aprobada por un administrador.",
+        user: {
+          id: user.id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+        }
+      });
+    } catch (error) {
+      console.error("Register passwordless error:", error);
+      res.status(500).json({ message: "Failed to register user" });
+    }
+  });
+
   // Request magic link for passwordless login
   app.post("/api/auth/request-magic-link", async (req, res) => {
     try {
@@ -172,16 +306,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const user = await storage.getUserByEmail(email);
       
       if (!user) {
-        // Por seguridad, no revelar si el email existe o no
-        return res.json({ 
-          message: "Si el email existe en nuestro sistema, recibirás un enlace de acceso." 
+        // Usuario no existe - debe registrarse primero
+        return res.status(404).json({ 
+          userExists: false,
+          message: "No existe una cuenta con este email. Por favor, regístrate primero." 
         });
       }
 
       // Verificar que el usuario esté aprobado
       if (!user.isApproved) {
-        return res.json({ 
-          message: "Si el email existe en nuestro sistema, recibirás un enlace de acceso." 
+        return res.status(403).json({ 
+          userExists: true,
+          needsApproval: true,
+          message: "Tu cuenta está pendiente de aprobación. Recibirás un email cuando sea aprobada." 
         });
       }
 
@@ -205,7 +342,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       res.json({ 
-        message: "Si el email existe en nuestro sistema, recibirás un enlace de acceso." 
+        userExists: true,
+        message: "Te hemos enviado un enlace de acceso a tu correo electrónico." 
       });
     } catch (error) {
       console.error("Request magic link error:", error);
@@ -3190,6 +3328,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Get region configs error:", error);
       res.status(500).json({ message: "Failed to get region configurations" });
+    }
+  });
+
+  // Public endpoint: Get region hierarchy structure for registration forms
+  app.get("/api/region-hierarchy", async (req, res) => {
+    try {
+      const configs = await storage.getRegionConfigs();
+      
+      // Construir jerarquía: Región → Categorías → Subcategorías
+      const hierarchy: Record<string, {
+        categories: Record<string, string[]>
+      }> = {};
+
+      for (const config of configs) {
+        if (!config.isActive) continue;
+
+        // Inicializar región si no existe
+        if (!hierarchy[config.region]) {
+          hierarchy[config.region] = { categories: {} };
+        }
+
+        // Inicializar categoría si no existe
+        if (!hierarchy[config.region].categories[config.category]) {
+          hierarchy[config.region].categories[config.category] = [];
+        }
+
+        // Agregar subcategoría si existe y no está duplicada
+        if (config.subcategory && !hierarchy[config.region].categories[config.category].includes(config.subcategory)) {
+          hierarchy[config.region].categories[config.category].push(config.subcategory);
+        }
+      }
+
+      res.json(hierarchy);
+    } catch (error) {
+      console.error("Get region hierarchy error:", error);
+      res.status(500).json({ message: "Failed to get region hierarchy" });
     }
   });
 

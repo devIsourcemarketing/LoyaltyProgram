@@ -126,4 +126,13 @@ export const NotificationHelpers = {
       message: `${userName} ha solicitado la recompensa "${rewardName}".`,
       type: "info",
     }),
+
+  // Notificación para admins - Nuevo usuario registrado
+  newUserRegistered: (adminUserId: string, userName: string, userRegion: string) =>
+    createAndEmitNotification({
+      userId: adminUserId,
+      title: "Nuevo Usuario Registrado",
+      message: `${userName} se ha registrado en la región ${userRegion} y requiere aprobación.`,
+      type: "info",
+    }),
 };

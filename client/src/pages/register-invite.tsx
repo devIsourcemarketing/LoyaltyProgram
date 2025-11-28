@@ -13,6 +13,12 @@ import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "@/hooks/useTranslation";
 import { CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 import { REGION_HIERARCHY } from "@/../../shared/constants";
+import { useQuery } from "@tanstack/react-query";
+
+// Tipo para la jerarquía de regiones desde la API
+type RegionHierarchy = Record<string, {
+  categories: Record<string, string[]>
+}>;
 
 const registerSchema = z.object({
   username: z.string().min(3, "Username must be at least 3 characters"),
@@ -47,6 +53,18 @@ export default function RegisterWithInvite() {
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [availableCountries, setAvailableCountries] = useState<string[]>([]);
   const [availableCities, setAvailableCities] = useState<string[]>([]);
+  const [availableCategories, setAvailableCategories] = useState<string[]>([]);
+  const [availableSubcategories, setAvailableSubcategories] = useState<string[]>([]);
+
+  // Obtener jerarquía de regiones desde la API
+  const { data: regionHierarchy } = useQuery<RegionHierarchy>({
+    queryKey: ["/api/region-hierarchy"],
+    queryFn: async () => {
+      const response = await fetch("/api/region-hierarchy");
+      if (!response.ok) throw new Error("Failed to load region hierarchy");
+      return response.json();
+    },
+  });
 
   const {
     register,
@@ -76,6 +94,32 @@ export default function RegisterWithInvite() {
     setToken(inviteToken);
     verifyToken(inviteToken);
   }, []);
+
+  // Actualizar categorías disponibles cuando se selecciona una región
+  useEffect(() => {
+    if (selectedRegion && regionHierarchy) {
+      const categories = Object.keys(regionHierarchy[selectedRegion]?.categories || {});
+      setAvailableCategories(categories);
+      
+      // Reset category y subcategory
+      setSelectedCategory("");
+      setValue("category", "");
+      setAvailableSubcategories([]);
+    } else {
+      setAvailableCategories([]);
+      setAvailableSubcategories([]);
+    }
+  }, [selectedRegion, regionHierarchy, setValue]);
+
+  // Actualizar subcategorías disponibles cuando se selecciona una categoría
+  useEffect(() => {
+    if (selectedRegion && selectedCategory && regionHierarchy) {
+      const subcategories = regionHierarchy[selectedRegion]?.categories[selectedCategory] || [];
+      setAvailableSubcategories(subcategories);
+    } else {
+      setAvailableSubcategories([]);
+    }
+  }, [selectedCategory, selectedRegion, regionHierarchy]);
 
   // Actualizar países disponibles cuando se selecciona una región
   useEffect(() => {
@@ -451,11 +495,11 @@ export default function RegisterWithInvite() {
                     <SelectValue placeholder={t("auth.selectCategory")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="ENTERPRISE">Enterprise</SelectItem>
-                    <SelectItem value="SMB">SMB</SelectItem>
-                    {selectedRegion === "NOLA" && (
-                      <SelectItem value="MSSP">MSSP</SelectItem>
-                    )}
+                    {availableCategories.map((cat) => (
+                      <SelectItem key={cat} value={cat}>
+                        {cat.charAt(0).toUpperCase() + cat.slice(1).toLowerCase()}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
                 {errors.category && (
@@ -464,55 +508,29 @@ export default function RegisterWithInvite() {
               </div>
             )}
 
-            {selectedRegion && selectedCategory && (
-              <>
-                {selectedRegion === "NOLA" && selectedCategory !== "MSSP" && (
-                  <div>
-                    <Label htmlFor="subcategory">{t("auth.subcategoryRequired")}</Label>
-                    <Select
-                      onValueChange={(value) => setValue("subcategory", value, { shouldValidate: true })}
-                      disabled={isSubmitting}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder={t("auth.selectSubcategory")} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="COLOMBIA">Colombia</SelectItem>
-                        <SelectItem value="CENTRO AMÉRICA">Centro América</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
-
-                {selectedRegion === "MEXICO" && (
-                  <div>
-                    <Label htmlFor="subcategory">Nivel de Partner *</Label>
-                    <Select
-                      onValueChange={(value) => setValue("subcategory", value, { shouldValidate: true })}
-                      disabled={isSubmitting}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder={t("auth.selectLevel")} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {selectedCategory === "ENTERPRISE" && (
-                          <>
-                            <SelectItem value="PLATINUM">Platinum</SelectItem>
-                            <SelectItem value="GOLD">Gold</SelectItem>
-                          </>
-                        )}
-                        {selectedCategory === "SMB" && (
-                          <>
-                            <SelectItem value="PLATINUM">Platinum</SelectItem>
-                            <SelectItem value="GOLD">Gold</SelectItem>
-                            <SelectItem value="SILVER & REGISTERED">Silver & Registered</SelectItem>
-                          </>
-                        )}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
-              </>
+            {selectedRegion && selectedCategory && availableSubcategories.length > 0 && (
+              <div>
+                <Label htmlFor="subcategory">
+                  {selectedRegion === "MEXICO" ? "Nivel de Partner *" : t("auth.subcategoryRequired")}
+                </Label>
+                <Select
+                  onValueChange={(value) => setValue("subcategory", value, { shouldValidate: true })}
+                  disabled={isSubmitting}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={
+                      selectedRegion === "MEXICO" ? t("auth.selectLevel") : t("auth.selectSubcategory")
+                    } />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableSubcategories.map((sub) => (
+                      <SelectItem key={sub} value={sub}>
+                        {sub}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             )}
 
             <Alert>

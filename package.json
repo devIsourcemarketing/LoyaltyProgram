@@ -15,6 +15,7 @@
     "test:email": "dotenv -e .env -- cross-env NODE_OPTIONS=\"--experimental-specifier-resolution=node\" tsx test-email.ts",
     "test:email-expectation": "dotenv -e .env -- cross-env NODE_OPTIONS=\"--experimental-specifier-resolution=node\" tsx test-expectation-email.ts",
     "test:magic-link": "dotenv -e .env -- cross-env NODE_OPTIONS=\"--experimental-specifier-resolution=node\" tsx test-magic-link-full.ts",
+    "test:passwordless-register": "dotenv -e .env -- cross-env NODE_OPTIONS=\"--experimental-specifier-resolution=node\" tsx test-passwordless-register.ts",
     "upload:email-images": "dotenv -e .env -- cross-env NODE_OPTIONS=\"--experimental-specifier-resolution=node\" tsx upload-email-images.ts",
     "upload:social-icons": "dotenv -e .env -- cross-env NODE_OPTIONS=\"--experimental-specifier-resolution=node\" tsx upload-social-icons.ts"
   },

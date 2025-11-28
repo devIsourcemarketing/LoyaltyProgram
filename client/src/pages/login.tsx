@@ -14,6 +14,7 @@ import { login, register } from "@/lib/auth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Mail } from "lucide-react";
+import { useLocation } from "wouter";
 import backgroundImage from "@assets/login.jpg";
 import kasperskyLogo from "@/assets/logo-kaspersky-cup.png";
 import { t } from '@/lib/i18n';
@@ -42,6 +43,7 @@ export default function Login() {
   const [magicLinkEmail, setMagicLinkEmail] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [, setLocation] = useLocation();
 
   const loginForm = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
@@ -110,14 +112,36 @@ export default function Login() {
         body: JSON.stringify({ email }),
       });
       
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Failed to send magic link");
+      const data = await response.json();
+      
+      // Si el usuario no existe, retornar con flag especial
+      if (response.status === 404 && data.userExists === false) {
+        return { userExists: false, email, message: data.message };
       }
       
-      return response.json();
+      // Si hay otro error, lanzar excepción
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to send magic link");
+      }
+      
+      return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      // Si el usuario no existe, redirigir a registro sin contraseña
+      if (data.userExists === false) {
+        setShowMagicLinkDialog(false);
+        setMagicLinkEmail("");
+        // Redirigir a página de registro passwordless con el email
+        setLocation(`/passwordless-register?email=${encodeURIComponent(data.email)}`);
+        toast({
+          title: "Registro requerido",
+          description: "No existe una cuenta con este email. Por favor, completa tu registro.",
+          variant: "default",
+        });
+        return;
+      }
+      
+      // Usuario existe y se envió el link
       toast({
         title: t("auth.linkSentTitle"),
         description: t("auth.linkSentDescription"),

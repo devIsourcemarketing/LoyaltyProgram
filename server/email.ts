@@ -2429,6 +2429,7 @@ export interface BienvenidaEmailData {
   email: string;
   firstName?: string;
   lastName?: string;
+  loginToken?: string; // Optional magic link token for first access
 }
 
 /**
@@ -2456,6 +2457,11 @@ export async function sendBienvenidaEmail(data: BienvenidaEmailData): Promise<bo
     const img3Url2x = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764344186/loyalty-program/emails/bienvenida/Group%2060%402x.png';
     const footerImageUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764337229/loyalty-program/emails/expectativa/footer.png';
     const userName = data.firstName || 'Usuario';
+    
+    // Construir URL de acceso si se proporciona loginToken
+    const loginUrl = data.loginToken 
+      ? `${process.env.APP_URL || 'https://kasperskycup.com'}/login/magic?token=${data.loginToken}`
+      : null;
     
     const sendSmtpEmail = new brevo.SendSmtpEmail();
     sendSmtpEmail.to = [{ 
@@ -2564,6 +2570,34 @@ export async function sendBienvenidaEmail(data: BienvenidaEmailData): Promise<bo
             line-height: 1.6;
           }
           
+          .access-button-container {
+            margin: 32px 0;
+            text-align: center;
+          }
+          
+          .access-button {
+            display: inline-block;
+            background-color: #29CCB1;
+            color: #FFFFFF !important;
+            text-decoration: none;
+            padding: 16px 48px;
+            border-radius: 4px;
+            font-size: 18px;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+          }
+          
+          .access-button:hover {
+            background-color: #23B39E;
+          }
+          
+          .access-note {
+            font-size: 13px;
+            color: #666666;
+            margin-top: 16px;
+            font-style: italic;
+          }
+          
           .footer-section {
             background-color: #1D1D1B;
             color: #FFFFFF;
@@ -2653,6 +2687,18 @@ export async function sendBienvenidaEmail(data: BienvenidaEmailData): Promise<bo
             <p class="message">
               Ingrese a <span class="highlight-text">kasperskycup.com</span>, conozca los términos y condiciones del programa y consulte su puntaje.
             </p>
+            
+            ${loginUrl ? `
+            <!-- Botón de Acceso -->
+            <div class="access-button-container">
+              <a href="${loginUrl}" class="access-button" style="display: inline-block; background-color: #29CCB1; color: #FFFFFF; text-decoration: none; padding: 16px 48px; border-radius: 4px; font-size: 18px; font-weight: 600;">
+                Acceder a mi cuenta
+              </a>
+              <p class="access-note" style="font-size: 13px; color: #666666; margin-top: 16px; font-style: italic;">
+                Este enlace de acceso expira en 7 días. Después de su primera visita, podrá solicitar nuevos enlaces de acceso desde la pantalla de inicio de sesión.
+              </p>
+            </div>
+            ` : ''}
             
             <!-- Tercera imagen -->
             <img src="${img3Url}" 
