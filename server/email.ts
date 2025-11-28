@@ -1475,7 +1475,7 @@ export async function sendRedemptionApprovedEmail(
               <a href="https://www.linkedin.com/company/kaspersky-lab" title="LinkedIn" style="display: inline-block; margin: 0 6px; text-decoration: none; background-color: #1D1D1B; padding: 8px; border-radius: 4px;">
                 <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338212/loyalty-program/emails/common/social-icons/Group%2025.png" alt="LinkedIn" style="width: 16px; height: 16px;" />
               </a>
-              <a href="https://www.instagram.com/kaspersky/" title="Instagram" style="display: inline-block; margin: 0 6px; text-decoration: none; background-color: #1D1D1B; padding: 8px; border-radius: 4px;">
+              <a href="https://www.instagram.com/kasperskylab/" title="Instagram" style="display: inline-block; margin: 0 6px; text-decoration: none; background-color: #1D1D1B; padding: 8px; border-radius: 4px;">
                 <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338213/loyalty-program/emails/common/social-icons/Group%2027.png" alt="Instagram" style="width: 16px; height: 16px;" />
               </a>
               <a href="https://www.youtube.com/user/Kaspersky" title="YouTube" style="display: inline-block; margin: 0 6px; text-decoration: none; background-color: #1D1D1B; padding: 8px; border-radius: 4px;">
@@ -1517,7 +1517,7 @@ Siga a Kaspersky en nuestras redes sociales:
 - Facebook: https://www.facebook.com/Kaspersky
 - Twitter: https://twitter.com/kaspersky
 - LinkedIn: https://www.linkedin.com/company/kaspersky-lab
-- Instagram: https://www.instagram.com/kaspersky/
+- Instagram: https://www.instagram.com/kasperskylab/
 - YouTube: https://www.youtube.com/user/Kaspersky
 
 Saludos,
@@ -2043,7 +2043,7 @@ export async function sendExpectationEmail(data: ExpectationEmailData): Promise<
                 <a href="https://www.linkedin.com/company/kaspersky-lab" style="display: inline-block; margin: 0 6px; text-decoration: none;" title="LinkedIn">
                   <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338212/loyalty-program/emails/common/social-icons/Group%2025.png" alt="LinkedIn" style="width: 16px; height: 16px;" />
                 </a>
-                <a href="https://www.instagram.com/kaspersky/" style="display: inline-block; margin: 0 6px; text-decoration: none;" title="Instagram">
+                <a href="https://www.instagram.com/kasperskylab/" style="display: inline-block; margin: 0 6px; text-decoration: none;" title="Instagram">
                   <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338213/loyalty-program/emails/common/social-icons/Group%2027.png" alt="Instagram" style="width: 16px; height: 16px;" />
                 </a>
                 <a href="https://www.youtube.com/user/Kaspersky" style="display: inline-block; margin: 0 6px; text-decoration: none;" title="YouTube">
@@ -2069,7 +2069,7 @@ Siga a Kaspersky en nuestras redes sociales:
 - Facebook: https://www.facebook.com/Kaspersky
 - Twitter: https://twitter.com/kaspersky
 - LinkedIn: https://www.linkedin.com/company/kaspersky-lab
-- Instagram: https://www.instagram.com/kaspersky/
+- Instagram: https://www.instagram.com/kasperskylab/
 - YouTube: https://www.youtube.com/user/Kaspersky
 
 Saludos,
@@ -2362,7 +2362,7 @@ export async function sendRegistroExitosoEmail(data: RegistroExitosoEmailData): 
                 <a href="https://www.linkedin.com/company/kaspersky-lab" style="display: inline-block; margin: 0 6px; text-decoration: none;" title="LinkedIn">
                   <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338212/loyalty-program/emails/common/social-icons/Group%2025.png" alt="LinkedIn" style="width: 16px; height: 16px;" />
                 </a>
-                <a href="https://www.instagram.com/kaspersky/" style="display: inline-block; margin: 0 6px; text-decoration: none;" title="Instagram">
+                <a href="https://www.instagram.com/kasperskylab/" style="display: inline-block; margin: 0 6px; text-decoration: none;" title="Instagram">
                   <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338213/loyalty-program/emails/common/social-icons/Group%2027.png" alt="Instagram" style="width: 16px; height: 16px;" />
                 </a>
                 <a href="https://www.youtube.com/user/Kaspersky" style="display: inline-block; margin: 0 6px; text-decoration: none;" title="YouTube">
@@ -2397,7 +2397,7 @@ Siga a Kaspersky en nuestras redes sociales:
 - Facebook: https://www.facebook.com/Kaspersky
 - Twitter: https://twitter.com/kaspersky
 - LinkedIn: https://www.linkedin.com/company/kaspersky-lab
-- Instagram: https://www.instagram.com/kaspersky/
+- Instagram: https://www.instagram.com/kasperskylab/
 - YouTube: https://www.youtube.com/user/Kaspersky
 
 Saludos,
@@ -2684,7 +2684,7 @@ export async function sendBienvenidaEmail(data: BienvenidaEmailData): Promise<bo
                 <a href="https://www.linkedin.com/company/kaspersky-lab" style="display: inline-block; margin: 0 6px; text-decoration: none;" title="LinkedIn">
                   <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338212/loyalty-program/emails/common/social-icons/Group%2025.png" alt="LinkedIn" style="width: 16px; height: 16px;" />
                 </a>
-                <a href="https://www.instagram.com/kaspersky/" style="display: inline-block; margin: 0 6px; text-decoration: none;" title="Instagram">
+                <a href="https://www.instagram.com/kasperskylab/" style="display: inline-block; margin: 0 6px; text-decoration: none;" title="Instagram">
                   <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338213/loyalty-program/emails/common/social-icons/Group%2027.png" alt="Instagram" style="width: 16px; height: 16px;" />
                 </a>
                 <a href="https://www.youtube.com/user/Kaspersky" style="display: inline-block; margin: 0 6px; text-decoration: none;" title="YouTube">
@@ -2716,7 +2716,7 @@ Siga a Kaspersky en nuestras redes sociales:
 - Facebook: https://www.facebook.com/Kaspersky
 - Twitter: https://twitter.com/kaspersky
 - LinkedIn: https://www.linkedin.com/company/kaspersky-lab
-- Instagram: https://www.instagram.com/kaspersky/
+- Instagram: https://www.instagram.com/kasperskylab/
 - YouTube: https://www.youtube.com/user/Kaspersky
 
 Saludos,
@@ -3006,7 +3006,7 @@ export async function sendMagicLinkEmail(data: MagicLinkEmailData): Promise<bool
                 <a href="https://www.linkedin.com/company/kaspersky-lab" style="display: inline-block; margin: 0 6px; text-decoration: none;" title="LinkedIn">
                   <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338212/loyalty-program/emails/common/social-icons/Group%2025.png" alt="LinkedIn" style="width: 16px; height: 16px;" />
                 </a>
-                <a href="https://www.instagram.com/kaspersky/" style="display: inline-block; margin: 0 6px; text-decoration: none;" title="Instagram">
+                <a href="https://www.instagram.com/kasperskylab/" style="display: inline-block; margin: 0 6px; text-decoration: none;" title="Instagram">
                   <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338213/loyalty-program/emails/common/social-icons/Group%2027.png" alt="Instagram" style="width: 16px; height: 16px;" />
                 </a>
                 <a href="https://www.youtube.com/user/Kaspersky" style="display: inline-block; margin: 0 6px; text-decoration: none;" title="YouTube">
@@ -3038,7 +3038,7 @@ Siga a Kaspersky en nuestras redes sociales:
 - Facebook: https://www.facebook.com/Kaspersky
 - Twitter: https://twitter.com/kaspersky
 - LinkedIn: https://www.linkedin.com/company/kaspersky-lab
-- Instagram: https://www.instagram.com/kaspersky/
+- Instagram: https://www.instagram.com/kasperskylab/
 - YouTube: https://www.youtube.com/user/Kaspersky
 
 Saludos,
@@ -3365,7 +3365,7 @@ export async function sendGolesRegistradosEmail(data: GolesRegistradosEmailData)
               <a href="https://www.linkedin.com/company/kaspersky-lab" style="display: inline-block; margin: 0 6px; text-decoration: none;" title="LinkedIn">
                 <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338212/loyalty-program/emails/common/social-icons/Group%2025.png" alt="LinkedIn" style="width: 16px; height: 16px;" />
               </a>
-              <a href="https://www.instagram.com/kaspersky/" style="display: inline-block; margin: 0 6px; text-decoration: none;" title="Instagram">
+              <a href="https://www.instagram.com/kasperskylab/" style="display: inline-block; margin: 0 6px; text-decoration: none;" title="Instagram">
                 <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338213/loyalty-program/emails/common/social-icons/Group%2027.png" alt="Instagram" style="width: 16px; height: 16px;" />
               </a>
               <a href="https://www.youtube.com/user/Kaspersky" style="display: inline-block; margin: 0 6px; text-decoration: none;" title="YouTube">
@@ -3408,7 +3408,7 @@ Siga a Kaspersky en nuestras redes sociales:
 - Facebook: https://www.facebook.com/Kaspersky
 - Twitter: https://twitter.com/kaspersky
 - LinkedIn: https://www.linkedin.com/company/kaspersky-lab
-- Instagram: https://www.instagram.com/kaspersky/
+- Instagram: https://www.instagram.com/kasperskylab/
 - YouTube: https://www.youtube.com/user/Kaspersky
 
 Saludos,
@@ -3745,7 +3745,7 @@ export async function sendPendienteAprobacionEmail(data: PendienteAprobacionEmai
               <a href="https://www.linkedin.com/company/kaspersky-lab" title="LinkedIn" style="display: inline-block; margin: 0 6px; text-decoration: none; background-color: #1D1D1B; padding: 8px; border-radius: 4px;">
                 <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338212/loyalty-program/emails/common/social-icons/Group%2025.png" alt="LinkedIn" style="width: 16px; height: 16px;" />
               </a>
-              <a href="https://www.instagram.com/kaspersky/" title="Instagram" style="display: inline-block; margin: 0 6px; text-decoration: none; background-color: #1D1D1B; padding: 8px; border-radius: 4px;">
+              <a href="https://www.instagram.com/kasperskylab/" title="Instagram" style="display: inline-block; margin: 0 6px; text-decoration: none; background-color: #1D1D1B; padding: 8px; border-radius: 4px;">
                 <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338213/loyalty-program/emails/common/social-icons/Group%2027.png" alt="Instagram" style="width: 16px; height: 16px;" />
               </a>
               <a href="https://www.youtube.com/user/Kaspersky" title="YouTube" style="display: inline-block; margin: 0 6px; text-decoration: none; background-color: #1D1D1B; padding: 8px; border-radius: 4px;">
@@ -3781,7 +3781,7 @@ Siga a Kaspersky en nuestras redes sociales:
 - Facebook: https://www.facebook.com/Kaspersky
 - Twitter: https://twitter.com/kaspersky
 - LinkedIn: https://www.linkedin.com/company/kaspersky-lab
-- Instagram: https://www.instagram.com/kaspersky/
+- Instagram: https://www.instagram.com/kasperskylab/
 - YouTube: https://www.youtube.com/user/Kaspersky
 
 Saludos,
@@ -4149,7 +4149,7 @@ export async function sendGanadorPremioMayorEmail(data: GanadorPremioMayorEmailD
               <a href="https://www.linkedin.com/company/kaspersky-lab" title="LinkedIn" style="display: inline-block; margin: 0 6px; text-decoration: none; background-color: #1D1D1B; padding: 8px; border-radius: 4px;">
                 <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338212/loyalty-program/emails/common/social-icons/Group%2025.png" alt="LinkedIn" style="width: 16px; height: 16px;" />
               </a>
-              <a href="https://www.instagram.com/kaspersky/" title="Instagram" style="display: inline-block; margin: 0 6px; text-decoration: none; background-color: #1D1D1B; padding: 8px; border-radius: 4px;">
+              <a href="https://www.instagram.com/kasperskylab/" title="Instagram" style="display: inline-block; margin: 0 6px; text-decoration: none; background-color: #1D1D1B; padding: 8px; border-radius: 4px;">
                 <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338213/loyalty-program/emails/common/social-icons/Group%2027.png" alt="Instagram" style="width: 16px; height: 16px;" />
               </a>
               <a href="https://www.youtube.com/user/Kaspersky" title="YouTube" style="display: inline-block; margin: 0 6px; text-decoration: none; background-color: #1D1D1B; padding: 8px; border-radius: 4px;">
@@ -4192,7 +4192,7 @@ Siga a Kaspersky en nuestras redes sociales:
 - Facebook: https://www.facebook.com/Kaspersky
 - Twitter: https://twitter.com/kaspersky
 - LinkedIn: https://www.linkedin.com/company/kaspersky-lab
-- Instagram: https://www.instagram.com/kaspersky/
+- Instagram: https://www.instagram.com/kasperskylab/
 - YouTube: https://www.youtube.com/user/Kaspersky
 
 Saludos,
