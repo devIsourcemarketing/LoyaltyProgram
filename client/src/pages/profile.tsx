@@ -125,8 +125,8 @@ export default function ProfilePage() {
     },
     onSuccess: (data) => {
       toast({
-        title: "✅ Profile Updated",
-        description: "Your profile information has been updated successfully.",
+        title: t("common.success"),
+        description: t("profile.profileUpdated"),
       });
       queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
       resetProfile(data.user);
@@ -171,8 +171,8 @@ export default function ProfilePage() {
     },
     onSuccess: () => {
       toast({
-        title: "✅ Password Changed",
-        description: "Your password has been updated successfully.",
+        title: t("common.success"),
+        description: t("profile.passwordUpdated"),
       });
       resetPassword();
     },

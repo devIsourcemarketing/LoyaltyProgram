@@ -176,7 +176,6 @@ export default function Navigation({ user }: NavigationProps) {
                     {t("common.profile")}
                   </DropdownMenuItem>
                 </Link>
-                <DropdownMenuItem data-testid="menu-settings">Settings</DropdownMenuItem>
                 <DropdownMenuItem onClick={handleLogout} data-testid="menu-logout">
                   {t("common.logout")}
                 </DropdownMenuItem>

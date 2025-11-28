@@ -236,7 +236,7 @@ export default function Admin() {
     onSuccess: () => {
       toast({
         title: t("common.success"),
-        description: "Deal approved successfully",
+        description: t("common.dealApprovedSuccessfully"),
       });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/deals"] });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/deals/pending"] });
@@ -258,7 +258,7 @@ export default function Admin() {
     onSuccess: () => {
       toast({
         title: t("common.success"),
-        description: "Deal rejected",
+        description: t("common.dealRejected"),
       });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/deals"] });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/deals/pending"] });
@@ -280,7 +280,7 @@ export default function Admin() {
     onSuccess: () => {
       toast({
         title: t("common.success"),
-        description: "User role updated successfully",
+        description: t("common.userRoleUpdatedSuccessfully"),
       });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
     },
@@ -319,7 +319,7 @@ export default function Admin() {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
       toast({
         title: t("common.success"),
-        description: "User created successfully",
+        description: t("common.userCreatedSuccessfully"),
       });
       setIsCreateUserModalOpen(false);
       createUserForm.reset();
@@ -354,7 +354,7 @@ export default function Admin() {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
       toast({
         title: t("common.success"),
-        description: "User updated successfully",
+        description: t("common.userUpdatedSuccessfully"),
       });
       setIsEditUserModalOpen(false);
       setSelectedUser(null);
@@ -400,7 +400,7 @@ export default function Admin() {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/reports"] });
       toast({
         title: t("common.success"),
-        description: "User deleted successfully",
+        description: t("common.userDeletedSuccessfully"),
       });
     },
     onError: (error: any) => {
@@ -465,7 +465,7 @@ export default function Admin() {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
       toast({
         title: t("common.success"),
-        description: "User approved successfully",
+        description: t("common.userApprovedSuccessfully"),
       });
     },
     onError: (error: any) => {
@@ -487,7 +487,7 @@ export default function Admin() {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
       toast({
         title: t("common.success"),
-        description: "User rejected successfully",
+        description: t("common.userRejectedSuccessfully"),
       });
     },
     onError: (error: any) => {

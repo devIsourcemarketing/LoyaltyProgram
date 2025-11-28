@@ -71,7 +71,7 @@ export default function Login() {
     onSuccess: () => {
       toast({
         title: t("common.success"),
-        description: "Logged in successfully",
+        description: t("common.loggedInSuccessfully"),
       });
       queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
     },
@@ -89,7 +89,7 @@ export default function Login() {
     onSuccess: (data: any) => {
       toast({
         title: t("common.success"),
-        description: data.message || "Account created successfully. Please wait for administrator approval before you can log in.",
+        description: data.message || t("common.accountCreatedSuccessfully"),
       });
       setIsLogin(true);
       registerForm.reset();
