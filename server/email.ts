@@ -3147,3 +3147,427 @@ Kaspersky Cup
     return false;
   }
 }
+
+export interface GanadorPremioMayorEmailData {
+  email: string;
+  firstName: string;
+  lastName: string;
+  periodo: string;
+  fechaPartido: string;
+  hora: string;
+  lugar: string;
+}
+
+/**
+ * Envía un email cuando se anuncia el ganador del premio mayor (viaje a la Copa Mundial)
+ */
+export async function sendGanadorPremioMayorEmail(data: GanadorPremioMayorEmailData): Promise<boolean> {
+  try {
+    if (!BREVO_API_KEY) {
+      console.warn('⚠️  BREVO_API_KEY no configurada. Email no enviado.');
+      console.log('📧 Simulated ganador premio mayor email to:', data.email);
+      console.log('🏆 Ganador del periodo:', data.periodo);
+      return true;
+    }
+
+    console.log('📤 Intentando enviar email de ganador premio mayor...');
+    console.log('   Destinatario:', data.email);
+    console.log('   Remitente:', FROM_EMAIL);
+
+    // Imágenes alojadas en Cloudinary (Europa)
+    const heroImageUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764346361/loyalty-program/emails/ganador-premio-mayor/Group%2066.jpg';
+    const heroImage2xUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764346362/loyalty-program/emails/ganador-premio-mayor/Group%2066%402x.jpg';
+    const maletasImageUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764346432/loyalty-program/emails/ganador-premio-mayor/Mail%2007%20-%2002.png';
+    const maletasImage2xUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764346434/loyalty-program/emails/ganador-premio-mayor/Mail%2007%20-%2002%402x.png';
+    const estadioImageUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764346365/loyalty-program/emails/ganador-premio-mayor/Group%2067.jpg';
+    const estadioImage2xUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764346369/loyalty-program/emails/ganador-premio-mayor/Group%2067%402x.jpg';
+    const logoKasperskyUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764346371/loyalty-program/emails/ganador-premio-mayor/Logo%20-%20Kaspersky%20Cup.png';
+    
+    const userName = data.firstName || 'Usuario';
+    
+    const sendSmtpEmail = new brevo.SendSmtpEmail();
+    sendSmtpEmail.to = [{ email: data.email, name: `${data.firstName} ${data.lastName}` }];
+    sendSmtpEmail.sender = { email: FROM_EMAIL, name: 'Kaspersky Cup' };
+    sendSmtpEmail.subject = '🏆 ¡Usted fue el máximo goleador de Kaspersky Cup!';
+    sendSmtpEmail.htmlContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+          * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+          }
+          
+          body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #000000;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+          }
+          
+          .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #000000;
+          }
+          
+          .header-logo {
+            text-align: center;
+            padding: 24px 0;
+            background-color: #000000;
+          }
+          
+          .header-logo img {
+            width: 120px;
+            height: auto;
+          }
+          
+          .hero-image-section {
+            position: relative;
+            text-align: center;
+            background-color: #000000;
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+          }
+          
+          .hero-image {
+            width: 100%;
+            max-width: 600px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+          }
+          
+          .content-section {
+            background-color: #FFFFFF;
+            padding: 40px;
+            text-align: center;
+          }
+          
+          .greeting {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1D1D1B;
+            margin-bottom: 8px;
+          }
+          
+          .name {
+            font-size: 32px;
+            font-weight: 700;
+            color: #29CCB1;
+            margin-bottom: 24px;
+          }
+          
+          .message {
+            font-size: 16px;
+            color: #1D1D1B;
+            line-height: 1.6;
+            margin-bottom: 16px;
+          }
+          
+          .highlight-text {
+            color: #29CCB1;
+            font-weight: 600;
+          }
+          
+          .maletas-section {
+            margin: 32px 0;
+          }
+          
+          .maletas-image {
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+          }
+          
+          .info-table {
+            width: 100%;
+            margin: 24px 0;
+            border-collapse: collapse;
+          }
+          
+          .info-table tr {
+            border-bottom: 1px solid #E5E7EB;
+          }
+          
+          .info-table tr:last-child {
+            border-bottom: none;
+          }
+          
+          .info-header {
+            background-color: #29CCB1;
+            color: #FFFFFF;
+            font-weight: 600;
+            padding: 12px 16px;
+            text-align: left;
+            width: 40%;
+          }
+          
+          .info-value {
+            background-color: #F9FAFB;
+            padding: 12px 16px;
+            text-align: left;
+            color: #1D1D1B;
+          }
+          
+          .prize-notice {
+            background-color: #1D1D1B;
+            color: #FFFFFF;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 24px 0;
+            font-size: 14px;
+            line-height: 1.6;
+          }
+          
+          .estadio-section {
+            margin: 32px 0;
+            background-color: #000000;
+            padding: 40px 20px;
+            border-radius: 8px;
+          }
+          
+          .estadio-image {
+            width: 100%;
+            max-width: 500px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+          }
+          
+          .thank-you-text {
+            color: #FFFFFF;
+            font-size: 24px;
+            font-weight: 700;
+            text-align: center;
+            margin-top: 20px;
+          }
+          
+          .thank-you-subtext {
+            color: #29CCB1;
+            font-size: 20px;
+            font-weight: 700;
+            text-align: center;
+          }
+          
+          .footer-section {
+            background-color: #FFFFFF;
+            color: #1D1D1B;
+            padding: 48px 40px;
+            text-align: center;
+          }
+          
+          .social-title {
+            font-size: 14px;
+            color: #1D1D1B;
+            margin-bottom: 16px;
+            font-weight: 400;
+          }
+          
+          .social-links a {
+            display: inline-block;
+            margin: 0 6px;
+            text-decoration: none;
+            background-color: #1D1D1B;
+            padding: 8px;
+            border-radius: 4px;
+          }
+          
+          .footer-logo {
+            margin-top: 32px;
+          }
+          
+          .footer-logo img {
+            width: 120px;
+            height: auto;
+            display: inline-block;
+          }
+          
+          @media only screen and (max-width: 600px) {
+            .content-section {
+              padding: 24px;
+            }
+            
+            .greeting, .name {
+              font-size: 24px;
+            }
+            
+            .message {
+              font-size: 14px;
+            }
+            
+            .footer-section {
+              padding: 36px 24px;
+            }
+            
+            .info-header, .info-value {
+              padding: 10px 12px;
+              font-size: 14px;
+            }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="email-container">
+          <!-- Logo Header en fondo negro -->
+          <div class="header-logo">
+            <img src="${logoKasperskyUrl}" alt="Kaspersky" />
+          </div>
+          
+          <!-- Imagen Hero -->
+          <div class="hero-image-section">
+            <img src="${heroImageUrl}" 
+                 srcset="${heroImageUrl} 1x, ${heroImage2xUrl} 2x"
+                 alt="Prepare sus maletas para vivir un partido de la Copa Mundial de Fútbol" 
+                 class="hero-image" 
+                 style="width: 100%; max-width: 600px; height: auto; display: block;" />
+          </div>
+          
+          <!-- Contenido -->
+          <div class="content-section">
+            <div class="greeting">HOLA</div>
+            <div class="name">(${userName})</div>
+            
+            <p class="message">
+              <strong>¡Se lo ha ganado!</strong><br>
+              Con jugadas increíbles y muchos goles, reconocemos que<br>
+              usted fue el <span class="highlight-text">máximo goleador de la competencia</span>.
+            </p>
+            
+            <div class="maletas-section">
+              <img src="${maletasImageUrl}" 
+                   srcset="${maletasImageUrl} 1x, ${maletasImage2xUrl} 2x"
+                   alt="Maletas" 
+                   class="maletas-image" />
+            </div>
+            
+            <p class="message">
+              Ahora es momento de hacer las maletas y vivir<br>
+              esta experiencia única: <span class="highlight-text">asistir a un partido real<br>
+              de la Copa Mundial</span>.
+            </p>
+            
+            <table class="info-table">
+              <tr>
+                <td class="info-header">Periodo</td>
+                <td class="info-value">${data.periodo}</td>
+              </tr>
+              <tr>
+                <td class="info-header">Fecha</td>
+                <td class="info-value">${data.fechaPartido}</td>
+              </tr>
+              <tr>
+                <td class="info-header">Hora</td>
+                <td class="info-value">${data.hora}</td>
+              </tr>
+              <tr>
+                <td class="info-header">Lugar</td>
+                <td class="info-value">${data.lugar}</td>
+              </tr>
+            </table>
+            
+            <div class="prize-notice">
+              <strong>Su premio incluye una experiencia completa</strong><br>
+              (vuelo de ida y vuelta, hospedaje y alimentación)
+              <br><br>
+              Nos pondremos en contacto contigo para hacer<br>
+              la entrega oficial de tu ticket.
+            </div>
+            
+            <div class="estadio-section">
+              <img src="${estadioImageUrl}" 
+                   srcset="${estadioImageUrl} 1x, ${estadioImage2xUrl} 2x"
+                   alt="Estadio" 
+                   class="estadio-image" />
+              <div class="thank-you-text">
+                Gracias por su<br>
+                esfuerzo, dedicación<br>
+                y entrega en
+              </div>
+              <div class="thank-you-subtext">Kaspersky Cup!</div>
+            </div>
+          </div>
+          
+          <!-- Footer Section -->
+          <div class="footer-section">
+            <!-- Texto Siga a Kaspersky -->
+            <div class="social-title">Siga a Kaspersky :</div>
+            
+            <!-- Redes Sociales -->
+            <div class="social-links">
+              <a href="https://www.facebook.com/Kaspersky" title="Facebook" style="display: inline-block; margin: 0 6px; text-decoration: none; background-color: #1D1D1B; padding: 8px; border-radius: 4px;">
+                <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338210/loyalty-program/emails/common/social-icons/Group%2023.png" alt="Facebook" style="width: 16px; height: 16px;" />
+              </a>
+              <a href="https://twitter.com/kaspersky" title="Twitter" style="display: inline-block; margin: 0 6px; text-decoration: none; background-color: #1D1D1B; padding: 8px; border-radius: 4px;">
+                <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338220/loyalty-program/emails/common/social-icons/Subtraction%201.png" alt="Twitter" style="width: 16px; height: 16px;" />
+              </a>
+              <a href="https://www.linkedin.com/company/kaspersky-lab" title="LinkedIn" style="display: inline-block; margin: 0 6px; text-decoration: none; background-color: #1D1D1B; padding: 8px; border-radius: 4px;">
+                <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338212/loyalty-program/emails/common/social-icons/Group%2025.png" alt="LinkedIn" style="width: 16px; height: 16px;" />
+              </a>
+              <a href="https://www.instagram.com/kaspersky/" title="Instagram" style="display: inline-block; margin: 0 6px; text-decoration: none; background-color: #1D1D1B; padding: 8px; border-radius: 4px;">
+                <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338213/loyalty-program/emails/common/social-icons/Group%2027.png" alt="Instagram" style="width: 16px; height: 16px;" />
+              </a>
+              <a href="https://www.youtube.com/user/Kaspersky" title="YouTube" style="display: inline-block; margin: 0 6px; text-decoration: none; background-color: #1D1D1B; padding: 8px; border-radius: 4px;">
+                <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338215/loyalty-program/emails/common/social-icons/Group%2028.png" alt="YouTube" style="width: 16px; height: 16px;" />
+              </a>
+            </div>
+            
+            <!-- Logo Kaspersky al final -->
+            <div class="footer-logo">
+              <img src="${logoKasperskyUrl}" alt="Kaspersky" />
+            </div>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+    sendSmtpEmail.textContent = `
+Kaspersky Cup - ¡Usted fue el máximo goleador!
+
+HOLA ${userName}
+
+¡Se lo ha ganado!
+Con jugadas increíbles y muchos goles, reconocemos que usted fue el máximo goleador de la competencia.
+
+Ahora es momento de hacer las maletas y vivir esta experiencia única: asistir a un partido real de la Copa Mundial.
+
+Detalles del viaje:
+- Periodo: ${data.periodo}
+- Fecha: ${data.fechaPartido}
+- Hora: ${data.hora}
+- Lugar: ${data.lugar}
+
+Su premio incluye una experiencia completa (vuelo de ida y vuelta, hospedaje y alimentación)
+
+Nos pondremos en contacto contigo para hacer la entrega oficial de tu ticket.
+
+Gracias por su esfuerzo, dedicación y entrega en Kaspersky Cup!
+
+Siga a Kaspersky en nuestras redes sociales:
+- Facebook: https://www.facebook.com/Kaspersky
+- Twitter: https://twitter.com/kaspersky
+- LinkedIn: https://www.linkedin.com/company/kaspersky-lab
+- Instagram: https://www.instagram.com/kaspersky/
+- YouTube: https://www.youtube.com/user/Kaspersky
+
+Saludos,
+Kaspersky Cup
+    `.trim();
+
+    await apiInstance.sendTransacEmail(sendSmtpEmail);
+    console.log('Ganador premio mayor email sent successfully to:', data.email);
+    return true;
+  } catch (error) {
+    console.error('Error sending ganador premio mayor email:', error);
+    return false;
+  }
+}

@@ -9,13 +9,13 @@
  * npm run test:email -- --type=goles-registrados --email=tu@email.com --firstName=Juan --lastName=Pérez
  * 
  * Parámetros:
- * --type: Tipo de email (expectativa, registro-exitoso, bienvenida, magic-link, goles-registrados)
+ * --type: Tipo de email (expectativa, registro-exitoso, bienvenida, magic-link, goles-registrados, ganador-premio-mayor)
  * --email: Email del destinatario
  * --firstName: Nombre (opcional, default: "Usuario")
  * --lastName: Apellido (opcional, default: "Prueba")
  */
 
-import { sendExpectationEmail, sendRegistroExitosoEmail, sendBienvenidaEmail, sendMagicLinkEmail, sendGolesRegistradosEmail } from './server/email';
+import { sendExpectationEmail, sendRegistroExitosoEmail, sendBienvenidaEmail, sendMagicLinkEmail, sendGolesRegistradosEmail, sendGanadorPremioMayorEmail } from './server/email';
 
 // Función para obtener argumentos de línea de comandos
 function getArg(name: string, defaultValue?: string): string {
@@ -87,6 +87,19 @@ async function testEmail() {
         });
         break;
       
+      case 'ganador-premio-mayor':
+        console.log('📤 Enviando Email de Ganador Premio Mayor...\n');
+        result = await sendGanadorPremioMayorEmail({ 
+          email, 
+          firstName, 
+          lastName,
+          periodo: 'Enero - Marzo 2026',
+          fechaPartido: '15 de Junio de 2026',
+          hora: '18:00 hrs',
+          lugar: 'Estadio Azteca, Ciudad de México'
+        });
+        break;
+      
       // Aquí puedes agregar más tipos de email
       // case 'otro-tipo':
       //   result = await sendOtroEmail({ email, firstName, lastName });
@@ -100,6 +113,7 @@ async function testEmail() {
         console.log('   - bienvenida');
         console.log('   - magic-link');
         console.log('   - goles-registrados');
+        console.log('   - ganador-premio-mayor');
         process.exit(1);
     }
 

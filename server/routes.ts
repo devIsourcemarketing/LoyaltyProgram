@@ -17,7 +17,8 @@ import {
   sendMagicLinkEmail,
   sendExpectationEmail,
   sendRegistroExitosoEmail,
-  sendBienvenidaEmail
+  sendBienvenidaEmail,
+  sendGanadorPremioMayorEmail
 } from "./email.js";
 
 // Extend session data interface
@@ -3326,6 +3327,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Get grand prize ranking error:", error);
       res.status(500).json({ message: "Failed to get grand prize ranking" });
+    }
+  });
+
+  app.post("/api/admin/grand-prize/announce-winner", async (req, res) => {
+    if (!req.session.userId || req.session.userRole !== "admin") {
+      return res.status(403).json({ message: "Admin access required" });
+    }
+
+    try {
+      const { userId, periodo, fechaPartido, hora, lugar } = req.body;
+      
+      if (!userId) {
+        return res.status(400).json({ message: "User ID is required" });
+      }
+
+      // Obtener información del usuario ganador
+      const winner = await storage.getUser(userId);
+      if (!winner) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Enviar email al ganador
+      await sendGanadorPremioMayorEmail({
+        email: winner.email,
+        firstName: winner.firstName,
+        lastName: winner.lastName,
+        periodo: periodo || 'Competencia Kaspersky Cup',
+        fechaPartido: fechaPartido || 'Por confirmar',
+        hora: hora || 'Por confirmar',
+        lugar: lugar || 'Por confirmar'
+      });
+
+      res.json({ 
+        message: "Winner announcement email sent successfully",
+        winner: {
+          id: winner.id,
+          email: winner.email,
+          firstName: winner.firstName,
+          lastName: winner.lastName
+        }
+      });
+    } catch (error) {
+      console.error("Announce grand prize winner error:", error);
+      res.status(500).json({ message: "Failed to announce winner" });
     }
   });
 
