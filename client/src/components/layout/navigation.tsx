@@ -11,7 +11,7 @@ import { logout } from "@/lib/auth";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "@/hooks/useTranslation";
 import type { AuthUser } from "@/lib/auth";
-import kasperskyLogo from "@/assets/kaspersky-logo.svg";
+import kasperskyLogo from "@/assets/logo-kaspersky-cup.png";
 import { NotificationBell } from "@/components/NotificationBell";
 import { isAdminRole } from "@/lib/roles";
 
