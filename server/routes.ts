@@ -15,7 +15,8 @@ import {
   sendRedemptionRequestToAdmin,
   sendSupportTicketToAdmin,
   sendMagicLinkEmail,
-  sendExpectationEmail
+  sendExpectationEmail,
+  sendRegistroExitosoEmail
 } from "./email.js";
 
 // Extend session data interface
@@ -1193,17 +1194,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         invitedFromRegion: adminUser?.region || null, // Track from which region the invitation was sent
       });
 
-      // Send invite email
-      const emailSent = await sendInviteEmail({
+      // Send Registro Exitoso email (Kaspersky Cup welcome/invite email)
+      const emailSent = await sendRegistroExitosoEmail({
         email,
         firstName,
         lastName,
-        inviteToken,
-        invitedBy: adminName,
+        inviteToken
       });
 
       if (!emailSent) {
-        console.warn("Failed to send invite email, but user was created");
+        console.warn("Failed to send registro exitoso email, but user was created");
       }
 
       res.status(201).json({ 
@@ -1311,13 +1311,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
             invitedFromRegion: adminUser?.region || null, // Track from which region the invitation was sent
           });
 
-          // Send invite email
-          const emailSent = await sendInviteEmail({
+          // Send Registro Exitoso email (Kaspersky Cup welcome/invite email)
+          const emailSent = await sendRegistroExitosoEmail({
             email,
             firstName,
             lastName,
-            inviteToken,
-            invitedBy: adminName,
+            inviteToken
           });
 
           results.success.push({
@@ -3771,6 +3770,125 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ 
         success: false, 
         message: "Failed to send batch expectation emails" 
+      });
+    }
+  });
+
+  /**
+   * Endpoint para enviar el email de registro exitoso a un usuario
+   * Se llama después de que un usuario completa su registro
+   */
+  app.post("/api/admin/send-registro-exitoso-email", async (req, res) => {
+    const userRole = req.session?.userRole;
+    
+    if (!isAdminRole(userRole)) {
+      return res.status(403).json({ message: "Admin access required" });
+    }
+
+    try {
+      const { email, firstName, lastName } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ message: "Email is required" });
+      }
+
+      // Validar formato de email
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({ message: "Invalid email format" });
+      }
+
+      const emailSent = await sendRegistroExitosoEmail({
+        email,
+        firstName,
+        lastName
+      });
+
+      if (emailSent) {
+        res.json({ 
+          success: true, 
+          message: "Registro exitoso email sent successfully" 
+        });
+      } else {
+        res.status(500).json({ 
+          success: false, 
+          message: "Failed to send registro exitoso email" 
+        });
+      }
+    } catch (error) {
+      console.error("Send registro exitoso email error:", error);
+      res.status(500).json({ 
+        success: false, 
+        message: "Failed to send registro exitoso email" 
+      });
+    }
+  });
+
+  /**
+   * Endpoint para enviar el email de registro exitoso a múltiples usuarios
+   * Útil para campañas masivas
+   */
+  app.post("/api/admin/send-registro-exitoso-email-batch", async (req, res) => {
+    const userRole = req.session?.userRole;
+    
+    if (!isAdminRole(userRole)) {
+      return res.status(403).json({ message: "Admin access required" });
+    }
+
+    try {
+      const { recipients } = req.body;
+      
+      if (!recipients || !Array.isArray(recipients) || recipients.length === 0) {
+        return res.status(400).json({ message: "Recipients array is required" });
+      }
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const results = {
+        total: recipients.length,
+        sent: 0,
+        failed: 0,
+        errors: [] as string[]
+      };
+
+      for (const recipient of recipients) {
+        try {
+          if (!recipient.email || !emailRegex.test(recipient.email)) {
+            results.failed++;
+            results.errors.push(`Invalid email: ${recipient.email || 'missing'}`);
+            continue;
+          }
+
+          const emailSent = await sendRegistroExitosoEmail({
+            email: recipient.email,
+            firstName: recipient.firstName,
+            lastName: recipient.lastName
+          });
+
+          if (emailSent) {
+            results.sent++;
+          } else {
+            results.failed++;
+            results.errors.push(`Failed to send to: ${recipient.email}`);
+          }
+
+          // Pequeña pausa para no saturar el servicio de email
+          await new Promise(resolve => setTimeout(resolve, 100));
+        } catch (error) {
+          results.failed++;
+          results.errors.push(`Error sending to ${recipient.email}: ${error}`);
+        }
+      }
+
+      res.json({ 
+        success: true, 
+        message: "Batch registro exitoso email sending completed",
+        results
+      });
+    } catch (error) {
+      console.error("Send batch registro exitoso email error:", error);
+      res.status(500).json({ 
+        success: false, 
+        message: "Failed to send batch registro exitoso emails" 
       });
     }
   });
