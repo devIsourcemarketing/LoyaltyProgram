@@ -192,6 +192,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Register without password (passwordless flow)
+  // Check if email belongs to an admin user
+  app.post("/api/auth/check-user-role", async (req, res) => {
+    try {
+      const { email } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ 
+          isAdmin: false,
+          hasPassword: false,
+          message: "Email is required" 
+        });
+      }
+
+      const user = await storage.getUserByEmail(email);
+      
+      if (!user) {
+        return res.json({ 
+          isAdmin: false,
+          hasPassword: false,
+          userExists: false 
+        });
+      }
+
+      // Verificar si es admin, regional-admin o super-admin
+      const isAdmin = user.role === "admin" || user.role === "regional-admin" || user.role === "super-admin";
+      
+      // Requiere contraseña si:
+      // 1. Es admin (cualquier tipo de admin)
+      // 2. Es usuario regular que NO es passwordless (creado por invitación/manual)
+      const requiresPassword = isAdmin || (user.isPasswordless === false && user.role === "user");
+      
+      res.json({ 
+        isAdmin,
+        hasPassword: user.isPasswordless === false,
+        userExists: true,
+        role: user.role,
+        isPasswordless: user.isPasswordless || false,
+        requiresPassword
+      });
+    } catch (error) {
+      console.error("Check user role error:", error);
+      res.status(500).json({ 
+        isAdmin: false,
+        hasPassword: false,
+        message: "Error checking user role" 
+      });
+    }
+  });
+
+  // Passwordless registration endpoint
   app.post("/api/auth/register-passwordless", async (req, res) => {
     try {
       const { email, firstName, lastName, country, region, category, subcategory } = req.body;
@@ -225,7 +275,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         regionSubcategory: subcategory || null,
         role: "user",
         isActive: true,
-        isApproved: false, // Requiere aprobación
+        isApproved: true, // Auto-aprobado para registro passwordless
+        isPasswordless: true, // Usuario passwordless
       });
 
       // Generar magic link para primer acceso
@@ -310,6 +361,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ 
           userExists: false,
           message: "No existe una cuenta con este email. Por favor, regístrate primero." 
+        });
+      }
+
+      // Verificar si es admin - los admins deben usar contraseña
+      const isAdmin = user.role === "admin" || user.role === "regional-admin" || user.role === "super-admin";
+      if (isAdmin) {
+        return res.status(403).json({ 
+          userExists: true,
+          isAdmin: true,
+          requiresPassword: true,
+          message: "Las cuentas de administrador deben usar contraseña para iniciar sesión." 
+        });
+      }
+
+      // Si el usuario NO es passwordless (campo explícito en DB), debe usar contraseña
+      if (user.isPasswordless === false && user.role === "user") {
+        return res.status(403).json({ 
+          userExists: true,
+          requiresPassword: true,
+          message: "Tu cuenta tiene contraseña configurada. Por favor, inicia sesión con tu contraseña." 
         });
       }
 

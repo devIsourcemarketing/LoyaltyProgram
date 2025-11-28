@@ -33,6 +33,7 @@ export const users = pgTable("users", {
   adminRegionId: varchar("admin_region_id").references(() => regionConfigs.id), // Para regional-admin: la región que administra. NULL para super-admin y users
   isActive: boolean("is_active").notNull().default(true),
   isApproved: boolean("is_approved").notNull().default(false),
+  isPasswordless: boolean("is_passwordless").notNull().default(false), // Usuario registrado por flujo passwordless (magic link)
   approvedBy: varchar("approved_by"),
   approvedAt: timestamp("approved_at"),
   inviteToken: text("invite_token"),

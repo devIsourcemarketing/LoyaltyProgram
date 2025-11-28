@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "@/hooks/useTranslation";
 import { login, register } from "@/lib/auth";
@@ -39,8 +38,9 @@ type RegisterForm = z.infer<typeof registerSchema>;
 export default function Login() {
   const { t } = useTranslation();
   const [isLogin, setIsLogin] = useState(true);
-  const [showMagicLinkDialog, setShowMagicLinkDialog] = useState(false);
-  const [magicLinkEmail, setMagicLinkEmail] = useState("");
+  const [emailForLogin, setEmailForLogin] = useState("");
+  const [isAdminEmail, setIsAdminEmail] = useState(false);
+  const [checkingEmail, setCheckingEmail] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [, setLocation] = useLocation();
@@ -119,6 +119,16 @@ export default function Login() {
         return { userExists: false, email, message: data.message };
       }
       
+      // Si es admin, debe usar contraseña
+      if (response.status === 403 && data.isAdmin) {
+        return { isAdmin: true, email, message: data.message };
+      }
+
+      // Si requiere contraseña, mostrar campo
+      if (response.status === 403 && data.requiresPassword) {
+        return { requiresPassword: true, email, message: data.message };
+      }
+      
       // Si hay otro error, lanzar excepción
       if (!response.ok) {
         throw new Error(data.message || "Failed to send magic link");
@@ -129,13 +139,35 @@ export default function Login() {
     onSuccess: (data) => {
       // Si el usuario no existe, redirigir a registro sin contraseña
       if (data.userExists === false) {
-        setShowMagicLinkDialog(false);
-        setMagicLinkEmail("");
         // Redirigir a página de registro passwordless con el email
         setLocation(`/passwordless-register?email=${encodeURIComponent(data.email)}`);
         toast({
           title: "Registro requerido",
           description: "No existe una cuenta con este email. Por favor, completa tu registro.",
+          variant: "default",
+        });
+        return;
+      }
+
+      // Si es admin, mostrar mensaje y activar campo de contraseña
+      if (data.isAdmin) {
+        setIsAdminEmail(true);
+        loginForm.setValue("username", data.email);
+        toast({
+          title: "Cuenta de administrador",
+          description: "Por favor, ingresa tu contraseña para continuar.",
+          variant: "default",
+        });
+        return;
+      }
+
+      // Si requiere contraseña (usuario creado por invitación), mostrar campo
+      if (data.requiresPassword) {
+        setIsAdminEmail(true);
+        loginForm.setValue("username", data.email);
+        toast({
+          title: "Contraseña requerida",
+          description: "Por favor, ingresa tu contraseña para continuar.",
           variant: "default",
         });
         return;
@@ -146,8 +178,7 @@ export default function Login() {
         title: t("auth.linkSentTitle"),
         description: t("auth.linkSentDescription"),
       });
-      setShowMagicLinkDialog(false);
-      setMagicLinkEmail("");
+      setEmailForLogin("");
     },
     onError: (error: any) => {
       toast({
@@ -164,6 +195,82 @@ export default function Login() {
 
   const onRegisterSubmit = (data: RegisterForm) => {
     registerMutation.mutate(data);
+  };
+
+  const handleEmailCheck = async (email: string) => {
+    if (!email || !email.includes('@')) {
+      setIsAdminEmail(false);
+      return;
+    }
+    
+    setCheckingEmail(true);
+    try {
+      const response = await fetch("/api/auth/check-user-role", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      
+      const data = await response.json();
+      
+      // Usar el flag requiresPassword del backend
+      // Este flag considera: admins O usuarios con isPasswordless = false
+      if (data.requiresPassword) {
+        setIsAdminEmail(true);
+        loginForm.setValue("username", email);
+      } else {
+        setIsAdminEmail(false);
+      }
+    } catch (error) {
+      // Si falla la verificación, asumir que no requiere contraseña
+      setIsAdminEmail(false);
+    } finally {
+      setCheckingEmail(false);
+    }
+  };
+
+  const handleEmailSubmit = async () => {
+    if (!emailForLogin || !emailForLogin.includes('@')) {
+      toast({
+        title: t("common.error"),
+        description: "Por favor ingresa un email válido",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Verificar si requiere contraseña ANTES de enviar magic link
+    setCheckingEmail(true);
+    try {
+      const response = await fetch("/api/auth/check-user-role", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: emailForLogin }),
+      });
+      
+      const data = await response.json();
+      
+      // Si requiere contraseña (admin o usuario con contraseña), mostrar campo de contraseña
+      if (data.requiresPassword) {
+        setIsAdminEmail(true);
+        loginForm.setValue("username", emailForLogin);
+        toast({
+          title: "Contraseña requerida",
+          description: "Por favor, ingresa tu contraseña para continuar.",
+          variant: "default",
+        });
+        return; // No enviar magic link
+      }
+      
+      // Si no requiere contraseña, enviar magic link
+      magicLinkMutation.mutate(emailForLogin);
+      
+    } catch (error) {
+      // Si falla la verificación, intentar enviar magic link de todos modos
+      magicLinkMutation.mutate(emailForLogin);
+    } finally {
+      setCheckingEmail(false);
+    }
   };
 
   const countries = [
@@ -205,82 +312,90 @@ export default function Login() {
         </CardHeader>
         <CardContent>
           {isLogin ? (
-            <Form {...loginForm}>
-              <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4">
-                <FormField
-                  control={loginForm.control}
-                  name="username"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Username</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Enter your username"
-                          data-testid="input-username"
-                          value={field.value}
-                          onChange={field.onChange}
-                          onBlur={field.onBlur}
-                          name={field.name}
-                          ref={field.ref}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+            <div className="space-y-4">
+              {/* Email input - siempre visible */}
+              <div className="space-y-2">
+                <Label htmlFor="email-login">{t("common.email")}</Label>
+                <Input
+                  id="email-login"
+                  type="email"
+                  placeholder={t("auth.yourEmail")}
+                  value={emailForLogin}
+                  onChange={(e) => {
+                    setEmailForLogin(e.target.value);
+                    setIsAdminEmail(false);
+                  }}
+                  onBlur={(e) => handleEmailCheck(e.target.value)}
+                  disabled={checkingEmail}
                 />
-                <FormField
-                  control={loginForm.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Password</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="password"
-                          placeholder="Enter your password"
-                          data-testid="input-password"
-                          value={field.value}
-                          onChange={field.onChange}
-                          onBlur={field.onBlur}
-                          name={field.name}
-                          ref={field.ref}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button
-                  type="submit"
-                  className="w-full button-green"
-                  disabled={loginMutation.isPending}
-                  data-testid="button-login"
-                >
-                  {loginMutation.isPending ? "Signing in..." : "Sign In"}
-                </Button>
-                
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t" />
-                  </div>
-                  <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-white px-2 text-muted-foreground">
-                      Or continue with
-                    </span>
-                  </div>
-                </div>
+              </div>
 
+              {/* Password field - solo visible si es admin */}
+              {isAdminEmail && (
+                <Form {...loginForm}>
+                  <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4">
+                    <FormField
+                      control={loginForm.control}
+                      name="password"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Password</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="password"
+                              placeholder="Enter your password"
+                              data-testid="input-password"
+                              value={field.value}
+                              onChange={field.onChange}
+                              onBlur={field.onBlur}
+                              name={field.name}
+                              ref={field.ref}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <Button
+                      type="submit"
+                      className="w-full button-green"
+                      disabled={loginMutation.isPending}
+                      data-testid="button-login"
+                    >
+                      {loginMutation.isPending ? "Signing in..." : "Sign In"}
+                    </Button>
+                  </form>
+                </Form>
+              )}
+
+              {/* Botón de magic link - solo visible si NO es admin */}
+              {!isAdminEmail && emailForLogin && (
                 <Button
                   type="button"
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => setShowMagicLinkDialog(true)}
+                  className="w-full button-green"
+                  onClick={handleEmailSubmit}
+                  disabled={magicLinkMutation.isPending || checkingEmail}
                 >
-                  <Mail className="mr-2 h-4 w-4" />
-                  Login without a password
+                  {magicLinkMutation.isPending ? (
+                    <>
+                      <Mail className="mr-2 h-4 w-4" />
+                      {t("support.submitting")}
+                    </>
+                  ) : (
+                    <>
+                      <Mail className="mr-2 h-4 w-4" />
+                      {t("auth.sendMagicLink")}
+                    </>
+                  )}
                 </Button>
-              </form>
-            </Form>
+              )}
+
+              {!emailForLogin && (
+                <div className="text-center text-sm text-muted-foreground py-4">
+                  Enter your email to continue
+                </div>
+              )}
+            </div>
           ) : (
             <Form {...registerForm}>
               <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className="space-y-4">
@@ -438,54 +553,6 @@ export default function Login() {
           </div>
         </CardContent>
       </Card>
-
-      {/* Magic Link Dialog */}
-      <Dialog open={showMagicLinkDialog} onOpenChange={setShowMagicLinkDialog}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>{t("auth.passwordlessAccess")}</DialogTitle>
-            <DialogDescription>
-              {t("auth.magicLinkDescription")}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="magic-link-email">{t("common.email")}</Label>
-              <Input
-                id="magic-link-email"
-                type="email"
-                placeholder={t("auth.yourEmail")}
-                value={magicLinkEmail}
-                onChange={(e) => setMagicLinkEmail(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && magicLinkEmail) {
-                    magicLinkMutation.mutate(magicLinkEmail);
-                  }
-                }}
-              />
-            </div>
-          </div>
-          <DialogFooter className="sm:justify-between">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => {
-                setShowMagicLinkDialog(false);
-                setMagicLinkEmail("");
-              }}
-            >
-              {t("common.cancel")}
-            </Button>
-            <Button
-              type="button"
-              onClick={() => magicLinkMutation.mutate(magicLinkEmail)}
-              disabled={!magicLinkEmail || magicLinkMutation.isPending}
-            >
-              {magicLinkMutation.isPending ? t("support.submitting") : t("auth.sendMagicLink")}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
