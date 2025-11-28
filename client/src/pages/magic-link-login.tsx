@@ -63,9 +63,9 @@ export default function MagicLinkLogin() {
             description: `Bienvenido de vuelta, ${data.user.firstName}`,
           });
           
-          // Redirigir al dashboard usando window.location para forzar recarga completa
+          // Redirigir a la raíz usando window.location para forzar recarga completa
           setTimeout(() => {
-            window.location.href = "/dashboard";
+            window.location.href = "/";
           }, 1500);
         } else {
           setIsValid(false);

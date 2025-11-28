@@ -2474,118 +2474,300 @@ Kaspersky Cup
 export async function sendMagicLinkEmail(data: MagicLinkEmailData): Promise<boolean> {
   try {
     if (!BREVO_API_KEY) {
-      console.warn('BREVO_API_KEY no configurada. Email no enviado.');
-      console.log('Simulated magic link email to:', data.email);
-      console.log('Magic link:', `${APP_URL}/login/magic?token=${data.loginToken}`);
-      return true; // Simular éxito en desarrollo
+      console.warn('⚠️  BREVO_API_KEY no configurada. Email no enviado.');
+      console.log('📧 Simulated magic link email to:', data.email);
+      console.log('🔗 Magic link:', `${APP_URL}/login/magic?token=${data.loginToken}`);
+      return true;
     }
+
+    console.log('📤 Intentando enviar email de magic link...');
+    console.log('   Destinatario:', data.email);
+    console.log('   Remitente:', FROM_EMAIL);
 
     const magicLink = `${APP_URL}/login/magic?token=${data.loginToken}`;
     
+    // Imágenes alojadas en Cloudinary (Europa)
+    const heroImageUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764344794/loyalty-program/emails/magic-link/Group%2061.png';
+    const heroImage2xUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764344796/loyalty-program/emails/magic-link/Group%2061%402x.png';
+    const footerImageUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764337229/loyalty-program/emails/expectativa/footer.png';
+    const userName = data.firstName || 'Usuario';
+    
     const sendSmtpEmail = new brevo.SendSmtpEmail();
     sendSmtpEmail.to = [{ email: data.email, name: `${data.firstName} ${data.lastName}` }];
-    sendSmtpEmail.sender = { email: FROM_EMAIL, name: 'Loyalty Program Platform' };
-    sendSmtpEmail.subject = '🔐 Tu enlace de acceso a LoyaltyPilot';
+    sendSmtpEmail.sender = { email: FROM_EMAIL, name: 'Kaspersky Cup' };
+    sendSmtpEmail.subject = '⚽ Tu enlace único de acceso - Kaspersky Cup';
     sendSmtpEmail.htmlContent = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <meta charset="utf-8">
-          <style>
-            body {
-              font-family: Arial, sans-serif;
-              line-height: 1.6;
-              color: #333;
-              max-width: 600px;
-              margin: 0 auto;
-              padding: 20px;
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+          * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+          }
+          
+          body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #FFFFFF;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+          }
+          
+          .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #FFFFFF;
+          }
+          
+          .hero-image-section {
+            position: relative;
+            text-align: center;
+            background-color: #FFFFFF;
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+          }
+          
+          .hero-image {
+            width: 100%;
+            max-width: 600px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+          }
+          
+          .content-section {
+            background-color: #FFFFFF;
+            padding: 40px;
+            text-align: center;
+          }
+          
+          .greeting {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1D1D1B;
+            margin-bottom: 8px;
+          }
+          
+          .name {
+            font-size: 32px;
+            font-weight: 700;
+            color: #29CCB1;
+            margin-bottom: 32px;
+          }
+          
+          .message {
+            font-size: 16px;
+            color: #1D1D1B;
+            line-height: 1.6;
+            margin-bottom: 24px;
+          }
+          
+          .highlight-text {
+            color: #29CCB1;
+            font-weight: 600;
+          }
+          
+          .cta-button {
+            display: inline-block;
+            background-color: #29CCB1;
+            color: #FFFFFF;
+            text-decoration: none;
+            padding: 14px 40px;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 24px 0;
+          }
+          
+          .link-text {
+            font-size: 14px;
+            color: #6B7280;
+            margin-top: 16px;
+          }
+          
+          .link-url {
+            color: #29CCB1;
+            word-break: break-all;
+          }
+          
+          .warning-box {
+            background-color: #1D1D1B;
+            border-radius: 4px;
+            padding: 24px;
+            margin: 32px 0;
+            text-align: left;
+            color: #FFFFFF;
+          }
+          
+          .warning-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-bottom: 16px;
+          }
+          
+          .warning-text {
+            font-size: 14px;
+            color: #FFFFFF;
+            line-height: 1.6;
+            margin-bottom: 8px;
+          }
+          
+          .footer-section {
+            background-color: #1D1D1B;
+            color: #FFFFFF;
+            padding: 48px 40px;
+            text-align: center;
+          }
+          
+          .footer-cup-badge {
+            margin: 0 auto 28px;
+            text-align: center;
+          }
+          
+          .footer-cup-image {
+            width: 250px;
+            height: auto;
+            display: inline-block;
+          }
+          
+          .social-section {
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+          }
+          
+          .social-title {
+            font-size: 14px;
+            color: #FFFFFF;
+            margin-bottom: 16px;
+            font-weight: 400;
+          }
+          
+          @media only screen and (max-width: 600px) {
+            .content-section {
+              padding: 24px;
             }
-            .header {
-              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-              color: white;
-              padding: 30px;
-              text-align: center;
-              border-radius: 10px 10px 0 0;
+            
+            .greeting, .name {
+              font-size: 24px;
             }
-            .content {
-              background: #f9fafb;
-              padding: 30px;
-              border-radius: 0 0 10px 10px;
+            
+            .message {
+              font-size: 14px;
             }
-            .button {
-              display: inline-block;
-              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-              color: white !important;
-              padding: 15px 30px;
-              text-decoration: none;
-              border-radius: 5px;
-              margin: 20px 0;
-              font-weight: bold;
+            
+            .footer-section {
+              padding: 36px 24px;
             }
-            .footer {
-              margin-top: 30px;
-              text-align: center;
-              color: #6b7280;
-              font-size: 12px;
-            }
-            .warning {
-              background: #fef3c7;
-              border-left: 4px solid #f59e0b;
-              padding: 15px;
-              margin: 20px 0;
-            }
-          </style>
-        </head>
-        <body>
-          <div class="header">
-            <h1>🔐 Acceso sin Contraseña</h1>
+          }
+        </style>
+      </head>
+      <body>
+        <div class="email-container">
+          <!-- Imagen Hero -->
+          <div class="hero-image-section">
+            <img src="${heroImageUrl}" 
+                 srcset="${heroImageUrl} 1x, ${heroImage2xUrl} 2x"
+                 alt="La emoción del fútbol, también se vive en las ventas" 
+                 class="hero-image" 
+                 style="width: 100%; max-width: 600px; height: auto; display: block;" />
           </div>
-          <div class="content">
-            <p>Hola ${data.firstName},</p>
+          
+          <!-- Contenido -->
+          <div class="content-section">
+            <div class="greeting">HOLA</div>
+            <div class="name">(${userName})</div>
             
-            <p>Has solicitado acceder a tu cuenta sin contraseña. Haz clic en el siguiente botón para iniciar sesión:</p>
-            
-            <div style="text-align: center;">
-              <a href="${magicLink}" class="button">Acceder Ahora</a>
-            </div>
-            
-            <p style="margin-top: 20px; font-size: 14px; color: #6b7280;">
-              O copia y pega este enlace en tu navegador:<br>
-              <a href="${magicLink}">${magicLink}</a>
+            <p class="message">
+              Haga clic en el siguiente botón para iniciar sesión<br>
+              en el programa <span class="highlight-text">Kaspersky Cup</span>:
             </p>
             
-            <div class="warning">
-              <p style="margin: 0;"><strong>⏰ Importante:</strong></p>
-              <ul style="margin: 10px 0 0 0; padding-left: 20px;">
-                <li>Este enlace expira en <strong>15 minutos</strong></li>
-                <li>Solo puede usarse <strong>una vez</strong></li>
-                <li>Si no solicitaste este acceso, ignora este email</li>
-              </ul>
+            <a href="${magicLink}" class="cta-button">Acceder ahora</a>
+            
+            <p class="link-text">
+              Si no puede acceder desde el botón, copie y pegue este enlace<br>
+              en su navegador:<br>
+              <a href="${magicLink}" class="link-url">${magicLink}</a>
+            </p>
+            
+            <div class="warning-box">
+              <div class="warning-title">IMPORTANTE:</div>
+              <div class="warning-text">Este enlace expira en <span class="highlight-text">15 minutos</span>.</div>
+              <div class="warning-text">Solo puede usarse <span class="highlight-text">una vez</span>.</div>
+              <div class="warning-text">Si no solicitó este acceso, <span class="highlight-text">ignore este correo</span>.</div>
+              <div class="warning-text">Este es un mensaje automático, por favor,<br><span class="highlight-text">no responda a este mensaje</span>.</div>
             </div>
           </div>
-          <div class="footer">
-            <p>Este es un correo automático, por favor no respondas a este mensaje.</p>
-            <p>&copy; ${new Date().getFullYear()} Loyalty Program Platform. Todos los derechos reservados.</p>
+          
+          <!-- Footer Section -->
+          <div class="footer-section">
+            <!-- Badge Kaspersky Cup -->
+            <div class="footer-cup-badge">
+              <img src="${footerImageUrl}" 
+                   alt="Kaspersky Cup" 
+                   class="footer-cup-image" 
+                   style="width: 250px; height: auto; display: inline-block;" />
+            </div>
+            
+            <!-- Redes Sociales -->
+            <div class="social-section">
+              <div class="social-title">Siga a Kaspersky :</div>
+              <div class="social-links">
+                <a href="https://www.facebook.com/Kaspersky" style="display: inline-block; margin: 0 6px; text-decoration: none;" title="Facebook">
+                  <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338210/loyalty-program/emails/common/social-icons/Group%2023.png" alt="Facebook" style="width: 16px; height: 16px;" />
+                </a>
+                <a href="https://twitter.com/kaspersky" style="display: inline-block; margin: 0 6px; text-decoration: none;" title="Twitter">
+                  <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338220/loyalty-program/emails/common/social-icons/Subtraction%201.png" alt="Twitter" style="width: 16px; height: 16px;" />
+                </a>
+                <a href="https://www.linkedin.com/company/kaspersky-lab" style="display: inline-block; margin: 0 6px; text-decoration: none;" title="LinkedIn">
+                  <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338212/loyalty-program/emails/common/social-icons/Group%2025.png" alt="LinkedIn" style="width: 16px; height: 16px;" />
+                </a>
+                <a href="https://www.instagram.com/kaspersky/" style="display: inline-block; margin: 0 6px; text-decoration: none;" title="Instagram">
+                  <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338213/loyalty-program/emails/common/social-icons/Group%2027.png" alt="Instagram" style="width: 16px; height: 16px;" />
+                </a>
+                <a href="https://www.youtube.com/user/Kaspersky" style="display: inline-block; margin: 0 6px; text-decoration: none;" title="YouTube">
+                  <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338215/loyalty-program/emails/common/social-icons/Group%2028.png" alt="YouTube" style="width: 16px; height: 16px;" />
+                </a>
+              </div>
+            </div>
           </div>
-        </body>
-        </html>
-      `;
+        </div>
+      </body>
+      </html>
+    `;
     sendSmtpEmail.textContent = `
-Hola ${data.firstName},
+Kaspersky Cup - Tu enlace único de acceso
 
-Has solicitado acceder a tu cuenta sin contraseña.
+HOLA ${userName}
 
-Para iniciar sesión, visita el siguiente enlace:
+Haga clic en el siguiente enlace para iniciar sesión en el programa Kaspersky Cup:
+
 ${magicLink}
 
 IMPORTANTE:
-- Este enlace expira en 15 minutos
-- Solo puede usarse una vez
-- Si no solicitaste este acceso, ignora este email
+- Este enlace expira en 15 minutos.
+- Solo puede usarse una vez.
+- Si no solicitó este acceso, ignore este correo.
+- Este es un mensaje automático, por favor, no responda a este mensaje.
+
+Siga a Kaspersky en nuestras redes sociales:
+- Facebook: https://www.facebook.com/Kaspersky
+- Twitter: https://twitter.com/kaspersky
+- LinkedIn: https://www.linkedin.com/company/kaspersky-lab
+- Instagram: https://www.instagram.com/kaspersky/
+- YouTube: https://www.youtube.com/user/Kaspersky
 
 Saludos,
-Loyalty Program Platform
-      `.trim();
+Kaspersky Cup
+    `.trim();
 
     await apiInstance.sendTransacEmail(sendSmtpEmail);
     console.log('Magic link email sent successfully to:', data.email);
