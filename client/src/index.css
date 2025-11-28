@@ -205,3 +205,26 @@
 button#radix-\:r7\::hover {
   background: #29CCB1;
 }
+/*--new-styles--*/
+.padding-top-60 {
+    padding-top: 60px;
+}
+.margin-auto {
+  margin: 0 auto;
+}
+.width-1210 {
+  max-width: 1210px;
+}
+.display-hero-rewards {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  justify-content: center;
+}
+.logo-hero-dashboard{
+    width: 90px;
+    margin-top: 20px;
+}
+.display-hero-dashboard {
+    align-items: center;
+}

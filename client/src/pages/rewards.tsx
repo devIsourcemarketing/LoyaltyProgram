@@ -174,20 +174,19 @@ export default function Rewards() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white padding-top-60">
       {/* Hero Banner */}
       <div 
-        className="relative z-10 bg-transparent"
+        className="relative z-10 bg-transparent margin-auto width-1210 rounded-xl display-hero-rewards"
         style={{
           backgroundImage: `url(${rewardsBackgroundImage})`,
           backgroundSize: 'cover',
           backgroundPosition: 'top center',
           backgroundRepeat: 'no-repeat',
-          minHeight: '500px',
-          paddingTop: '100px'
+          minHeight: '400px',
         }}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+        <div className="max-w-7xl px-4 sm:px-6 lg:px-8 pb-8">
           <div className="text-left space-y-4 max-w-lg">
             <h1 className="text-4xl lg:text-5xl font-bold leading-tight text-white" data-testid="text-page-title">
               {t('rewards.textHeroRewards')}
