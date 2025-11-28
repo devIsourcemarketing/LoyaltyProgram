@@ -1147,113 +1147,389 @@ export async function sendRedemptionApprovedEmail(
     status: string;
     estimatedDeliveryDays?: number;
   }
-): Promise<void> {
+): Promise<boolean> {
   try {
     if (!BREVO_API_KEY) {
       console.warn('BREVO_API_KEY no configurada. Email no enviado.');
       console.log(`Simulated redemption approved email to: ${email}`);
-      return;
+      return true;
     }
 
     const sendSmtpEmail = new brevo.SendSmtpEmail();
-    sendSmtpEmail.to = [{ email, name: `${firstName} ${lastName}` }];
-    sendSmtpEmail.sender = { email: FROM_EMAIL, name: 'Loyalty Program Platform' };
-    sendSmtpEmail.subject = '🎁 Redención Aprobada - Tu Recompensa Está en Camino';
+    sendSmtpEmail.sender = { name: 'Kaspersky Cup', email: FROM_EMAIL };
+    sendSmtpEmail.to = [{ email: email, name: `${firstName} ${lastName}` }];
+    sendSmtpEmail.subject = 'Kaspersky Cup - ¡Premio Aprobado!';
+
+    const userName = firstName.toUpperCase();
+
+    // URLs de las imágenes en Cloudinary
+    const heroImageUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764347920/loyalty-program/emails/aprobacion-premio/Group%2064.png';
+    const heroImage2xUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764347922/loyalty-program/emails/aprobacion-premio/Group%2064%402x.png';
+    const logoKasperskyUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764336795/loyalty-program/emails/common/Kaspersky%20Logo.png';
+
     sendSmtpEmail.htmlContent = `
       <!DOCTYPE html>
-      <html>
+      <html lang="es">
       <head>
-        <meta charset="utf-8">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>¡Premio Aprobado! - Kaspersky Cup</title>
         <style>
+          * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+          }
+          
           body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            color: #333;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+          }
+          
+          .email-container {
             max-width: 600px;
             margin: 0 auto;
-            padding: 20px;
+            background-color: #ffffff;
+            overflow: hidden;
           }
-          .header {
-            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-            color: white;
-            padding: 30px;
+          
+          /* Header con logo Kaspersky */
+          .header-logo {
             text-align: center;
-            border-radius: 10px 10px 0 0;
+            padding: 30px 20px 20px;
+            background-color: #ffffff;
           }
-          .content {
-            background: #f9fafb;
-            padding: 30px;
-            border: 1px solid #e5e7eb;
+          
+          .header-logo img {
+            width: 120px;
+            height: auto;
           }
-          .reward-box {
-            background: white;
-            border: 2px solid #8b5cf6;
+          
+          /* Imagen Hero con fondo negro */
+          .hero-section {
+            text-align: center;
+            background-color: #1D1D1B;
+            padding: 0;
+            position: relative;
+          }
+          
+          .hero-image {
+            width: 100%;
+            height: auto;
+            display: block;
+          }
+          
+          /* Contenido principal */
+          .content-section {
+            padding: 40px 40px 30px;
+            background-color: #ffffff;
+            text-align: center;
+          }
+          
+          .greeting {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1D1D1B;
+            margin-bottom: 5px;
+            line-height: 1.2;
+          }
+          
+          .user-name {
+            font-size: 32px;
+            font-weight: 700;
+            color: #29CCB1;
+            margin-bottom: 25px;
+            line-height: 1.2;
+          }
+          
+          .message-text {
+            font-size: 16px;
+            color: #4A4A4A;
+            line-height: 1.8;
+            margin-bottom: 30px;
+          }
+          
+          .highlight-text {
+            color: #29CCB1;
+            font-weight: 700;
+          }
+          
+          /* Tabla de información */
+          .info-table {
+            width: 100%;
+            margin: 30px 0;
+            border-collapse: separate;
+            border-spacing: 0;
+            overflow: hidden;
+          }
+          
+          .info-table tr td {
+            padding: 15px 20px;
+            font-size: 14px;
+            border-bottom: 1px solid #E5E7EB;
+          }
+          
+          .info-table tr:last-child td {
+            border-bottom: none;
+          }
+          
+          .info-table td:first-child {
+            background-color: #29CCB1;
+            color: #ffffff;
+            font-weight: 600;
+            text-align: left;
+            width: 45%;
+          }
+          
+          .info-table td:last-child {
+            background-color: #ffffff;
+            color: #1D1D1B;
+            text-align: left;
+            border: 1px solid #E5E7EB;
+            border-left: none;
+            font-weight: 500;
+          }
+          
+          .status-box {
+            background-color: #F8F8F8;
             border-radius: 8px;
-            padding: 20px;
-            margin: 20px 0;
+            padding: 25px;
+            margin: 30px 0;
+            text-align: left;
+          }
+          
+          .status-box p {
+            font-size: 15px;
+            color: #4A4A4A;
+            line-height: 1.8;
+            margin: 0;
+          }
+          
+          .cta-button {
+            display: inline-block;
+            background-color: #29CCB1;
+            color: #ffffff;
+            padding: 14px 32px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            margin: 25px 0 20px;
+          }
+          
+          .footer-text {
+            font-size: 15px;
+            color: #4A4A4A;
+            line-height: 1.6;
+            margin-top: 20px;
+          }
+          
+          .footer-highlight {
+            color: #29CCB1;
+            font-weight: 700;
+          }
+          
+          /* Footer Section */
+          .footer-section {
+            padding: 30px 40px 40px;
+            background-color: #ffffff;
             text-align: center;
           }
-          .footer {
-            background: #f3f4f6;
-            padding: 20px;
-            text-align: center;
-            font-size: 12px;
-            color: #6b7280;
-            border-radius: 0 0 10px 10px;
+          
+          .social-title {
+            font-size: 14px;
+            color: #666666;
+            margin-bottom: 15px;
+            font-weight: 600;
+          }
+          
+          .social-links {
+            margin-bottom: 25px;
+          }
+          
+          .social-links a {
+            display: inline-block;
+            margin: 0 6px;
+            text-decoration: none;
+            background-color: #1D1D1B;
+            padding: 8px;
+            border-radius: 4px;
+          }
+          
+          .social-links img {
+            width: 16px;
+            height: 16px;
+            display: block;
+          }
+          
+          .footer-logo {
+            margin-top: 25px;
+          }
+          
+          .footer-logo img {
+            width: 80px;
+            height: auto;
+          }
+          
+          /* Responsive */
+          @media only screen and (max-width: 600px) {
+            .content-section,
+            .footer-section {
+              padding-left: 20px;
+              padding-right: 20px;
+            }
+            
+            .greeting,
+            .user-name {
+              font-size: 26px;
+            }
+            
+            .message-text {
+              font-size: 14px;
+            }
           }
         </style>
       </head>
       <body>
-        <div class="header">
-          <h1>🎁 ¡Redención Aprobada!</h1>
-        </div>
-        <div class="content">
-          <p>Hola <strong>${firstName} ${lastName}</strong>,</p>
+        <div class="email-container">
+          <!-- Header Logo -->
+          <div class="header-logo">
+            <img src="${logoKasperskyUrl}" 
+                 alt="Kaspersky" />
+          </div>
           
-          <p>¡Fantástico! Tu solicitud de redención ha sido aprobada.</p>
+          <!-- Hero Image -->
+          <div class="hero-section">
+            <img src="${heroImageUrl}" 
+                 srcset="${heroImageUrl} 1x, ${heroImage2xUrl} 2x"
+                 alt="¡Así se hace! Su premio ya va en camino" 
+                 class="hero-image" />
+          </div>
           
-          <div class="reward-box">
-            <h2 style="color: #8b5cf6; margin-top: 0;">🎉 ${redemptionDetails.rewardName}</h2>
-            <p style="font-size: 18px; color: #6b7280;">
-              <strong>${redemptionDetails.pointsCost} puntos</strong> canjeados
+          <!-- Content Section -->
+          <div class="content-section">
+            <div class="greeting">HOLA</div>
+            <div class="user-name">(${userName})</div>
+            
+            <p class="message-text">
+              ¡Fantástico!
+            </p>
+            
+            <p class="message-text">
+              Su premio ha sido aprobado y está en proceso de entrega.
+            </p>
+            
+            <!-- Info Table -->
+            <table class="info-table">
+              <tr>
+                <td>Nombre del premio</td>
+                <td>${redemptionDetails.rewardName}</td>
+              </tr>
+              <tr>
+                <td>Goles canjeados</td>
+                <td>${redemptionDetails.pointsCost} Goles</td>
+              </tr>
+              <tr>
+                <td>Tiempo estimado<br>de entrega</td>
+                <td>${redemptionDetails.estimatedDeliveryDays || 3} Días</td>
+              </tr>
+            </table>
+            
+            <!-- Status Box -->
+            <div class="status-box">
+              <p>
+                El equipo de <span class="highlight-text">Kaspersky Cup</span> se pondrá en contacto con 
+                usted para validar los datos de envío y asegurarse de que 
+                su premio llegue sin inconvenientes.
+              </p>
+            </div>
+            
+            <p class="message-text">
+              También puede revisar el estado de su premio<br>
+              haciendo clic aquí:
+            </p>
+            
+            <!-- CTA Button -->
+            <a href="${APP_URL}/rewards" class="cta-button">Mis redenciones</a>
+            
+            <!-- Footer Text -->
+            <p class="footer-text">
+              <span class="footer-highlight">¡Gracias por jugar en Kaspersky Cup!</span>
             </p>
           </div>
           
-          <p><strong>Estado:</strong> ${redemptionDetails.status === 'approved' ? '✅ Aprobado' : '📦 En proceso'}</p>
-          
-          ${redemptionDetails.estimatedDeliveryDays ? `
-          <div style="background: #f3f4f6; padding: 15px; border-radius: 8px; margin: 20px 0;">
-            <p style="margin: 0; color: #374151;">
-              <strong>⏱️ Tiempo estimado de entrega:</strong> 
-              <span style="color: #8b5cf6; font-weight: bold;">${redemptionDetails.estimatedDeliveryDays} días hábiles</span>
-            </p>
+          <!-- Footer Section -->
+          <div class="footer-section">
+            <!-- Texto Siga a Kaspersky -->
+            <div class="social-title">Siga a Kaspersky :</div>
+            
+            <!-- Redes Sociales -->
+            <div class="social-links">
+              <a href="https://www.facebook.com/Kaspersky" title="Facebook" style="display: inline-block; margin: 0 6px; text-decoration: none; background-color: #1D1D1B; padding: 8px; border-radius: 4px;">
+                <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338210/loyalty-program/emails/common/social-icons/Group%2023.png" alt="Facebook" style="width: 16px; height: 16px;" />
+              </a>
+              <a href="https://twitter.com/kaspersky" title="Twitter" style="display: inline-block; margin: 0 6px; text-decoration: none; background-color: #1D1D1B; padding: 8px; border-radius: 4px;">
+                <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338220/loyalty-program/emails/common/social-icons/Subtraction%201.png" alt="Twitter" style="width: 16px; height: 16px;" />
+              </a>
+              <a href="https://www.linkedin.com/company/kaspersky-lab" title="LinkedIn" style="display: inline-block; margin: 0 6px; text-decoration: none; background-color: #1D1D1B; padding: 8px; border-radius: 4px;">
+                <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338212/loyalty-program/emails/common/social-icons/Group%2025.png" alt="LinkedIn" style="width: 16px; height: 16px;" />
+              </a>
+              <a href="https://www.instagram.com/kaspersky/" title="Instagram" style="display: inline-block; margin: 0 6px; text-decoration: none; background-color: #1D1D1B; padding: 8px; border-radius: 4px;">
+                <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338213/loyalty-program/emails/common/social-icons/Group%2027.png" alt="Instagram" style="width: 16px; height: 16px;" />
+              </a>
+              <a href="https://www.youtube.com/user/Kaspersky" title="YouTube" style="display: inline-block; margin: 0 6px; text-decoration: none; background-color: #1D1D1B; padding: 8px; border-radius: 4px;">
+                <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338215/loyalty-program/emails/common/social-icons/Group%2028.png" alt="YouTube" style="width: 16px; height: 16px;" />
+              </a>
+            </div>
+            
+            <!-- Logo Kaspersky al final -->
+            <div class="footer-logo">
+              <img src="${logoKasperskyUrl}" alt="Kaspersky" />
+            </div>
           </div>
-          ` : ''}
-          
-          <p>Recibirás más información sobre la entrega de tu recompensa próximamente.</p>
-          
-          <p style="margin-top: 30px;">
-            <a href="${APP_URL}/rewards" style="display: inline-block; background: #8b5cf6; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px;">
-              Ver Mis Redenciones
-            </a>
-          </p>
-          
-          <p style="margin-top: 30px; font-size: 14px; color: #6b7280;">
-            ¡Gracias por ser parte de nuestro programa de lealtad!
-          </p>
-        </div>
-        <div class="footer">
-          <p>Este es un correo automático, por favor no respondas a este mensaje.</p>
-          <p>&copy; ${new Date().getFullYear()} Loyalty Program Platform. Todos los derechos reservados.</p>
         </div>
       </body>
       </html>
     `;
 
+    sendSmtpEmail.textContent = `
+Kaspersky Cup - ¡Premio Aprobado!
+
+HOLA (${userName})
+
+¡Fantástico!
+
+Su premio ha sido aprobado y está en proceso de entrega.
+
+Nombre del premio: ${redemptionDetails.rewardName}
+Goles canjeados: ${redemptionDetails.pointsCost} Goles
+Tiempo estimado de entrega: ${redemptionDetails.estimatedDeliveryDays || 3} Días
+
+El equipo de Kaspersky Cup se pondrá en contacto con usted para validar los datos de envío y asegurarse de que su premio llegue sin inconvenientes.
+
+También puede revisar el estado de su premio haciendo clic aquí:
+${APP_URL}/rewards
+
+¡Gracias por jugar en Kaspersky Cup!
+
+Siga a Kaspersky en nuestras redes sociales:
+- Facebook: https://www.facebook.com/Kaspersky
+- Twitter: https://twitter.com/kaspersky
+- LinkedIn: https://www.linkedin.com/company/kaspersky-lab
+- Instagram: https://www.instagram.com/kaspersky/
+- YouTube: https://www.youtube.com/user/Kaspersky
+
+Saludos,
+Kaspersky Cup
+    `.trim();
+
     await apiInstance.sendTransacEmail(sendSmtpEmail);
     console.log('Redemption approved email sent successfully to:', email);
+    return true;
   } catch (error) {
     console.error('Error sending redemption approved email:', error);
+    return false;
   }
 }
 

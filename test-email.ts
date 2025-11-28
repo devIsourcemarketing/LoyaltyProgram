@@ -8,16 +8,17 @@
  * npm run test:email -- --type=magic-link --email=tu@email.com --firstName=Juan --lastName=Pérez
  * npm run test:email -- --type=goles-registrados --email=tu@email.com --firstName=Juan --lastName=Pérez
  * npm run test:email -- --type=pendiente-aprobacion --email=tu@email.com --firstName=Juan --lastName=Pérez
+ * npm run test:email -- --type=aprobacion-premio --email=tu@email.com --firstName=Juan --lastName=Pérez
  * npm run test:email -- --type=ganador-premio-mayor --email=tu@email.com --firstName=Juan --lastName=Pérez
  * 
  * Parámetros:
- * --type: Tipo de email (expectativa, registro-exitoso, bienvenida, magic-link, goles-registrados, pendiente-aprobacion, ganador-premio-mayor)
+ * --type: Tipo de email (expectativa, registro-exitoso, bienvenida, magic-link, goles-registrados, pendiente-aprobacion, aprobacion-premio, ganador-premio-mayor)
  * --email: Email del destinatario
  * --firstName: Nombre (opcional, default: "Usuario")
  * --lastName: Apellido (opcional, default: "Prueba")
  */
 
-import { sendExpectationEmail, sendRegistroExitosoEmail, sendBienvenidaEmail, sendMagicLinkEmail, sendGolesRegistradosEmail, sendPendienteAprobacionEmail, sendGanadorPremioMayorEmail } from './server/email';
+import { sendExpectationEmail, sendRegistroExitosoEmail, sendBienvenidaEmail, sendMagicLinkEmail, sendGolesRegistradosEmail, sendPendienteAprobacionEmail, sendRedemptionApprovedEmail, sendGanadorPremioMayorEmail } from './server/email';
 
 // Función para obtener argumentos de línea de comandos
 function getArg(name: string, defaultValue?: string): string {
@@ -113,6 +114,21 @@ async function testEmail() {
         });
         break;
       
+      case 'aprobacion-premio':
+        console.log('📤 Enviando Email de Aprobación de Premio...\n');
+        result = await sendRedemptionApprovedEmail(
+          email,
+          firstName,
+          lastName,
+          {
+            rewardName: 'Balón Oficial Kaspersky Cup',
+            pointsCost: 100,
+            status: 'approved',
+            estimatedDeliveryDays: 3
+          }
+        );
+        break;
+      
       // Aquí puedes agregar más tipos de email
       // case 'otro-tipo':
       //   result = await sendOtroEmail({ email, firstName, lastName });
@@ -127,6 +143,7 @@ async function testEmail() {
         console.log('   - magic-link');
         console.log('   - goles-registrados');
         console.log('   - pendiente-aprobacion');
+        console.log('   - aprobacion-premio');
         console.log('   - ganador-premio-mayor');
         process.exit(1);
     }
