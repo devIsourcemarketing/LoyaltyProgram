@@ -16,7 +16,8 @@ import {
   sendSupportTicketToAdmin,
   sendMagicLinkEmail,
   sendExpectationEmail,
-  sendRegistroExitosoEmail
+  sendRegistroExitosoEmail,
+  sendBienvenidaEmail
 } from "./email.js";
 
 // Extend session data interface
@@ -1424,8 +1425,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         inviteToken: null, // Clear the token after use
       });
 
-      // Send approval email (account is ready to use)
-      await sendApprovalEmail(user.email, user.firstName, user.lastName);
+      // Send welcome email (account is ready to use)
+      await sendBienvenidaEmail({
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName
+      });
 
       res.status(200).json({ 
         message: "Registration completed successfully. You can now log in!",
@@ -1563,8 +1568,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         req.session.userRole = updatedUser.role;
       }
 
-      // Send activation email
-      await sendApprovalEmail(user.email, user.firstName, user.lastName);
+      // Send welcome email
+      await sendBienvenidaEmail({
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName
+      });
 
       console.log("✅ Passwordless login successful for:", updatedUser.email);
 
@@ -2276,12 +2285,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
 
-      // Send approval email
-      await sendApprovalEmail(
-        approvedUser.email,
-        approvedUser.firstName,
-        approvedUser.lastName
-      );
+      // Send welcome email
+      await sendBienvenidaEmail({
+        email: approvedUser.email,
+        firstName: approvedUser.firstName,
+        lastName: approvedUser.lastName
+      });
 
       res.json({ 
         message: "User approved successfully", 

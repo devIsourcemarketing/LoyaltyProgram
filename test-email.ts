@@ -4,15 +4,16 @@
  * Uso:
  * npm run test:email -- --type=expectativa --email=tu@email.com
  * npm run test:email -- --type=registro-exitoso --email=tu@email.com --firstName=Juan --lastName=Pérez
+ * npm run test:email -- --type=bienvenida --email=tu@email.com --firstName=Juan --lastName=Pérez
  * 
  * Parámetros:
- * --type: Tipo de email (expectativa, registro-exitoso, etc.)
+ * --type: Tipo de email (expectativa, registro-exitoso, bienvenida, etc.)
  * --email: Email del destinatario
  * --firstName: Nombre (opcional, default: "Usuario")
  * --lastName: Apellido (opcional, default: "Prueba")
  */
 
-import { sendExpectationEmail, sendRegistroExitosoEmail } from './server/email';
+import { sendExpectationEmail, sendRegistroExitosoEmail, sendBienvenidaEmail } from './server/email';
 
 // Función para obtener argumentos de línea de comandos
 function getArg(name: string, defaultValue?: string): string {
@@ -54,9 +55,14 @@ async function testEmail() {
         });
         break;
       
+      case 'bienvenida':
+        console.log('📤 Enviando Email de Bienvenida...\n');
+        result = await sendBienvenidaEmail({ email, firstName, lastName });
+        break;
+      
       // Aquí puedes agregar más tipos de email
-      // case 'bienvenida':
-      //   result = await sendWelcomeEmail({ email, firstName, lastName });
+      // case 'otro-tipo':
+      //   result = await sendOtroEmail({ email, firstName, lastName });
       //   break;
       
       default:
@@ -64,6 +70,7 @@ async function testEmail() {
         console.log('\n📋 Tipos disponibles:');
         console.log('   - expectativa');
         console.log('   - registro-exitoso');
+        console.log('   - bienvenida');
         process.exit(1);
     }
 
