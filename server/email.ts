@@ -2777,3 +2777,373 @@ Kaspersky Cup
     return false;
   }
 }
+
+export interface GolesRegistradosEmailData {
+  email: string;
+  firstName: string;
+  lastName: string;
+  producto: string;
+  valorDeal: number;
+  golesSumados: number;
+  totalGoles: number;
+}
+
+/**
+ * Envía un email cuando el KL registra goles a nombre del usuario
+ */
+export async function sendGolesRegistradosEmail(data: GolesRegistradosEmailData): Promise<boolean> {
+  try {
+    if (!BREVO_API_KEY) {
+      console.warn('⚠️  BREVO_API_KEY no configurada. Email no enviado.');
+      console.log('📧 Simulated goles registrados email to:', data.email);
+      console.log('📊 Goles sumados:', data.golesSumados);
+      console.log('⚽ Total goles:', data.totalGoles);
+      return true;
+    }
+
+    console.log('📤 Intentando enviar email de goles registrados...');
+    console.log('   Destinatario:', data.email);
+    console.log('   Remitente:', FROM_EMAIL);
+
+    // Imágenes alojadas en Cloudinary (Europa)
+    const heroImageUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764345851/loyalty-program/emails/goles-registrados/Group%2062.png';
+    const heroImage2xUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764345853/loyalty-program/emails/goles-registrados/Group%2062%402x.png';
+    const footerImageUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764337229/loyalty-program/emails/expectativa/footer.png';
+    const userName = data.firstName || 'Usuario';
+    
+    const sendSmtpEmail = new brevo.SendSmtpEmail();
+    sendSmtpEmail.to = [{ email: data.email, name: `${data.firstName} ${data.lastName}` }];
+    sendSmtpEmail.sender = { email: FROM_EMAIL, name: 'Kaspersky Cup' };
+    sendSmtpEmail.subject = '⚽ ¡Golazo! Su marcador sigue creciendo - Kaspersky Cup';
+    sendSmtpEmail.htmlContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+          * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+          }
+          
+          body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #FFFFFF;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+          }
+          
+          .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #FFFFFF;
+          }
+          
+          .header-logo {
+            text-align: center;
+            padding: 24px 0;
+            background-color: #FFFFFF;
+          }
+          
+          .header-logo img {
+            width: 120px;
+            height: auto;
+          }
+          
+          .hero-image-section {
+            position: relative;
+            text-align: center;
+            background-color: #FFFFFF;
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+          }
+          
+          .hero-image {
+            width: 100%;
+            max-width: 600px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+          }
+          
+          .content-section {
+            background-color: #FFFFFF;
+            padding: 40px;
+            text-align: center;
+          }
+          
+          .greeting {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1D1D1B;
+            margin-bottom: 8px;
+          }
+          
+          .name {
+            font-size: 32px;
+            font-weight: 700;
+            color: #29CCB1;
+            margin-bottom: 24px;
+          }
+          
+          .message {
+            font-size: 16px;
+            color: #1D1D1B;
+            line-height: 1.6;
+            margin-bottom: 16px;
+          }
+          
+          .highlight-text {
+            color: #29CCB1;
+            font-weight: 600;
+          }
+          
+          .stats-table {
+            width: 100%;
+            margin: 24px 0;
+            border-collapse: collapse;
+          }
+          
+          .stats-table tr {
+            border-bottom: 1px solid #E5E7EB;
+          }
+          
+          .stats-table tr:last-child {
+            border-bottom: none;
+          }
+          
+          .stats-header {
+            background-color: #29CCB1;
+            color: #FFFFFF;
+            font-weight: 600;
+            padding: 12px 16px;
+            text-align: left;
+          }
+          
+          .stats-value {
+            background-color: #F9FAFB;
+            padding: 12px 16px;
+            text-align: right;
+            color: #1D1D1B;
+          }
+          
+          .cta-button {
+            display: inline-block;
+            background-color: #29CCB1;
+            color: #FFFFFF;
+            text-decoration: none;
+            padding: 14px 40px;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 24px 0;
+          }
+          
+          .info-box {
+            background-color: #F0F9FF;
+            border: 1px solid #BAE6FD;
+            border-radius: 4px;
+            padding: 16px;
+            margin: 24px 0;
+            text-align: left;
+          }
+          
+          .info-text {
+            font-size: 14px;
+            color: #1D1D1B;
+            line-height: 1.6;
+            margin: 0;
+          }
+          
+          .footer-section {
+            background-color: #1D1D1B;
+            color: #FFFFFF;
+            padding: 48px 40px;
+            text-align: center;
+          }
+          
+          .footer-cup-badge {
+            margin: 0 auto 28px;
+            text-align: center;
+          }
+          
+          .footer-cup-image {
+            width: 250px;
+            height: auto;
+            display: inline-block;
+          }
+          
+          .social-section {
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+          }
+          
+          .social-title {
+            font-size: 14px;
+            color: #FFFFFF;
+            margin-bottom: 16px;
+            font-weight: 400;
+          }
+          
+          @media only screen and (max-width: 600px) {
+            .content-section {
+              padding: 24px;
+            }
+            
+            .greeting, .name {
+              font-size: 24px;
+            }
+            
+            .message {
+              font-size: 14px;
+            }
+            
+            .footer-section {
+              padding: 36px 24px;
+            }
+            
+            .stats-header, .stats-value {
+              padding: 10px 12px;
+              font-size: 14px;
+            }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="email-container">
+          <!-- Logo Header -->
+          <div class="header-logo">
+            <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764337229/loyalty-program/emails/expectativa/footer.png" alt="Kaspersky Cup" />
+          </div>
+          
+          <!-- Imagen Hero -->
+          <div class="hero-image-section">
+            <img src="${heroImageUrl}" 
+                 srcset="${heroImageUrl} 1x, ${heroImage2xUrl} 2x"
+                 alt="¡Golazo! Su marcador sigue creciendo" 
+                 class="hero-image" 
+                 style="width: 100%; max-width: 600px; height: auto; display: block;" />
+          </div>
+          
+          <!-- Contenido -->
+          <div class="content-section">
+            <div class="greeting">HOLA</div>
+            <div class="name">(${userName})</div>
+            
+            <p class="message">
+              <strong>¡Excelentes noticias!</strong><br>
+              Nuevas ventas fueron registradas a su nombre y ha<br>
+              acumulado más goles en <span class="highlight-text">Kaspersky Cup</span>.
+            </p>
+            
+            <table class="stats-table">
+              <tr>
+                <td class="stats-header">Producto</td>
+                <td class="stats-value">${data.producto}</td>
+              </tr>
+              <tr>
+                <td class="stats-header">Valor del Deal</td>
+                <td class="stats-value">${data.valorDeal} Goles</td>
+              </tr>
+              <tr>
+                <td class="stats-header">Goles sumados</td>
+                <td class="stats-value">${data.golesSumados} Goles</td>
+              </tr>
+            </table>
+            
+            <p class="message">
+              Sus goles ya están disponibles en su cuenta y puede<br>
+              usarlos para <span class="highlight-text">canjear el premio imperdible del mes</span>.
+            </p>
+            
+            <a href="${APP_URL}" class="cta-button">Ver mi marcador</a>
+            
+            <div class="info-box">
+              <p class="info-text">
+                <strong>¡Sigue así!</strong><br>
+                Cada nuevo gol te acerca a vivir en vivo la<br>
+                <span class="highlight-text">Copa Mundial de Fútbol 2026</span>.
+              </p>
+            </div>
+          </div>
+          
+          <!-- Footer Section -->
+          <div class="footer-section">
+            <!-- Texto Siga a Kaspersky -->
+            <div class="social-title">Siga a Kaspersky :</div>
+            
+            <!-- Redes Sociales -->
+            <div class="social-links">
+              <a href="https://www.facebook.com/Kaspersky" style="display: inline-block; margin: 0 6px; text-decoration: none;" title="Facebook">
+                <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338210/loyalty-program/emails/common/social-icons/Group%2023.png" alt="Facebook" style="width: 16px; height: 16px;" />
+              </a>
+              <a href="https://twitter.com/kaspersky" style="display: inline-block; margin: 0 6px; text-decoration: none;" title="Twitter">
+                <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338220/loyalty-program/emails/common/social-icons/Subtraction%201.png" alt="Twitter" style="width: 16px; height: 16px;" />
+              </a>
+              <a href="https://www.linkedin.com/company/kaspersky-lab" style="display: inline-block; margin: 0 6px; text-decoration: none;" title="LinkedIn">
+                <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338212/loyalty-program/emails/common/social-icons/Group%2025.png" alt="LinkedIn" style="width: 16px; height: 16px;" />
+              </a>
+              <a href="https://www.instagram.com/kaspersky/" style="display: inline-block; margin: 0 6px; text-decoration: none;" title="Instagram">
+                <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338213/loyalty-program/emails/common/social-icons/Group%2027.png" alt="Instagram" style="width: 16px; height: 16px;" />
+              </a>
+              <a href="https://www.youtube.com/user/Kaspersky" style="display: inline-block; margin: 0 6px; text-decoration: none;" title="YouTube">
+                <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338215/loyalty-program/emails/common/social-icons/Group%2028.png" alt="YouTube" style="width: 16px; height: 16px;" />
+              </a>
+            </div>
+            
+            <!-- Badge Kaspersky Cup al final -->
+            <div class="footer-cup-badge" style="margin-top: 32px;">
+              <img src="${footerImageUrl}" 
+                   alt="Kaspersky Cup" 
+                   class="footer-cup-image" 
+                   style="width: 250px; height: auto; display: inline-block;" />
+            </div>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+    sendSmtpEmail.textContent = `
+Kaspersky Cup - ¡Golazo! Su marcador sigue creciendo
+
+HOLA ${userName}
+
+¡Excelentes noticias!
+Nuevas ventas fueron registradas a su nombre y ha acumulado más goles en Kaspersky Cup.
+
+Producto: ${data.producto}
+Valor del Deal: ${data.valorDeal} Goles
+Goles sumados: ${data.golesSumados} Goles
+
+Sus goles ya están disponibles en su cuenta y puede usarlos para canjear el premio imperdible del mes.
+
+Ver mi marcador: ${APP_URL}
+
+¡Sigue así!
+Cada nuevo gol te acerca a vivir en vivo la Copa Mundial de Fútbol 2026.
+
+Siga a Kaspersky en nuestras redes sociales:
+- Facebook: https://www.facebook.com/Kaspersky
+- Twitter: https://twitter.com/kaspersky
+- LinkedIn: https://www.linkedin.com/company/kaspersky-lab
+- Instagram: https://www.instagram.com/kaspersky/
+- YouTube: https://www.youtube.com/user/Kaspersky
+
+Saludos,
+Kaspersky Cup
+    `.trim();
+
+    await apiInstance.sendTransacEmail(sendSmtpEmail);
+    console.log('Goles registrados email sent successfully to:', data.email);
+    return true;
+  } catch (error) {
+    console.error('Error sending goles registrados email:', error);
+    return false;
+  }
+}

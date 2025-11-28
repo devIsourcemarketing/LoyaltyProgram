@@ -10,7 +10,7 @@ import { nanoid } from "nanoid";
 import { 
   sendInviteEmail, 
   sendApprovalEmail, 
-  sendDealApprovedEmail, 
+  sendGolesRegistradosEmail, 
   sendRedemptionApprovedEmail,
   sendRedemptionRequestToAdmin,
   sendSupportTicketToAdmin,
@@ -532,16 +532,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Obtener información del usuario para enviar email
       const dealUser = await storage.getUser(deal.userId);
       if (dealUser && deal.pointsEarned && deal.pointsEarned > 0) {
-        await sendDealApprovedEmail(
-          dealUser.email,
-          dealUser.firstName,
-          dealUser.lastName,
-          {
-            productName: deal.productName,
-            dealValue: deal.dealValue,
-            pointsEarned: deal.pointsEarned
-          }
-        );
+        // Obtener total de goles del usuario después de aprobar
+        const updatedUser = await storage.getUser(deal.userId);
+        const totalGoles = updatedUser?.points || 0;
+        
+        await sendGolesRegistradosEmail({
+          email: dealUser.email,
+          firstName: dealUser.firstName,
+          lastName: dealUser.lastName,
+          producto: deal.productName,
+          valorDeal: parseInt(deal.dealValue) || 0,
+          golesSumados: deal.pointsEarned,
+          totalGoles: totalGoles
+        });
       }
       
       res.json(deal);
@@ -2058,6 +2061,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
               points: dealData.pointsEarned,
               description: `Points earned from bulk imported deal: ${dealData.productName}`,
             });
+            
+            // Enviar email al usuario notificando los goles registrados
+            const dealUser = await storage.getUser(dealData.userId);
+            if (dealUser) {
+              const updatedUser = await storage.getUser(dealData.userId);
+              const totalGoles = updatedUser?.points || 0;
+              
+              await sendGolesRegistradosEmail({
+                email: dealUser.email,
+                firstName: dealUser.firstName,
+                lastName: dealUser.lastName,
+                producto: dealData.productName,
+                valorDeal: parseInt(dealData.dealValue) || 0,
+                golesSumados: dealData.pointsEarned,
+                totalGoles: totalGoles
+              });
+            }
           }
         } catch (error) {
           console.error("Error inserting deal:", error);
