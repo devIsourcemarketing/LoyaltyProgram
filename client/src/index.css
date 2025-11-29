@@ -137,6 +137,16 @@
   .shadow-material-lg {
     box-shadow: 0 4px 8px rgba(0,0,0,0.12), 0 16px 24px rgba(0,0,0,0.14);
   }
+
+  /* Hide scrollbar but keep functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;  /* Chrome, Safari and Opera */
+  }
 }
 /*------new styles-----*/
 /*--login--*/

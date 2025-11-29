@@ -1910,7 +1910,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
 
     try {
-      const regionName = await getAdminRegion(userId);
+      let regionName: string;
+      
+      // If super-admin and region is specified in query, use it
+      if (userRole === 'super-admin' && req.query.region && req.query.region !== 'all') {
+        regionName = req.query.region as string;
+      } else {
+        // Otherwise, get the admin's region (returns 'all' for super-admin)
+        regionName = await getAdminRegion(userId);
+      }
+      
       const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;
       
       const topScorers = await storage.getTopScorers(regionName, limit);

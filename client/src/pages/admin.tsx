@@ -129,6 +129,7 @@ export default function Admin() {
     startDate: "",
     endDate: "",
   });
+  const [topScorersRegion, setTopScorersRegion] = useState("all");
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -236,8 +237,28 @@ export default function Admin() {
     points: number;
     company: string | null;
   }>>({
-    queryKey: ["/api/admin/top-scorers"],
+    queryKey: ["/api/admin/top-scorers", topScorersRegion],
     enabled: currentUser?.role === "admin" || currentUser?.role === "regional-admin" || currentUser?.role === "super-admin",
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      
+      // For super-admin, allow filtering by region
+      if (currentUser?.role === "super-admin" && topScorersRegion !== "all") {
+        params.append("region", topScorersRegion);
+      }
+      
+      // Always request top 10
+      params.append("limit", "10");
+      
+      const url = `/api/admin/top-scorers${params.toString() ? `?${params.toString()}` : ""}`;
+      const response = await fetch(url, { credentials: "include" });
+      
+      if (!response.ok) {
+        throw new Error(`${response.status}: ${response.statusText}`);
+      }
+      
+      return response.json();
+    },
   });
 
   const { data: rewards, isLoading: rewardsLoading } = useQuery<Reward[]>({
@@ -1046,8 +1067,29 @@ export default function Admin() {
           {/* Top Scorers - Goleadores de la temporada */}
           <Card className="shadow-material mt-6">
             <CardHeader>
-              <div className="flex justify-between items-center">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <CardTitle>{t('admin.topScorers')}</CardTitle>
+                
+                {/* Region filter for super-admin */}
+                {currentUser?.role === "super-admin" && (
+                  <div className="w-full sm:w-auto">
+                    <Select
+                      value={topScorersRegion}
+                      onValueChange={setTopScorersRegion}
+                    >
+                      <SelectTrigger className="w-full sm:w-[200px]" data-testid="select-top-scorers-region">
+                        <SelectValue placeholder={t("common.allRegions")} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">{t("common.allRegions")}</SelectItem>
+                        <SelectItem value="NOLA">NOLA</SelectItem>
+                        <SelectItem value="SOLA">SOLA</SelectItem>
+                        <SelectItem value="BRASIL">BRASIL</SelectItem>
+                        <SelectItem value="MEXICO">MEXICO</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
               </div>
             </CardHeader>
             <CardContent>
