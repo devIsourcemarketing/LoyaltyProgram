@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -90,7 +91,31 @@ type EditUserForm = z.infer<typeof editUserSchema>;
 
 export default function Admin() {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState("overview");
+  const [location] = useLocation();
+  
+  // Get tab from URL and update state when URL changes
+  const getTabFromUrl = () => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('tab') || 'overview';
+  };
+  
+  const [activeTab, setActiveTab] = useState(getTabFromUrl());
+
+  useEffect(() => {
+    const tab = getTabFromUrl();
+    setActiveTab(tab);
+  }, [location]);
+
+  // Also listen to popstate for browser back/forward buttons
+  useEffect(() => {
+    const handlePopState = () => {
+      const tab = getTabFromUrl();
+      setActiveTab(tab);
+    };
+    
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
   const [isRewardModalOpen, setIsRewardModalOpen] = useState(false);
   const [selectedReward, setSelectedReward] = useState<Reward | null>(null);
   const [isCreateUserModalOpen, setIsCreateUserModalOpen] = useState(false);
@@ -930,127 +955,12 @@ export default function Admin() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-8">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2" data-testid="text-admin-title">
-          {t('admin.panel')}
-        </h1>
-        <p className="text-gray-600">
-          {t('admin.manageUsersDealsReports')}
-        </p>
-      </div>
-
+    <div className="max-w-7xl mx-auto px-6 pt-4 pb-8">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className={`grid w-full ${currentUser?.role === 'super-admin' ? 'grid-cols-8' : 'grid-cols-7'} bg-white p-1 rounded-lg border border-gray-200 mb-6`}>
-          <TabsTrigger value="overview" className="data-[state=active]:bg-[#29CCB1] data-[state=active]:text-white data-[state=inactive]:text-gray-600 rounded-md transition-all font-medium" data-testid="tab-overview">{t('admin.overview')}</TabsTrigger>
-          <TabsTrigger value="invitations" className="data-[state=active]:bg-[#29CCB1] data-[state=active]:text-white data-[state=inactive]:text-gray-600 rounded-md transition-all font-medium" data-testid="tab-invitations">{t('admin.invitations')}</TabsTrigger>
-          <TabsTrigger value="users" className="data-[state=active]:bg-[#29CCB1] data-[state=active]:text-white data-[state=inactive]:text-gray-600 rounded-md transition-all font-medium" data-testid="tab-users">{t('admin.users')}</TabsTrigger>
-          <TabsTrigger value="deals" className="data-[state=active]:bg-[#29CCB1] data-[state=active]:text-white data-[state=inactive]:text-gray-600 rounded-md transition-all font-medium" data-testid="tab-deals">{t('admin.deals')}</TabsTrigger>
-          <TabsTrigger value="rewards" className="data-[state=active]:bg-[#29CCB1] data-[state=active]:text-white data-[state=inactive]:text-gray-600 rounded-md transition-all font-medium" data-testid="tab-rewards">{t('admin.rewards')}</TabsTrigger>
-          <TabsTrigger value="regions" className="data-[state=active]:bg-[#29CCB1] data-[state=active]:text-white data-[state=inactive]:text-gray-600 rounded-md transition-all font-medium" data-testid="tab-regions">
-            <Globe className="w-4 h-4 mr-2" />
-            {t('admin.regions')}
-          </TabsTrigger>
-          {currentUser?.role === 'super-admin' && (
-            <TabsTrigger value="masters" className="data-[state=active]:bg-[#29CCB1] data-[state=active]:text-white data-[state=inactive]:text-gray-600 rounded-md transition-all font-medium" data-testid="tab-masters">
-              <Database className="w-4 h-4 mr-2" />
-              {t('admin.masters')}
-            </TabsTrigger>
-          )}
-          <TabsTrigger value="settings" className="data-[state=active]:bg-[#29CCB1] data-[state=active]:text-white data-[state=inactive]:text-gray-600 rounded-md transition-all font-medium" data-testid="tab-settings">
-            <Settings className="w-4 h-4 mr-2" />
-            {t('admin.settings')}
-          </TabsTrigger>
-        </TabsList>
-
         {/* Overview Tab */}
-        <TabsContent value="overview" className="mt-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <Card className="shadow-sm hover:shadow-md transition-shadow border border-gray-200 rounded-xl overflow-hidden">
-              <CardContent className="p-6">
-                <div className="flex items-center">
-                  <div className="p-3 rounded-full" style={{ backgroundColor: '#9DFFEF' }}>
-                    <Users className="h-6 w-6" style={{ color: '#00A88E' }} />
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">{t('admin.totalUsers')}</p>
-                    {reportsLoading ? (
-                      <Skeleton className="h-8 w-16 mt-1" />
-                    ) : (
-                      <p className="text-2xl font-semibold text-gray-900" data-testid="text-total-users">
-                        {reportsData?.userCount || 0}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="shadow-sm hover:shadow-md transition-shadow border border-gray-200 rounded-xl overflow-hidden">
-              <CardContent className="p-6">
-                <div className="flex items-center">
-                  <div className="p-3 rounded-full" style={{ backgroundColor: '#9DFFEF' }}>
-                    <ClipboardCheck className="h-6 w-6" style={{ color: '#00A88E' }} />
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">{t('admin.totalDeals')}</p>
-                    {reportsLoading ? (
-                      <Skeleton className="h-8 w-16 mt-1" />
-                    ) : (
-                      <p className="text-2xl font-semibold text-gray-900" data-testid="text-total-deals">
-                        {reportsData?.dealCount || 0}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="shadow-sm hover:shadow-md transition-shadow border border-gray-200 rounded-xl overflow-hidden">
-              <CardContent className="p-6">
-                <div className="flex items-center">
-                  <div className="p-3 rounded-full" style={{ backgroundColor: '#9DFFEF' }}>
-                    <BarChart3 className="h-6 w-6" style={{ color: '#00A88E' }} />
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">{t('admin.totalRevenue')}</p>
-                    {reportsLoading ? (
-                      <Skeleton className="h-8 w-20 mt-1" />
-                    ) : (
-                      <p className="text-2xl font-semibold text-gray-900" data-testid="text-total-revenue">
-                        {formatCurrency(reportsData?.totalRevenue || 0)}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="shadow-sm hover:shadow-md transition-shadow border border-gray-200 rounded-xl overflow-hidden">
-              <CardContent className="p-6">
-                <div className="flex items-center">
-                  <div className="p-3 rounded-full" style={{ backgroundColor: '#E6F7FF' }}>
-                    <Gift className="h-6 w-6" style={{ color: '#33BBFF' }} />
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">{t('admin.redeemedRewards')}</p>
-                    {reportsLoading ? (
-                      <Skeleton className="h-8 w-16 mt-1" />
-                    ) : (
-                      <p className="text-2xl font-semibold text-gray-900" data-testid="text-redeemed-rewards">
-                        {reportsData?.redeemedRewards || 0}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
+        <TabsContent value="overview" className="mt-0">
           {/* Regions Overview Section */}
-          <div className="mb-8">
-            <RegionsOverview />
-          </div>
+          <RegionsOverview />
 
           {/* Reports Section */}
           <Card className="shadow-sm hover:shadow-md transition-shadow border border-gray-200 rounded-xl overflow-hidden">
@@ -1185,12 +1095,12 @@ export default function Admin() {
         </TabsContent>
 
         {/* User Invitations Tab */}
-        <TabsContent value="invitations" className="mt-6">
+        <TabsContent value="invitations" className="mt-0">
           <UserInvitationsTab />
         </TabsContent>
 
         {/* Users Tab - Consolidated with sub-tabs */}
-        <TabsContent value="users" className="mt-6">
+        <TabsContent value="users" className="mt-0">
           <Card className="shadow-sm hover:shadow-md transition-shadow border border-gray-200 rounded-xl overflow-hidden">
             <CardHeader>
               <CardTitle className="flex items-center">
@@ -1891,7 +1801,7 @@ export default function Admin() {
         </TabsContent>
 
         {/* Deals Tab */}
-        <TabsContent value="deals" className="mt-6">
+        <TabsContent value="deals" className="mt-0">
           <Card className="shadow-sm hover:shadow-md transition-shadow border border-gray-200 rounded-xl overflow-hidden">
             <CardHeader>
               <div className="flex justify-between items-center">
@@ -2063,7 +1973,7 @@ export default function Admin() {
         </TabsContent>
 
         {/* Rewards Tab - Consolidated with sub-tabs */}
-        <TabsContent value="rewards" className="mt-6">
+        <TabsContent value="rewards" className="mt-0">
           <Card className="shadow-sm hover:shadow-md transition-shadow border border-gray-200 rounded-xl overflow-hidden">
             <CardHeader>
               <CardTitle className="flex items-center">
@@ -2429,17 +2339,17 @@ export default function Admin() {
         </TabsContent>
 
         {/* Regions Tab */}
-        <TabsContent value="regions" className="mt-6">
+        <TabsContent value="regions" className="mt-0">
           <RegionsManagementTab />
         </TabsContent>
 
         {/* Masters Tab - Master Data Management */}
-        <TabsContent value="masters" className="mt-6">
+        <TabsContent value="masters" className="mt-0">
           <MastersTab />
         </TabsContent>
 
         {/* Settings Tab - with sub-tabs for Support, Points Config, and Program Configuration */}
-        <TabsContent value="settings" className="mt-6">
+        <TabsContent value="settings" className="mt-0">
           <Card className="shadow-sm hover:shadow-md transition-shadow border border-gray-200 rounded-xl overflow-hidden">
             <CardHeader>
               <CardTitle className="flex items-center">

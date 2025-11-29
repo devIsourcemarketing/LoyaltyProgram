@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { Bell, ChevronDown, Menu, X } from "lucide-react";
+import { Bell, ChevronDown, Menu, X, Globe, Database, Settings } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { logout } from "@/lib/auth";
 import { useToast } from "@/hooks/use-toast";
@@ -25,6 +25,24 @@ export default function Navigation({ user }: NavigationProps) {
   const { t, currentLanguage, changeLanguage } = useTranslation();
   const queryClient = useQueryClient();
   const { toast } = useToast();
+
+  // Get current admin tab from URL and update on location change
+  const [currentTab, setCurrentTab] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('tab') || 'overview';
+  });
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    setCurrentTab(params.get('tab') || 'overview');
+  }, [location]);
+
+  const handleTabChange = (tab: string) => {
+    const newUrl = `/admin?tab=${tab}`;
+    window.history.pushState({}, '', newUrl);
+    setCurrentTab(tab);
+    window.dispatchEvent(new PopStateEvent('popstate'));
+  };
 
 
   // Improved safety check - show loading state instead of null
@@ -107,32 +125,112 @@ export default function Navigation({ user }: NavigationProps) {
                 />
               </Link>
             </div>
-            {isAdminRole(user.role) && (
-              <div className="bg-[#9DFFEF] px-4 py-1.5 rounded-md">
-                <span className="text-sm font-medium text-[#1D1D1B]">{t('admin.panel')}</span>
-              </div>
-            )}
-            
-            {/* Desktop Navigation - Only for non-admin users */}
-            {!isAdminRole(user.role) && (
+            {isAdminRole(user.role) ? (
+              <>
+                <div className="bg-[#9DFFEF] px-4 py-1.5 rounded-md">
+                  <span className="text-sm font-medium text-[#1D1D1B]">{t('admin.panel')}</span>
+                </div>
+                <div className="ml-6">
+                  <div className="flex items-baseline space-x-1 bg-white p-1 rounded-lg border border-gray-200">
+                    <button 
+                      onClick={() => handleTabChange('overview')}
+                      className={`px-5 py-2.5 rounded-md text-sm font-medium transition-all ${
+                        currentTab === 'overview' 
+                          ? 'bg-[#29CCB1] text-white' 
+                          : 'text-gray-600 hover:text-green-600 hover:bg-gray-50'
+                      }`}>
+                      {t('admin.overview')}
+                    </button>
+                    <button 
+                      onClick={() => handleTabChange('invitations')}
+                      className={`px-5 py-2.5 rounded-md text-sm font-medium transition-all ${
+                        currentTab === 'invitations' 
+                          ? 'bg-[#29CCB1] text-white' 
+                          : 'text-gray-600 hover:text-green-600 hover:bg-gray-50'
+                      }`}>
+                      {t('admin.invitations')}
+                    </button>
+                    <button 
+                      onClick={() => handleTabChange('users')}
+                      className={`px-5 py-2.5 rounded-md text-sm font-medium transition-all ${
+                        currentTab === 'users' 
+                          ? 'bg-[#29CCB1] text-white' 
+                          : 'text-gray-600 hover:text-green-600 hover:bg-gray-50'
+                      }`}>
+                      {t('admin.users')}
+                    </button>
+                    <button 
+                      onClick={() => handleTabChange('deals')}
+                      className={`px-5 py-2.5 rounded-md text-sm font-medium transition-all ${
+                        currentTab === 'deals' 
+                          ? 'bg-[#29CCB1] text-white' 
+                          : 'text-gray-600 hover:text-green-600 hover:bg-gray-50'
+                      }`}>
+                      {t('admin.deals')}
+                    </button>
+                    <button 
+                      onClick={() => handleTabChange('rewards')}
+                      className={`px-5 py-2.5 rounded-md text-sm font-medium transition-all ${
+                        currentTab === 'rewards' 
+                          ? 'bg-[#29CCB1] text-white' 
+                          : 'text-gray-600 hover:text-green-600 hover:bg-gray-50'
+                      }`}>
+                      {t('admin.rewards')}
+                    </button>
+                    <button 
+                      onClick={() => handleTabChange('regions')}
+                      className={`px-5 py-2.5 rounded-md text-sm font-medium transition-all ${
+                        currentTab === 'regions' 
+                          ? 'bg-[#29CCB1] text-white' 
+                          : 'text-gray-600 hover:text-green-600 hover:bg-gray-50'
+                      }`}>
+                      <Globe className="w-4 h-4 inline mr-1" />
+                      {t('admin.regions')}
+                    </button>
+                    {user.role === 'super-admin' && (
+                      <button 
+                        onClick={() => handleTabChange('masters')}
+                        className={`px-5 py-2.5 rounded-md text-sm font-medium transition-all ${
+                          currentTab === 'masters' 
+                            ? 'bg-[#29CCB1] text-white' 
+                            : 'text-gray-600 hover:text-green-600 hover:bg-gray-50'
+                        }`}>
+                        <Database className="w-4 h-4 inline mr-1" />
+                        {t('admin.masters')}
+                      </button>
+                    )}
+                    <button 
+                      onClick={() => handleTabChange('settings')}
+                      className={`px-5 py-2.5 rounded-md text-sm font-medium transition-all ${
+                        currentTab === 'settings' 
+                          ? 'bg-[#29CCB1] text-white' 
+                          : 'text-gray-600 hover:text-green-600 hover:bg-gray-50'
+                      }`}>
+                      <Settings className="w-4 h-4 inline mr-1" />
+                      {t('admin.settings')}
+                    </button>
+                  </div>
+                </div>
+              </>
+            ) : (
               <div className="hidden md:block">
                 <div className="ml-10 flex items-baseline space-x-4">
                   {navItems.map((item) => (
-                  <Link key={item.href} href={item.href}>
-                    <button
-                      className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                        item.current
-                          ? "text-blue-600 bg-blue-50 text-green-600 green-background-opacity15"
-                          : "text-gray-700 hover:text-green-600"
-                      }`}
-                      data-testid={`nav-${item.label.toLowerCase().replace(" ", "-")}`}
-                    >
-                      {item.label}
-                    </button>
-                  </Link>
-                ))}
+                    <Link key={item.href} href={item.href}>
+                      <button
+                        className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                          item.current
+                            ? "text-blue-600 bg-blue-50 text-green-600 green-background-opacity15"
+                            : "text-gray-700 hover:text-green-600"
+                        }`}
+                        data-testid={`nav-${item.label.toLowerCase().replace(" ", "-")}`}
+                      >
+                        {item.label}
+                      </button>
+                    </Link>
+                  ))}
+                </div>
               </div>
-            </div>
             )}
           </div>
 

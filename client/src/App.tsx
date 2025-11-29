@@ -95,7 +95,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
   return (
     <div className={user ? "with-header-container min-h-screen bg-white" : ""}>
       {user && <Navigation user={user} />}
-      <main className={user ? "pt-0" : ""}>
+      <main>
         {children}
       </main>
       {user && <SupportButton />}
