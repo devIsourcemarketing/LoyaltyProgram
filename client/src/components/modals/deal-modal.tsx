@@ -18,6 +18,9 @@ const dealSchema = z.object({
   productType: z.enum(["software", "hardware", "equipment"], {
     required_error: "Please select a product type",
   }),
+  dealType: z.enum(["new_customer", "renewal"], {
+    required_error: "Please select a deal type",
+  }),
   productName: z.string().min(1, "Product name is required"),
   dealValue: z.string().min(1, "Deal value is required"),
   quantity: z.string().min(1, "Quantity is required"),
@@ -61,6 +64,7 @@ export default function DealModal({ isOpen, onClose, deal }: DealModalProps) {
     resolver: zodResolver(dealSchema),
     defaultValues: {
       productType: undefined,
+      dealType: undefined,
       productName: "",
       dealValue: "",
       quantity: "",
@@ -77,6 +81,7 @@ export default function DealModal({ isOpen, onClose, deal }: DealModalProps) {
       const closeDate = deal.closeDate ? new Date(deal.closeDate).toISOString().split('T')[0] : "";
       form.reset({
         productType: deal.productType,
+        dealType: deal.dealType || "new_customer",
         productName: deal.productName || "",
         dealValue: deal.dealValue?.toString() || "",
         quantity: deal.quantity?.toString() || "",
@@ -90,6 +95,7 @@ export default function DealModal({ isOpen, onClose, deal }: DealModalProps) {
       // Pre-fill region with user's region for new deals
       form.reset({
         productType: undefined,
+        dealType: undefined,
         productName: "",
         dealValue: "",
         quantity: "",
@@ -188,6 +194,48 @@ export default function DealModal({ isOpen, onClose, deal }: DealModalProps) {
               
               <FormField
                 control={form.control}
+                name="dealType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('deals.dealType')}</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger data-testid="select-deal-type">
+                          <SelectValue placeholder={t('deals.selectDealType')} />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="new_customer">{t('deals.newCustomer')}</SelectItem>
+                        <SelectItem value="renewal">{t('deals.renewal')}</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField
+                control={form.control}
+                name="productName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('deals.productName')}</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="Enterprise Software License"
+                        data-testid="input-product-name"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
                 name="dealValue"
                 render={({ field }) => (
                   <FormItem>
@@ -205,24 +253,6 @@ export default function DealModal({ isOpen, onClose, deal }: DealModalProps) {
                 )}
               />
             </div>
-
-            <FormField
-              control={form.control}
-              name="productName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('deals.productName')}</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      placeholder="Enterprise Software License"
-                      data-testid="input-product-name"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <FormField
