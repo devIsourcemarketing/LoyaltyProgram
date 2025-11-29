@@ -27,7 +27,7 @@ import type { SupportTicketWithUser } from "@shared/schema";
 
 export default function SupportTicketsTab() {
   const { t } = useTranslation();
-  const [selectedRegion, setSelectedRegion] = useState<string>("");
+  const [selectedRegion, setSelectedRegion] = useState<string>("ALL");
   const [selectedTicket, setSelectedTicket] = useState<SupportTicketWithUser | null>(null);
   const [isResponseDialogOpen, setIsResponseDialogOpen] = useState(false);
   const [adminResponse, setAdminResponse] = useState("");
@@ -40,25 +40,11 @@ export default function SupportTicketsTab() {
     queryKey: ["/api/auth/me"],
   });
 
-  // Establecer región basada en el rol del usuario
-  useEffect(() => {
-    if (currentUser) {
-      const user = currentUser as any;
-      if (user.role === "regional-admin") {
-        const userRegion = user.region || user.country || "";
-        setSelectedRegion(userRegion);
-      } else if (user.role === "admin" || user.role === "super-admin") {
-        // Para admin/super-admin, establecer región por defecto si no hay una seleccionada
-        if (!selectedRegion) {
-          setSelectedRegion("NOLA");
-        }
-      }
-    }
-  }, [currentUser, selectedRegion]);
-
+  // El backend ya filtra por región automáticamente según el rol
+  // Para admin/super-admin trae TODOS los tickets, para regional-admin solo de su región
   const { data: tickets, isLoading } = useQuery<SupportTicketWithUser[]>({
-    queryKey: ["/api/admin/support-tickets", selectedRegion],
-    enabled: !!selectedRegion,
+    queryKey: ["/api/admin/support-tickets"],
+    enabled: !!currentUser,
   });
 
   const updateTicketMutation = useMutation({
@@ -77,7 +63,7 @@ export default function SupportTicketsTab() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/support-tickets", selectedRegion] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/support-tickets"] });
       toast({
         title: t("admin.ticketUpdated"),
         description: t("admin.ticketUpdatedSuccessfully"),
@@ -212,35 +198,39 @@ export default function SupportTicketsTab() {
     );
   }
 
-  const openTickets = tickets?.filter((t) => t.status === "open") || [];
-  const inProgressTickets = tickets?.filter((t) => t.status === "in_progress") || [];
-  const resolvedTickets = tickets?.filter((t) => t.status === "resolved") || [];
-  const closedTickets = tickets?.filter((t) => t.status === "closed") || [];
+  // Filtrar tickets por región seleccionada en el frontend solo para super-admin/admin
+  // Regional-admin ya viene filtrado desde el backend
+  const user = currentUser as any;
+  const filteredTickets = tickets?.filter((t) => {
+    // Si es regional-admin, mostrar todos (ya vienen filtrados del backend)
+    if (user?.role === "regional-admin") return true;
+    // Si selectedRegion es "ALL", mostrar todos
+    if (selectedRegion === "ALL") return true;
+    // Filtrar por región seleccionada
+    return t.userRegion === selectedRegion;
+  }) || [];
+
+  const openTickets = filteredTickets.filter((t) => t.status === "open");
+  const inProgressTickets = filteredTickets.filter((t) => t.status === "in_progress");
+  const resolvedTickets = filteredTickets.filter((t) => t.status === "resolved");
+  const closedTickets = filteredTickets.filter((t) => t.status === "closed");
 
   return (
     <>
       <div className="space-y-6">
-        {/* Selector de Región */}
-        <div className="mb-6 p-4 bg-gray-50 rounded-lg border">
-          <div className="flex items-center justify-between">
-            <div className="flex-1">
-              <h3 className="text-sm font-medium text-gray-900 mb-2">{t("deals.region")}</h3>
-              {currentUser && (currentUser as any).role === "regional-admin" ? (
-                <div className="flex items-center space-x-2">
-                  <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
-                    {selectedRegion}
-                  </Badge>
-                  <span className="text-xs text-gray-500">
-                    ({t("admin.regionalAdminViewOnlyRegion")})
-                  </span>
-                </div>
-              ) : (
+        {/* Selector de Región - Solo para Admin/Super-admin */}
+        {currentUser && ((currentUser as any).role === "admin" || (currentUser as any).role === "super-admin") && (
+          <div className="mb-6 p-4 bg-gray-50 rounded-lg border">
+            <div className="flex items-center justify-between">
+              <div className="flex-1">
+                <h3 className="text-sm font-medium text-gray-900 mb-2">{t("deals.region")}</h3>
                 <div className="flex items-center space-x-3">
                   <Select value={selectedRegion} onValueChange={setSelectedRegion}>
                     <SelectTrigger className="w-48">
                       <SelectValue placeholder={t("admin.selectRegionPlaceholder")} />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="ALL">{t("common.allRegions")}</SelectItem>
                       <SelectItem value="NOLA">NOLA</SelectItem>
                       <SelectItem value="SOLA">SOLA</SelectItem>
                       <SelectItem value="BRASIL">BRASIL</SelectItem>
@@ -248,13 +238,13 @@ export default function SupportTicketsTab() {
                     </SelectContent>
                   </Select>
                   <span className="text-xs text-gray-500">
-                    {t("admin.selectRegionToViewTickets")}
+                    {selectedRegion === "ALL" ? t("admin.viewAllTickets") : `${t("admin.viewAllTickets")} - ${selectedRegion}`}
                   </span>
                 </div>
-              )}
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card>

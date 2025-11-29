@@ -609,4 +609,5 @@ export type SupportTicketWithUser = SupportTicket & {
   userLastName: string;
   userName: string;
   userEmail: string;
+  userRegion?: "NOLA" | "SOLA" | "BRASIL" | "MEXICO";
 };

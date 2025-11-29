@@ -1756,6 +1756,7 @@ export class DatabaseStorage implements IStorage {
         userLastName: users.lastName,
         userName: users.username,
         userEmail: users.email,
+        userRegion: users.region,
       })
       .from(supportTickets)
       .leftJoin(users, eq(supportTickets.userId, users.id))
