@@ -318,7 +318,7 @@ export default function GrandPrizeTab() {
 
           {/* Tipo de Criterio */}
           <div className="space-y-2">
-            <Label htmlFor="criteria-type">Tipo de Criterio</Label>
+            <Label htmlFor="criteria-type">{t('admin.criteriaType')}</Label>
             <Select
               value={criteria.criteriaType}
               onValueChange={(value: "points" | "deals" | "combined" | "top_goals") =>
@@ -329,10 +329,10 @@ export default function GrandPrizeTab() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="top_goals">Mayor Cantidad de Goles (Ranking)</SelectItem>
-                <SelectItem value="points">Solo Puntos</SelectItem>
-                <SelectItem value="deals">Solo Deals Completados</SelectItem>
-                <SelectItem value="combined">Combinado (Puntos + Deals)</SelectItem>
+                <SelectItem value="top_goals">{t('admin.topGoalsRanking')}</SelectItem>
+                <SelectItem value="points">{t('admin.onlyPoints')}</SelectItem>
+                <SelectItem value="deals">{t('admin.onlyDeals')}</SelectItem>
+                <SelectItem value="combined">{t('admin.combinedPointsDeals')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -368,7 +368,7 @@ export default function GrandPrizeTab() {
           {criteria.criteriaType === "combined" && (
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="points-weight">Peso Puntos (%)</Label>
+                <Label htmlFor="points-weight">{t('admin.pointsWeight')}</Label>
                 <Input
                   id="points-weight"
                   type="number"
@@ -386,7 +386,7 @@ export default function GrandPrizeTab() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="deals-weight">Peso Deals (%)</Label>
+                <Label htmlFor="deals-weight">{t('admin.dealsWeight')}</Label>
                 <Input
                   id="deals-weight"
                   type="number"

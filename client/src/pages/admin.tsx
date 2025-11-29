@@ -2437,9 +2437,9 @@ export default function Admin() {
                   <TabsTrigger value="points-config" data-testid="subtab-points-config">
                     {t('admin.pointsConfiguration')}
                   </TabsTrigger>
-                  <TabsTrigger value="program-config" data-testid="subtab-program-config">
+                  {/* <TabsTrigger value="program-config" data-testid="subtab-program-config">
                     {t('admin.programConfiguration')}
-                  </TabsTrigger>
+                  </TabsTrigger> */}
                   <TabsTrigger value="grand-prize" data-testid="subtab-grand-prize">
                     {t('admin.grandPrizeFinal')}
                   </TabsTrigger>
@@ -2457,12 +2457,6 @@ export default function Admin() {
                 <TabsContent value="points-config">
                   <PointsConfigTab />
                 </TabsContent>
-
-                {/* Program Configuration Sub-Tab */}
-                <TabsContent value="program-config">
-                  <ProgramConfigTab />
-                </TabsContent>
-
                 {/* Grand Prize Sub-Tab */}
                 <TabsContent value="grand-prize">
                   <GrandPrizeTab />
