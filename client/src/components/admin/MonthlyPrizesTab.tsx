@@ -417,17 +417,16 @@ export default function MonthlyPrizesTab() {
             </div>
           </div>
 
-          {/* Ranking y Descripción */}
+          {/* Goals Target to Participate */}
           <div className="space-y-2">
-            <Label htmlFor="rank">{t("admin.positionTopRequired")}</Label>
+            <Label htmlFor="goalTarget">{t("admin.goalTargetRequired")}</Label>
             <Input
-              id="rank"
+              id="goalTarget"
               type="number"
-              value={prize.rank}
-              onChange={(e) => setPrize({ ...prize, rank: parseInt(e.target.value) })}
-              min={1}
-              max={10}
-              placeholder="1"
+              value={prize.goalTarget}
+              onChange={(e) => setPrize({ ...prize, goalTarget: parseInt(e.target.value) })}
+              min={0}
+              placeholder="10"
             />
           </div>
 
@@ -451,31 +450,18 @@ export default function MonthlyPrizesTab() {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="value">{t("admin.prizeValue")}</Label>
-              <Input
-                id="value"
-                type="number"
-                value={prize.prizeValue || ""}
-                onChange={(e) =>
-                  setPrize({ ...prize, prizeValue: e.target.value ? parseFloat(e.target.value) : undefined })
-                }
-                placeholder={t("admin.estimatedValuePlaceholder")}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="goalTarget">{t("admin.goalTargetRequired")}</Label>
-              <Input
-                id="goalTarget"
-                type="number"
-                value={prize.goalTarget}
-                onChange={(e) => setPrize({ ...prize, goalTarget: parseInt(e.target.value) })}
-                min={0}
-                placeholder="10"
-              />
-            </div>
+          {/* Position in ranking */}
+          <div className="space-y-2">
+            <Label htmlFor="rank">{t("admin.positionTopRequired")}</Label>
+            <Input
+              id="rank"
+              type="number"
+              value={prize.rank}
+              onChange={(e) => setPrize({ ...prize, rank: parseInt(e.target.value) })}
+              min={1}
+              max={10}
+              placeholder="1"
+            />
           </div>
 
           <Separator />
