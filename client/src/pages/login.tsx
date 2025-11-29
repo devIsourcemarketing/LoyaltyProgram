@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -12,11 +12,12 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { login, register } from "@/lib/auth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Mail } from "lucide-react";
+import { Mail, Clock, RefreshCw, ArrowLeft, AlertCircle } from "lucide-react";
 import { useLocation } from "wouter";
 import backgroundImage from "@assets/login.jpg";
 import kasperskyLogo from "@/assets/logo-kaspersky-cup.png";
 import { t } from '@/lib/i18n';
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const loginSchema = z.object({
   username: z.string().min(1, "Username is required"),
@@ -41,9 +42,20 @@ export default function Login() {
   const [emailForLogin, setEmailForLogin] = useState("");
   const [isAdminEmail, setIsAdminEmail] = useState(false);
   const [checkingEmail, setCheckingEmail] = useState(false);
+  const [showMagicLinkSent, setShowMagicLinkSent] = useState(false);
+  const [sentEmail, setSentEmail] = useState("");
+  const [resendTimer, setResendTimer] = useState(0);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [, setLocation] = useLocation();
+
+  // Temporizador para reenvío (60 segundos)
+  useEffect(() => {
+    if (resendTimer > 0) {
+      const timer = setTimeout(() => setResendTimer(resendTimer - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [resendTimer]);
 
   const loginForm = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
@@ -174,10 +186,9 @@ export default function Login() {
       }
       
       // Usuario existe y se envió el link
-      toast({
-        title: t("auth.linkSentTitle"),
-        description: t("auth.linkSentDescription"),
-      });
+      setSentEmail(data.email || emailForLogin);
+      setShowMagicLinkSent(true);
+      setResendTimer(60); // 60 segundos para poder reenviar
       setEmailForLogin("");
     },
     onError: (error: any) => {
@@ -273,6 +284,24 @@ export default function Login() {
     }
   };
 
+  const handleResendMagicLink = () => {
+    if (resendTimer > 0) return;
+    magicLinkMutation.mutate(sentEmail);
+    setResendTimer(60);
+  };
+
+  const handleChangeEmail = () => {
+    setShowMagicLinkSent(false);
+    setSentEmail("");
+    setEmailForLogin("");
+  };
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
   const countries = [
     { value: "US", label: "United States" },
     { value: "CA", label: "Canada" },
@@ -311,7 +340,59 @@ export default function Login() {
           </p>
         </CardHeader>
         <CardContent>
-          {isLogin ? (
+          {/* Pantalla de "Enlace enviado" */}
+          {showMagicLinkSent ? (
+            <div className="space-y-6">
+              <div className="text-center">
+                <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
+                  <Mail className="h-8 w-8 text-green-600" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                  {t("auth.checkYourEmail")}
+                </h3>
+                <p className="text-gray-600 mb-1">
+                  {t("auth.magicLinkSentTo")}
+                </p>
+                <p className="text-lg font-semibold text-gray-900 mb-3">
+                  {sentEmail}
+                </p>
+                <p className="text-sm text-gray-500">
+                  {t("auth.openEmailFromDevice")}
+                </p>
+              </div>
+
+              <Alert className="bg-blue-50 border-blue-200">
+                <AlertCircle className="h-4 w-4 text-blue-600" />
+                <AlertDescription className="text-sm text-blue-800">
+                  {t("auth.didntReceive")}
+                </AlertDescription>
+              </Alert>
+
+              <div className="space-y-3">
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={handleResendMagicLink}
+                  disabled={resendTimer > 0 || magicLinkMutation.isPending}
+                >
+                  <RefreshCw className={`h-4 w-4 mr-2 ${magicLinkMutation.isPending ? 'animate-spin' : ''}`} />
+                  {resendTimer > 0 
+                    ? `${t("auth.resendLinkIn")} ${formatTime(resendTimer)}`
+                    : t("auth.resendLink")
+                  }
+                </Button>
+
+                <Button
+                  variant="ghost"
+                  className="w-full"
+                  onClick={handleChangeEmail}
+                >
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  {t("auth.changeEmail")}
+                </Button>
+              </div>
+            </div>
+          ) : isLogin ? (
             <div className="space-y-4">
               {/* Email input - siempre visible */}
               <div className="space-y-2">
