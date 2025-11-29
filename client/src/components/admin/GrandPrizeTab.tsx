@@ -17,7 +17,7 @@ import type { User } from "@shared/schema";
 interface GrandPrizeCriteria {
   id?: string;
   name: string;
-  criteriaType: "points" | "deals" | "combined";
+  criteriaType: "points" | "deals" | "combined" | "top_goals";
   minPoints?: number;
   minDeals?: number;
   region?: string;
@@ -321,7 +321,7 @@ export default function GrandPrizeTab() {
             <Label htmlFor="criteria-type">Tipo de Criterio</Label>
             <Select
               value={criteria.criteriaType}
-              onValueChange={(value: "points" | "deals" | "combined") =>
+              onValueChange={(value: "points" | "deals" | "combined" | "top_goals") =>
                 setCriteria({ ...criteria, criteriaType: value })
               }
             >
@@ -329,6 +329,7 @@ export default function GrandPrizeTab() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="top_goals">Mayor Cantidad de Goles (Ranking)</SelectItem>
                 <SelectItem value="points">Solo Puntos</SelectItem>
                 <SelectItem value="deals">Solo Deals Completados</SelectItem>
                 <SelectItem value="combined">Combinado (Puntos + Deals)</SelectItem>

@@ -12,7 +12,7 @@ export const supportTicketStatusEnum = pgEnum("support_ticket_status", ["open", 
 export const regionEnum = pgEnum("region", ["NOLA", "SOLA", "BRASIL", "MEXICO"]);
 export const regionCategoryEnum = pgEnum("region_category", ["ENTERPRISE", "SMB", "MSSP"]);
 export const dealTypeEnum = pgEnum("deal_type", ["new_customer", "renewal"]);
-export const criteriaTypeEnum = pgEnum("criteria_type", ["points", "deals", "combined"]);
+export const criteriaTypeEnum = pgEnum("criteria_type", ["points", "deals", "combined", "top_goals"]);
 
 // Types from enums
 export type Region = typeof regionEnum.enumValues[number];
