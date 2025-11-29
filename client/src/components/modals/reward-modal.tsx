@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import { Upload, X, Image as ImageIcon } from "lucide-react";
 import type { Reward } from "@shared/schema";
 
 const rewardSchema = z.object({
@@ -23,7 +24,7 @@ const rewardSchema = z.object({
   region: z.string().min(1, "Region is required"),
   isActive: z.boolean().default(true),
   stockQuantity: z.string().optional(),
-  imageUrl: z.string().url("Invalid URL").optional().or(z.literal("")),
+  imageUrl: z.string().optional(),
   estimatedDeliveryDays: z.string().optional(),
 });
 
@@ -51,6 +52,9 @@ export default function RewardModal({ isOpen, onClose, reward }: RewardModalProp
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const isEditing = !!reward;
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   // Get current user to determine region access
   const { data: currentUser } = useQuery<any>({
@@ -88,6 +92,8 @@ export default function RewardModal({ isOpen, onClose, reward }: RewardModalProp
         imageUrl: reward.imageUrl || "",
         estimatedDeliveryDays: reward.estimatedDeliveryDays?.toString() || "",
       });
+      // Set image preview if exists
+      setImagePreview(reward.imageUrl || null);
     } else if (currentUser) {
       // Si es regional-admin, auto-asignar su región
       // Usar region si existe, sino country como fallback
@@ -109,12 +115,104 @@ export default function RewardModal({ isOpen, onClose, reward }: RewardModalProp
         estimatedDeliveryDays: "",
       });
       
+      // Clear image preview for new reward
+      setImagePreview(null);
+      
       // Establecer el valor del campo explícitamente
       if (defaultRegion) {
         form.setValue("region", defaultRegion);
       }
     }
   }, [reward, form, currentUser, isOpen]);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+      toast({
+        title: "Error",
+        description: "Por favor sube una imagen en formato PNG, JPG o WEBP",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate file size (max 2MB for better performance)
+    const maxSize = 2 * 1024 * 1024; // 2MB
+    if (file.size > maxSize) {
+      const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+      toast({
+        title: "Imagen demasiado grande",
+        description: `El tamaño de la imagen es ${fileSizeMB}MB. El tamaño máximo permitido es 2MB. Por favor, reduce el tamaño de la imagen.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsUploading(true);
+
+    try {
+      // Convert file to base64
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64String = reader.result as string;
+
+        // Upload to Cloudinary via backend
+        const response = await fetch('/api/upload/image', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({
+            image: base64String,
+            folder: 'rewards',
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to upload image');
+        }
+
+        const data = await response.json();
+        
+        // Update form with image URL
+        form.setValue('imageUrl', data.url);
+        setImagePreview(data.url);
+
+        toast({
+          title: t("common.success"),
+          description: "Imagen subida exitosamente",
+        });
+      };
+
+      reader.onerror = () => {
+        throw new Error('Failed to read file');
+      };
+
+      reader.readAsDataURL(file);
+    } catch (error) {
+      console.error('Image upload error:', error);
+      toast({
+        title: "Error",
+        description: "Error al subir la imagen. Por favor intenta de nuevo.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    form.setValue('imageUrl', '');
+    setImagePreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
 
   const createRewardMutation = useMutation({
     mutationFn: async (data: RewardForm) => {
@@ -157,6 +255,10 @@ export default function RewardModal({ isOpen, onClose, reward }: RewardModalProp
 
   const handleClose = () => {
     form.reset();
+    setImagePreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
     onClose();
   };
 
@@ -334,14 +436,62 @@ export default function RewardModal({ isOpen, onClose, reward }: RewardModalProp
               name="imageUrl"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Image URL (Optional)</FormLabel>
+                  <FormLabel>Image (PNG or JPG)</FormLabel>
                   <FormControl>
-                    <Input
-                      {...field}
-                      type="url"
-                      placeholder="https://example.com/image.jpg"
-                      data-testid="input-image-url"
-                    />
+                    <div className="space-y-4">
+                      {/* Image Preview */}
+                      {imagePreview ? (
+                        <div className="relative w-full h-48 border-2 border-gray-200 rounded-lg overflow-hidden bg-gray-50">
+                          <img
+                            src={imagePreview}
+                            alt="Reward preview"
+                            className="w-full h-full object-contain"
+                          />
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="sm"
+                            className="absolute top-2 right-2"
+                            onClick={handleRemoveImage}
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <div
+                          className="w-full h-48 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-[#29CCB1] transition-colors bg-gray-50"
+                          onClick={() => fileInputRef.current?.click()}
+                        >
+                          <ImageIcon className="w-12 h-12 text-gray-400 mb-2" />
+                          <p className="text-sm text-gray-600 mb-1">Click para subir imagen</p>
+                          <p className="text-xs text-gray-400">PNG, JPG o WEBP (máx 2MB)</p>
+                        </div>
+                      )}
+
+                      {/* Hidden File Input */}
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/png,image/jpeg,image/jpg,image/webp"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                        disabled={isUploading}
+                      />
+
+                      {/* Upload Button */}
+                      {!imagePreview && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => fileInputRef.current?.click()}
+                          disabled={isUploading}
+                          className="w-full"
+                        >
+                          <Upload className="w-4 h-4 mr-2" />
+                          {isUploading ? "Subiendo..." : "Subir Imagen"}
+                        </Button>
+                      )}
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>

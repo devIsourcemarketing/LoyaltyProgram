@@ -958,7 +958,7 @@ export class DatabaseStorage implements IStorage {
 
   async getUserRewardsWithDetails(
     userId: string,
-  ): Promise<Array<UserReward & { rewardName?: string; pointsCost?: number }>> {
+  ): Promise<Array<UserReward & { rewardName?: string; pointsCost?: number; imageUrl?: string }>> {
     const result = await db
       .select({
         id: userRewards.id,
@@ -976,6 +976,7 @@ export class DatabaseStorage implements IStorage {
         shippedBy: userRewards.shippedBy,
         rewardName: rewards.name,
         pointsCost: rewards.pointsCost,
+        imageUrl: rewards.imageUrl,
       })
       .from(userRewards)
       .leftJoin(rewards, eq(userRewards.rewardId, rewards.id))
@@ -983,7 +984,7 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(userRewards.redeemedAt));
 
     return result as Array<
-      UserReward & { rewardName?: string; pointsCost?: number }
+      UserReward & { rewardName?: string; pointsCost?: number; imageUrl?: string }
     >;
   }
 
@@ -1795,21 +1796,26 @@ export class DatabaseStorage implements IStorage {
   ): Promise<PointsConfig | undefined> {
     const existingConfig = await this.getPointsConfig();
 
+    // Filter out undefined values to avoid Drizzle type errors
+    const filteredUpdates = Object.fromEntries(
+      Object.entries(updates).filter(([_, v]) => v !== undefined)
+    );
+
     if (!existingConfig) {
       const [newConfig] = await db
         .insert(pointsConfig)
         .values({
-          ...updates,
+          ...filteredUpdates,
           updatedBy,
           updatedAt: new Date(),
-        })
+        } as any)
         .returning();
       return newConfig;
     }
 
     const [config] = await db
       .update(pointsConfig)
-      .set({ ...updates, updatedBy, updatedAt: new Date() })
+      .set({ ...filteredUpdates, updatedBy, updatedAt: new Date() })
       .where(eq(pointsConfig.id, existingConfig.id))
       .returning();
     return config || undefined;

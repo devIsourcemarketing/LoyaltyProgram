@@ -7,6 +7,7 @@ import { z } from "zod";
 import * as XLSX from 'xlsx';
 import { NotificationHelpers } from "./notifications";
 import { nanoid } from "nanoid";
+import { cloudinary } from "./cloudinary";
 import { 
   sendInviteEmail, 
   sendApprovalEmail, 
@@ -4251,6 +4252,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ 
         success: false, 
         message: "Failed to send batch registro exitoso emails" 
+      });
+    }
+  });
+
+  // Upload image to Cloudinary
+  app.post("/api/upload/image", async (req, res) => {
+    try {
+      const { image, folder = 'rewards' } = req.body;
+      
+      if (!image) {
+        return res.status(400).json({ message: "Image data is required" });
+      }
+
+      // Upload to Cloudinary
+      const result = await cloudinary.uploader.upload(image, {
+        folder: `loyalty-pilot/${folder}`,
+        resource_type: 'auto',
+        allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
+      });
+
+      res.json({
+        success: true,
+        url: result.secure_url,
+        publicId: result.public_id,
+      });
+    } catch (error) {
+      console.error("Upload image error:", error);
+      res.status(500).json({
+        success: false,
+        message: "Failed to upload image",
       });
     }
   });

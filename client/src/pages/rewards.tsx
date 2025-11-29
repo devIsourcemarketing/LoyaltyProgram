@@ -257,26 +257,28 @@ export default function Rewards() {
           ) : rewards && rewards.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {rewards.map((reward) => (
-                <Card key={reward.id} className="shadow-material" data-testid={`card-reward-${reward.id}`}>
+                <Card key={reward.id} className="shadow-material overflow-hidden" data-testid={`card-reward-${reward.id}`}>
+                  {/* Image Header */}
+                  {reward.imageUrl && (
+                    <div className="w-full h-48 bg-gray-100 relative overflow-hidden">
+                      <img 
+                        src={reward.imageUrl} 
+                        alt={reward.name}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                        }}
+                      />
+                    </div>
+                  )}
+                  
                   <CardContent className="p-6">
                     <div className="flex items-center space-x-4 mb-4 reward-info">
-                      {reward.imageUrl ? (
-                        <img 
-                          src={reward.imageUrl} 
-                          alt={reward.name}
-                          className="w-12 h-12 rounded-lg object-cover"
-                          onError={(e) => {
-                            e.currentTarget.style.display = 'none';
-                            const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
-                            if (nextElement) {
-                              nextElement.style.display = 'flex';
-                            }
-                          }}
-                        />
-                      ) : null}
-                      <div className={`w-12 h-12 bg-gradient-to-br ${getCategoryColor(reward.category)} rounded-lg flex items-center justify-center green-background ${reward.imageUrl ? 'hidden' : ''}`}>
-                        {getRewardIcon(reward.category)}
-                      </div>
+                      {!reward.imageUrl && (
+                        <div className="w-12 h-12 bg-gradient-to-br rounded-lg flex items-center justify-center green-background">
+                          {getRewardIcon(reward.category)}
+                        </div>
+                      )}
                       <div className="flex-1">
                         <h3 className="font-semibold text-gray-900">{reward.name}</h3>
                         <p className="text-sm text-gray-600 text-center">
@@ -345,32 +347,30 @@ export default function Rewards() {
           ) : availableRewards().length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {availableRewards().map((reward) => (
-                <Card key={reward.id} className="shadow-material border-green-200" data-testid={`card-available-reward-${reward.id}`}>
+                <Card key={reward.id} className="shadow-material border-green-200 overflow-hidden" data-testid={`card-available-reward-${reward.id}`}>
+                  {reward.imageUrl && (
+                    <div className="w-full h-48 bg-gray-100 relative overflow-hidden">
+                      <img 
+                        src={reward.imageUrl} 
+                        alt={reward.name}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.parentElement!.style.display = 'none';
+                        }}
+                      />
+                    </div>
+                  )}
                   <CardContent className="p-6">
-                    <div className="flex items-center space-x-4 mb-4 reward-info">
-                      {reward.imageUrl ? (
-                        <img 
-                          src={reward.imageUrl} 
-                          alt={reward.name}
-                          className="w-12 h-12 rounded-lg object-cover"
-                          onError={(e) => {
-                            e.currentTarget.style.display = 'none';
-                            const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
-                            if (nextElement) {
-                              nextElement.style.display = 'flex';
-                            }
-                          }}
-                        />
-                      ) : null}
-                      <div className={`w-12 h-12 bg-gradient-to-br ${getCategoryColor(reward.category)} rounded-lg flex items-center justify-center green-background ${reward.imageUrl ? 'hidden' : ''}`}>
+                    {!reward.imageUrl && (
+                      <div className={`w-12 h-12 bg-gradient-to-br ${getCategoryColor(reward.category)} rounded-lg flex items-center justify-center green-background mb-4`}>
                         {getRewardIcon(reward.category)}
                       </div>
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-gray-900">{reward.name}</h3>
-                        <p className="text-sm text-green-600 font-medium text-center">
-                          <span className="goal-number">{reward.pointsCost.toLocaleString()}</span> Goals ✓
-                        </p>
-                      </div>
+                    )}
+                    <div className="mb-4">
+                      <h3 className="font-semibold text-gray-900">{reward.name}</h3>
+                      <p className="text-sm text-green-600 font-medium">
+                        <span className="goal-number">{reward.pointsCost.toLocaleString()}</span> Goals ✓
+                      </p>
                     </div>
                     
                     {reward.description && (
@@ -414,32 +414,30 @@ export default function Rewards() {
           <TabsContent key={category} value={category} className="mt-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredRewards(category).map((reward) => (
-                <Card key={reward.id} className="shadow-material">
+                <Card key={reward.id} className="shadow-material overflow-hidden">
+                  {reward.imageUrl && (
+                    <div className="w-full h-48 bg-gray-100 relative overflow-hidden">
+                      <img 
+                        src={reward.imageUrl} 
+                        alt={reward.name}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.parentElement!.style.display = 'none';
+                        }}
+                      />
+                    </div>
+                  )}
                   <CardContent className="p-6">
-                    <div className="flex items-center space-x-4 mb-4 reward-info">
-                      {reward.imageUrl ? (
-                        <img 
-                          src={reward.imageUrl} 
-                          alt={reward.name}
-                          className="w-12 h-12 rounded-lg object-cover"
-                          onError={(e) => {
-                            e.currentTarget.style.display = 'none';
-                            const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
-                            if (nextElement) {
-                              nextElement.style.display = 'flex';
-                            }
-                          }}
-                        />
-                      ) : null}
-                      <div className={`w-12 h-12 bg-gradient-to-br ${getCategoryColor(reward.category)} rounded-lg flex items-center justify-center green-background ${reward.imageUrl ? 'hidden' : ''}`}>
+                    {!reward.imageUrl && (
+                      <div className={`w-12 h-12 bg-gradient-to-br ${getCategoryColor(reward.category)} rounded-lg flex items-center justify-center green-background mb-4`}>
                         {getRewardIcon(reward.category)}
                       </div>
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-gray-900">{reward.name}</h3>
-                        <p className="text-sm text-gray-600 text-center">
-                          <span className="goal-number text-green-600">{reward.pointsCost.toLocaleString()}</span> Goals
-                        </p>
-                      </div>
+                    )}
+                    <div className="mb-4">
+                      <h3 className="font-semibold text-gray-900">{reward.name}</h3>
+                      <p className="text-sm text-gray-600">
+                        <span className="goal-number text-green-600">{reward.pointsCost.toLocaleString()}</span> Goals
+                      </p>
                     </div>
                     
                     {reward.description && (
@@ -486,26 +484,44 @@ export default function Rewards() {
           ) : userRewards && userRewards.length > 0 ? (
             <div className="space-y-4">
               {userRewards.map((userReward: any) => (
-                <Card key={userReward.id} className="shadow-material" data-testid={`card-user-reward-${userReward.id}`}>
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-4">
-                        <div className={`w-12 h-12 green-background ${
-                          userReward.status === 'approved' ? 'bg-green-100' :
-                          userReward.status === 'pending' ? 'bg-yellow-100' : 'bg-red-100'
-                        } rounded-lg flex items-center justify-center`}>
-                          <Award className={`w-6 h-6 white-text ${
-                            userReward.status === 'approved' ? 'text-green-600' :
-                            userReward.status === 'pending' ? 'text-yellow-600' : 'text-red-600'
-                          }`} />
-                        </div>
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-gray-900" data-testid={`text-reward-name-${userReward.id}`}>
-                            {userReward.rewardName || 'Unknown Reward'}
-                          </h3>
-                          <p className="text-sm text-gray-600">
-                            {userReward.pointsCost?.toLocaleString()} points • Redeemed: {new Date(userReward.redeemedAt).toLocaleDateString()}
-                          </p>
+                <Card key={userReward.id} className="shadow-material overflow-hidden" data-testid={`card-user-reward-${userReward.id}`}>
+                  <div className="flex flex-col md:flex-row">
+                    {/* Image Section */}
+                    {userReward.imageUrl && (
+                      <div className="w-full md:w-48 h-48 bg-gray-100 relative overflow-hidden flex-shrink-0">
+                        <img 
+                          src={userReward.imageUrl} 
+                          alt={userReward.rewardName || 'Reward'}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.parentElement!.style.display = 'none';
+                          }}
+                        />
+                      </div>
+                    )}
+                    
+                    {/* Content Section */}
+                    <CardContent className="p-6 flex-1">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-4 flex-1">
+                          {!userReward.imageUrl && (
+                            <div className={`w-12 h-12 green-background ${
+                              userReward.status === 'approved' ? 'bg-green-100' :
+                              userReward.status === 'pending' ? 'bg-yellow-100' : 'bg-red-100'
+                            } rounded-lg flex items-center justify-center flex-shrink-0`}>
+                              <Award className={`w-6 h-6 white-text ${
+                                userReward.status === 'approved' ? 'text-green-600' :
+                                userReward.status === 'pending' ? 'text-yellow-600' : 'text-red-600'
+                              }`} />
+                            </div>
+                          )}
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-gray-900" data-testid={`text-reward-name-${userReward.id}`}>
+                              {userReward.rewardName || 'Unknown Reward'}
+                            </h3>
+                            <p className="text-sm text-gray-600">
+                              {userReward.pointsCost?.toLocaleString()} points • Redeemed: {new Date(userReward.redeemedAt).toLocaleDateString()}
+                            </p>
                           
                           {/* Status Information */}
                           {userReward.status === 'pending' && (
@@ -546,7 +562,8 @@ export default function Rewards() {
                           )}
                         </div>
                       </div>
-                      <div className="text-right">
+                      
+                      <div className="text-right flex-shrink-0">
                         <Badge className={`${
                           userReward.status === 'approved' ? 'bg-green-100 text-green-800 green-background white-text' :
                           userReward.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'
@@ -556,7 +573,8 @@ export default function Rewards() {
                         </Badge>
                       </div>
                     </div>
-                  </CardContent>
+                    </CardContent>
+                  </div>
                 </Card>
               ))}
             </div>

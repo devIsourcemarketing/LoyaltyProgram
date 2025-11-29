@@ -2063,12 +2063,29 @@ export default function Admin() {
                   ) : rewards && rewards.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                       {rewards.map((reward) => (
-                        <Card key={reward.id} className="border" data-testid={`card-admin-reward-${reward.id}`}>
+                        <Card key={reward.id} className="border overflow-hidden" data-testid={`card-admin-reward-${reward.id}`}>
+                          {/* Image Preview */}
+                          {reward.imageUrl && (
+                            <div className="w-full h-48 bg-gray-100 relative overflow-hidden">
+                              <img
+                                src={reward.imageUrl}
+                                alt={reward.name}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  // Fallback if image fails to load
+                                  e.currentTarget.style.display = 'none';
+                                }}
+                              />
+                            </div>
+                          )}
+                          
                           <CardContent className="p-4">
                             <div className="flex items-center space-x-3 mb-3">
-                              <div className="w-10 h-10 bg-gradient-to-br from-accent-400 to-accent-600 rounded-lg flex items-center justify-center">
-                                <Gift className="text-white h-5 w-5" />
-                              </div>
+                              {!reward.imageUrl && (
+                                <div className="w-10 h-10 bg-gradient-to-br from-accent-400 to-accent-600 rounded-lg flex items-center justify-center">
+                                  <Gift className="text-white h-5 w-5" />
+                                </div>
+                              )}
                               <div className="flex-1">
                                 <h4 className="font-medium text-gray-900">{reward.name}</h4>
                                 <p className="text-sm text-gray-600">
@@ -2077,13 +2094,26 @@ export default function Admin() {
                               </div>
                             </div>
                             
-                            <Badge variant="outline" className="mb-3">
-                              {reward.category}
-                            </Badge>
+                            <div className="flex gap-2 mb-3">
+                              <Badge variant="outline">
+                                {reward.category}
+                              </Badge>
+                              {reward.region && (
+                                <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                                  {reward.region}
+                                </Badge>
+                              )}
+                            </div>
                             
                             {reward.description && (
                               <p className="text-sm text-gray-600 mb-3 line-clamp-2">
                                 {reward.description}
+                              </p>
+                            )}
+                            
+                            {reward.stockQuantity && (
+                              <p className="text-xs text-gray-500 mb-3">
+                                Stock: {reward.stockQuantity}
                               </p>
                             )}
                             
