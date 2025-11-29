@@ -2604,6 +2604,63 @@ export class DatabaseStorage implements IStorage {
   async deleteProductType(id: string): Promise<void> {
     await db.delete(productTypesTable).where(eq(productTypesTable.id, id));
   }
+
+  // Top Scorers (Goleadores de la temporada)
+  async getTopScorers(regionName?: string, limit: number = 10): Promise<any[]> {
+    try {
+      console.log('🔍 getTopScorers called with:', { regionName, limit });
+      
+      // Build query using Drizzle's sql template for safe parameter binding
+      let baseQuery = sql`
+        SELECT 
+          u.id,
+          u.first_name as "firstName",
+          u.last_name as "lastName",
+          u.email,
+          u.region,
+          COALESCE(SUM(ph.points), 0)::numeric as points
+        FROM ${users} u
+        LEFT JOIN ${pointsHistory} ph ON ph.user_id = u.id
+        WHERE u.role = 'user'
+      `;
+      
+      // Add region filter if specified
+      if (regionName && regionName !== 'all') {
+        baseQuery = sql`${baseQuery} AND u.region = ${regionName}`;
+      }
+      
+      const finalQuery = sql`
+        ${baseQuery}
+        GROUP BY u.id, u.first_name, u.last_name, u.email, u.region
+        HAVING COALESCE(SUM(ph.points), 0) > 0
+        ORDER BY points DESC
+        LIMIT ${limit}
+      `;
+
+      console.log('📝 Executing query with region:', regionName, 'limit:', limit);
+
+      const result = await db.execute(finalQuery);
+      
+      console.log('📊 Raw result from DB:', result.rows);
+      
+      // Convert to expected format
+      const topScorers = result.rows.map((row: any) => ({
+        id: row.id,
+        firstName: row.firstName,
+        lastName: row.lastName,
+        email: row.email,
+        region: row.region,
+        company: null, // Company field doesn't exist in users table
+        points: Number(row.points || 0),
+      }));
+
+      console.log('✅ Processed top scorers:', topScorers);
+      return topScorers;
+    } catch (error) {
+      console.error('❌ Error in getTopScorers:', error);
+      throw error;
+    }
+  }
 }
 
 export const storage = new DatabaseStorage();

@@ -10,6 +10,7 @@
     "check": "tsc",
     "db:push": "drizzle-kit push",
     "db:seed": "dotenv -e .env -- tsx seed-master-data.ts",
+    "seed:top-scorers": "dotenv -e .env -- cross-env NODE_OPTIONS=\"--experimental-specifier-resolution=node\" tsx seed-top-scorers-data.ts",
     "create:test-users": "dotenv -e .env -- cross-env NODE_OPTIONS=\"--experimental-specifier-resolution=node\" tsx create-test-users.ts",
     "assign:regions": "dotenv -e .env -- cross-env NODE_OPTIONS=\"--experimental-specifier-resolution=node\" tsx assign-regions-to-admins.ts",
     "test:email": "dotenv -e .env -- cross-env NODE_OPTIONS=\"--experimental-specifier-resolution=node\" tsx test-email.ts",

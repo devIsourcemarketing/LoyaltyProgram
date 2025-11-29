@@ -226,6 +226,20 @@ export default function Admin() {
     enabled: currentUser?.role === "admin",
   });
 
+  // Top Scorers query
+  const { data: topScorers, isLoading: topScorersLoading } = useQuery<Array<{
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    region: string;
+    points: number;
+    company: string | null;
+  }>>({
+    queryKey: ["/api/admin/top-scorers"],
+    enabled: currentUser?.role === "admin" || currentUser?.role === "regional-admin" || currentUser?.role === "super-admin",
+  });
+
   const { data: rewards, isLoading: rewardsLoading } = useQuery<Reward[]>({
     queryKey: ["/api/rewards"],
     enabled: currentUser?.role === "admin" || currentUser?.role === "regional-admin" || currentUser?.role === "super-admin",
@@ -1029,65 +1043,50 @@ export default function Admin() {
             </CardContent>
           </Card>
 
-          {/* Pending Deals Quick View */}
+          {/* Top Scorers - Goleadores de la temporada */}
           <Card className="shadow-material mt-6">
             <CardHeader>
               <div className="flex justify-between items-center">
-                <CardTitle>{t('admin.pendingDeals')}</CardTitle>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setActiveTab("deals")}
-                  data-testid="button-view-all-pending"
-                >
-                  {t('admin.viewAll')}
-                </Button>
+                <CardTitle>{t('admin.topScorers')}</CardTitle>
               </div>
             </CardHeader>
             <CardContent>
-              {pendingDealsLoading ? (
+              {topScorersLoading ? (
                 <div className="space-y-4">
-                  {[...Array(3)].map((_, i) => (
+                  {[...Array(10)].map((_, i) => (
                     <Skeleton key={i} className="h-16 w-full" />
                   ))}
                 </div>
-              ) : pendingDeals && pendingDeals.length > 0 ? (
-                <div className="space-y-4">
-                  {pendingDeals.slice(0, 5).map((deal) => (
-                    <div key={deal.id} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div>
-                        <h4 className="font-medium">{deal.productName}</h4>
-                        <p className="text-sm text-gray-600">
-                          {deal.userFirstName && deal.userLastName 
-                            ? `${deal.userFirstName} ${deal.userLastName}`
-                            : deal.userName || t('admin.unknownUser')} • {formatCurrency(deal.dealValue)} • {formatDate(deal.createdAt.toString())}
-                        </p>
+              ) : topScorers && topScorers.length > 0 ? (
+                <div className="space-y-3">
+                  {topScorers.map((user, index) => (
+                    <div key={user.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+                      <div className="flex items-center space-x-3 sm:space-x-4 min-w-0 flex-1">
+                        <div className={`flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-full font-bold text-lg ${
+                          index === 0 ? 'bg-yellow-100 text-yellow-700' :
+                          index === 1 ? 'bg-gray-100 text-gray-700' :
+                          index === 2 ? 'bg-orange-100 text-orange-700' :
+                          'bg-blue-50 text-blue-600'
+                        }`}>
+                          {index + 1}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <h4 className="font-medium truncate">{user.firstName} {user.lastName}</h4>
+                          <p className="text-sm text-gray-600 truncate">
+                            {user.email} • {user.region}
+                          </p>
+                        </div>
                       </div>
-                      <div className="flex space-x-2">
-                        <Button
-                          size="sm"
-                          onClick={() => handleApproveDeal(deal.id)}
-                          disabled={approveDealMutation.isPending}
-                          data-testid={`button-approve-${deal.id}`}
-                        >
-                          <Check className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleRejectDeal(deal.id)}
-                          disabled={rejectDealMutation.isPending}
-                          data-testid={`button-reject-${deal.id}`}
-                        >
-                          <X className="w-4 h-4" />
-                        </Button>
+                      <div className="text-left sm:text-right flex-shrink-0 w-full sm:w-auto">
+                        <p className="text-2xl font-bold text-[#29CCB1]">{user.points}</p>
+                        <p className="text-xs text-gray-500">{t('points')}</p>
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-500 text-center py-8" data-testid="text-no-pending-deals">
-                  {t('admin.noPendingDeals')}
+                <p className="text-gray-500 text-center py-8">
+                  {t('admin.noTopScorers')}
                 </p>
               )}
             </CardContent>

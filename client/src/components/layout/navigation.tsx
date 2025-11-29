@@ -127,14 +127,14 @@ export default function Navigation({ user }: NavigationProps) {
             </div>
             {isAdminRole(user.role) ? (
               <>
-                <div className="bg-[#9DFFEF] px-4 py-1.5 rounded-md">
-                  <span className="text-sm font-medium text-[#1D1D1B]">{t('admin.panel')}</span>
+                <div className="bg-[#9DFFEF] px-3 sm:px-4 py-1.5 rounded-md whitespace-nowrap">
+                  <span className="text-xs sm:text-sm font-medium text-[#1D1D1B]">{t('admin.panel')}</span>
                 </div>
-                <div className="ml-6">
-                  <div className="flex items-baseline space-x-1 bg-white p-1 rounded-lg border border-gray-200">
+                <div className="ml-2 sm:ml-6 overflow-x-auto max-w-full">
+                  <div className="flex items-baseline space-x-1 bg-white p-1 rounded-lg border border-gray-200 min-w-max">
                     <button 
                       onClick={() => handleTabChange('overview')}
-                      className={`px-5 py-2.5 rounded-md text-sm font-medium transition-all ${
+                      className={`px-2 sm:px-5 py-2 sm:py-2.5 rounded-md text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
                         currentTab === 'overview' 
                           ? 'bg-[#29CCB1] text-white' 
                           : 'text-gray-600 hover:text-green-600 hover:bg-gray-50'
@@ -143,7 +143,7 @@ export default function Navigation({ user }: NavigationProps) {
                     </button>
                     <button 
                       onClick={() => handleTabChange('invitations')}
-                      className={`px-5 py-2.5 rounded-md text-sm font-medium transition-all ${
+                      className={`px-2 sm:px-5 py-2 sm:py-2.5 rounded-md text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
                         currentTab === 'invitations' 
                           ? 'bg-[#29CCB1] text-white' 
                           : 'text-gray-600 hover:text-green-600 hover:bg-gray-50'
@@ -152,7 +152,7 @@ export default function Navigation({ user }: NavigationProps) {
                     </button>
                     <button 
                       onClick={() => handleTabChange('users')}
-                      className={`px-5 py-2.5 rounded-md text-sm font-medium transition-all ${
+                      className={`px-2 sm:px-5 py-2 sm:py-2.5 rounded-md text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
                         currentTab === 'users' 
                           ? 'bg-[#29CCB1] text-white' 
                           : 'text-gray-600 hover:text-green-600 hover:bg-gray-50'
@@ -161,7 +161,7 @@ export default function Navigation({ user }: NavigationProps) {
                     </button>
                     <button 
                       onClick={() => handleTabChange('deals')}
-                      className={`px-5 py-2.5 rounded-md text-sm font-medium transition-all ${
+                      className={`px-2 sm:px-5 py-2 sm:py-2.5 rounded-md text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
                         currentTab === 'deals' 
                           ? 'bg-[#29CCB1] text-white' 
                           : 'text-gray-600 hover:text-green-600 hover:bg-gray-50'
@@ -170,7 +170,7 @@ export default function Navigation({ user }: NavigationProps) {
                     </button>
                     <button 
                       onClick={() => handleTabChange('rewards')}
-                      className={`px-5 py-2.5 rounded-md text-sm font-medium transition-all ${
+                      className={`px-2 sm:px-5 py-2 sm:py-2.5 rounded-md text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
                         currentTab === 'rewards' 
                           ? 'bg-[#29CCB1] text-white' 
                           : 'text-gray-600 hover:text-green-600 hover:bg-gray-50'
@@ -179,34 +179,34 @@ export default function Navigation({ user }: NavigationProps) {
                     </button>
                     <button 
                       onClick={() => handleTabChange('regions')}
-                      className={`px-5 py-2.5 rounded-md text-sm font-medium transition-all ${
+                      className={`px-2 sm:px-5 py-2 sm:py-2.5 rounded-md text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
                         currentTab === 'regions' 
                           ? 'bg-[#29CCB1] text-white' 
                           : 'text-gray-600 hover:text-green-600 hover:bg-gray-50'
                       }`}>
-                      <Globe className="w-4 h-4 inline mr-1" />
+                      <Globe className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1" />
                       {t('admin.regions')}
                     </button>
                     {user.role === 'super-admin' && (
                       <button 
                         onClick={() => handleTabChange('masters')}
-                        className={`px-5 py-2.5 rounded-md text-sm font-medium transition-all ${
+                        className={`px-2 sm:px-5 py-2 sm:py-2.5 rounded-md text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
                           currentTab === 'masters' 
                             ? 'bg-[#29CCB1] text-white' 
                             : 'text-gray-600 hover:text-green-600 hover:bg-gray-50'
                         }`}>
-                        <Database className="w-4 h-4 inline mr-1" />
+                        <Database className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1" />
                         {t('admin.masters')}
                       </button>
                     )}
                     <button 
                       onClick={() => handleTabChange('settings')}
-                      className={`px-5 py-2.5 rounded-md text-sm font-medium transition-all ${
+                      className={`px-2 sm:px-5 py-2 sm:py-2.5 rounded-md text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
                         currentTab === 'settings' 
                           ? 'bg-[#29CCB1] text-white' 
                           : 'text-gray-600 hover:text-green-600 hover:bg-gray-50'
                       }`}>
-                      <Settings className="w-4 h-4 inline mr-1" />
+                      <Settings className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1" />
                       {t('admin.settings')}
                     </button>
                   </div>
@@ -254,18 +254,18 @@ export default function Navigation({ user }: NavigationProps) {
             {/* User Menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="flex items-center space-x-2 text-[#1D1D1B] hover:bg-gray-100 h-9 px-3" data-testid="button-user-menu">
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback className="bg-blue-100 text-blue-600 green-background white-text">
+                <Button variant="ghost" className="flex items-center space-x-1 sm:space-x-2 text-[#1D1D1B] hover:bg-gray-100 h-9 px-2 sm:px-3" data-testid="button-user-menu">
+                  <Avatar className="h-7 w-7 sm:h-8 sm:w-8">
+                    <AvatarFallback className="bg-blue-100 text-blue-600 green-background white-text text-xs sm:text-sm">
                       {userInitials}
                     </AvatarFallback>
                   </Avatar>
-                  <div className="hidden md:block text-left">
-                    <div className="text-sm font-medium text-[#1D1D1B]" data-testid="text-user-name">
+                  <div className="hidden lg:block text-left">
+                    <div className="text-sm font-medium text-[#1D1D1B] truncate max-w-[150px]" data-testid="text-user-name">
                       {user.role === 'regional-admin' || user.role === 'admin' ? `${user.role === 'admin' ? 'Admin' : 'Sales'} ${user.lastName || user.firstName}` : `${user.firstName} ${user.lastName}`}
                     </div>
                   </div>
-                  <ChevronDown className="h-4 w-4 text-[#1D1D1B]" />
+                  <ChevronDown className="h-3 w-3 sm:h-4 sm:w-4 text-[#1D1D1B]" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">

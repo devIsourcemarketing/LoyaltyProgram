@@ -1897,6 +1897,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/admin/top-scorers", async (req, res) => {
+    const userRole = req.session?.userRole;
+    const userId = req.session?.userId;
+    
+    if (!isAdminRole(userRole)) {
+      return res.status(403).json({ message: "Admin access required" });
+    }
+
+    if (!userId) {
+      return res.status(401).json({ message: "Authentication required" });
+    }
+
+    try {
+      const regionName = await getAdminRegion(userId);
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;
+      
+      const topScorers = await storage.getTopScorers(regionName, limit);
+      res.json(topScorers);
+    } catch (error) {
+      console.error("Error getting top scorers:", error);
+      res.status(500).json({ message: "Failed to get top scorers" });
+    }
+  });
+
   app.get("/api/admin/reports/user-ranking", async (req, res) => {
     const userRole = req.session?.userRole;
     if (!isAdminRole(userRole)) {
