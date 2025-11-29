@@ -152,15 +152,18 @@ export const supportTickets = pgTable("support_tickets", {
 export const pointsConfig = pgTable("points_config", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   region: regionEnum("region").notNull(), // ¡Campo región agregado!
-  softwareRate: integer("software_rate").notNull().default(1000),
-  hardwareRate: integer("hardware_rate").notNull().default(5000),
-  equipmentRate: integer("equipment_rate").notNull().default(10000),
+  // Points Assignment Rules - Based on Deal Type
+  newCustomerRate: integer("new_customer_rate").notNull().default(1000), // USD per point for new customer deals
+  renewalRate: integer("renewal_rate").notNull().default(2000), // USD per point for renewal deals
+  // Deprecated fields (kept for backward compatibility)
+  softwareRate: integer("software_rate").default(1000),
+  hardwareRate: integer("hardware_rate").default(5000),
+  equipmentRate: integer("equipment_rate").default(10000),
   grandPrizeThreshold: integer("grand_prize_threshold").notNull().default(50000),
   // Reglas de acumulación de goles (por defecto)
   defaultNewCustomerGoalRate: integer("default_new_customer_goal_rate").notNull().default(1000),
   defaultRenewalGoalRate: integer("default_renewal_goal_rate").notNull().default(2000),
-  redemptionStartDate: timestamp("redemption_start_date"),
-  redemptionEndDate: timestamp("redemption_end_date"),
+  // Redemption period removed - now configured per prize
   updatedAt: timestamp("updated_at").notNull().default(sql`now()`),
   updatedBy: varchar("updated_by").references(() => users.id),
 });
@@ -196,6 +199,8 @@ export const monthlyRegionPrizes = pgTable("monthly_region_prizes", {
   prizeDescription: text("prize_description"),
   prizeValue: decimal("prize_value", { precision: 10, scale: 2 }), // Valor monetario del premio (opcional)
   goalTarget: integer("goal_target").notNull(), // Meta en goles para participar en sorteo
+  redemptionStartDate: timestamp("redemption_start_date"), // Start of redemption window
+  redemptionEndDate: timestamp("redemption_end_date"), // End of redemption window
   isActive: boolean("is_active").notNull().default(true),
   createdAt: timestamp("created_at").notNull().default(sql`now()`),
 });
@@ -231,8 +236,10 @@ export const grandPrizeCriteria = pgTable("grand_prize_criteria", {
   minPoints: integer("min_points").default(0),
   minDeals: integer("min_deals").default(0),
   region: text("region").notNull(), // "NOLA", "SOLA", "BRASIL", "MEXICO"
-  startDate: timestamp("start_date"),
-  endDate: timestamp("end_date"),
+  startDate: timestamp("start_date"), // Criteria evaluation period start
+  endDate: timestamp("end_date"), // Criteria evaluation period end
+  redemptionStartDate: timestamp("redemption_start_date"), // When winners can claim prize
+  redemptionEndDate: timestamp("redemption_end_date"), // Deadline to claim prize
   pointsWeight: integer("points_weight").default(60), // Peso en % para criterio combinado
   dealsWeight: integer("deals_weight").default(40), // Peso en % para criterio combinado
   isActive: boolean("is_active").notNull().default(true),

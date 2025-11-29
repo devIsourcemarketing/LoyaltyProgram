@@ -22,6 +22,8 @@ interface Prize {
   prizeDescription?: string;
   prizeValue?: number;
   goalTarget: number;
+  redemptionStartDate?: string;
+  redemptionEndDate?: string;
   createdAt?: Date;
 }
 
@@ -79,6 +81,8 @@ export default function MonthlyPrizesTab() {
     prizeDescription: "",
     prizeValue: undefined,
     goalTarget: 0,
+    redemptionStartDate: "",
+    redemptionEndDate: "",
   });
 
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -195,6 +199,8 @@ export default function MonthlyPrizesTab() {
         prizeDescription: "",
         prizeValue: undefined,
         goalTarget: 0,
+        redemptionStartDate: "",
+        redemptionEndDate: "",
       });
       toast({
         title: t("admin.prizeSaved"),
@@ -264,6 +270,8 @@ export default function MonthlyPrizesTab() {
       prizeDescription: prizeToEdit.prizeDescription || "",
       prizeValue: prizeToEdit.prizeValue,
       goalTarget: prizeToEdit.goalTarget,
+      redemptionStartDate: prizeToEdit.redemptionStartDate ? new Date(prizeToEdit.redemptionStartDate).toISOString().split('T')[0] : "",
+      redemptionEndDate: prizeToEdit.redemptionEndDate ? new Date(prizeToEdit.redemptionEndDate).toISOString().split('T')[0] : "",
     });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -279,6 +287,8 @@ export default function MonthlyPrizesTab() {
       prizeDescription: "",
       prizeValue: undefined,
       goalTarget: 0,
+      redemptionStartDate: "",
+      redemptionEndDate: "",
     });
   };
 
@@ -462,6 +472,37 @@ export default function MonthlyPrizesTab() {
               max={10}
               placeholder="1"
             />
+          </div>
+
+          {/* Redemption Period */}
+          <div className="space-y-4 pt-4">
+            <div className="flex items-center gap-2">
+              <Trophy className="w-4 h-4 text-yellow-600" />
+              <Label className="text-base font-semibold">{t("admin.redemptionPeriod")}</Label>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              {t("admin.redemptionPeriodMonthlyDesc")}
+            </p>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="redemption-start-date">{t("admin.redemptionStartDate")}</Label>
+                <Input
+                  id="redemption-start-date"
+                  type="date"
+                  value={prize.redemptionStartDate || ""}
+                  onChange={(e) => setPrize({ ...prize, redemptionStartDate: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="redemption-end-date">{t("admin.redemptionEndDate")}</Label>
+                <Input
+                  id="redemption-end-date"
+                  type="date"
+                  value={prize.redemptionEndDate || ""}
+                  onChange={(e) => setPrize({ ...prize, redemptionEndDate: e.target.value })}
+                />
+              </div>
+            </div>
           </div>
 
           <Separator />

@@ -33,14 +33,11 @@ import type { PointsConfig } from "@shared/schema";
 
 const pointsConfigFormSchema = z.object({
   region: z.string().min(1, { message: "validation.regionRequired" }),
-  softwareRate: z.number().min(1, "Debe ser al menos 1").max(1000000, "Valor muy alto"),
-  hardwareRate: z.number().min(1, "Debe ser al menos 1").max(1000000, "Valor muy alto"),
-  equipmentRate: z.number().min(1, "Debe ser al menos 1").max(1000000, "Valor muy alto"),
+  newCustomerRate: z.number().min(1, "Debe ser al menos 1").max(1000000, "Valor muy alto"),
+  renewalRate: z.number().min(1, "Debe ser al menos 1").max(1000000, "Valor muy alto"),
   grandPrizeThreshold: z.number().min(1, "Debe ser al menos 1").max(10000000, "Valor muy alto"),
   defaultNewCustomerGoalRate: z.number().min(1, "Debe ser al menos 1").max(1000000, "Valor muy alto"),
   defaultRenewalGoalRate: z.number().min(1, "Debe ser al menos 1").max(1000000, "Valor muy alto"),
-  redemptionStartDate: z.string().optional(),
-  redemptionEndDate: z.string().optional(),
 });
 
 type PointsConfigForm = z.infer<typeof pointsConfigFormSchema>;
@@ -91,14 +88,11 @@ export default function PointsConfigTab() {
     resolver: zodResolver(pointsConfigFormSchema),
     defaultValues: {
       region: "",
-      softwareRate: 1000,
-      hardwareRate: 5000,
-      equipmentRate: 10000,
+      newCustomerRate: 1000,
+      renewalRate: 2000,
       grandPrizeThreshold: 50000,
       defaultNewCustomerGoalRate: 1000,
       defaultRenewalGoalRate: 2000,
-      redemptionStartDate: "",
-      redemptionEndDate: "",
     },
   });
 
@@ -106,18 +100,11 @@ export default function PointsConfigTab() {
     if (config && selectedRegion) {
       form.reset({
         region: selectedRegion,
-        softwareRate: config.softwareRate,
-        hardwareRate: config.hardwareRate,
-        equipmentRate: config.equipmentRate,
+        newCustomerRate: (config as any).newCustomerRate || 1000,
+        renewalRate: (config as any).renewalRate || 2000,
         grandPrizeThreshold: config.grandPrizeThreshold,
         defaultNewCustomerGoalRate: (config as any).defaultNewCustomerGoalRate || 1000,
         defaultRenewalGoalRate: (config as any).defaultRenewalGoalRate || 2000,
-        redemptionStartDate: config.redemptionStartDate 
-          ? new Date(config.redemptionStartDate).toISOString().split('T')[0] 
-          : "",
-        redemptionEndDate: config.redemptionEndDate 
-          ? new Date(config.redemptionEndDate).toISOString().split('T')[0] 
-          : "",
       });
     } else if (selectedRegion) {
       // Si no hay config pero hay región seleccionada, establecer la región en el formulario
@@ -129,14 +116,11 @@ export default function PointsConfigTab() {
     mutationFn: async (data: PointsConfigForm) => {
       const payload = {
         region: data.region,
-        softwareRate: data.softwareRate,
-        hardwareRate: data.hardwareRate,
-        equipmentRate: data.equipmentRate,
+        newCustomerRate: data.newCustomerRate,
+        renewalRate: data.renewalRate,
         grandPrizeThreshold: data.grandPrizeThreshold,
         defaultNewCustomerGoalRate: data.defaultNewCustomerGoalRate,
         defaultRenewalGoalRate: data.defaultRenewalGoalRate,
-        redemptionStartDate: data.redemptionStartDate ? new Date(data.redemptionStartDate).toISOString() : null,
-        redemptionEndDate: data.redemptionEndDate ? new Date(data.redemptionEndDate).toISOString() : null,
       };
       const response = await apiRequest("PATCH", "/api/admin/points-config", payload);
       return response.json();
@@ -233,78 +217,69 @@ export default function PointsConfigTab() {
                 </div>
               </div>
               
-              <div className="grid gap-6 md:grid-cols-3">
-                <FormField
-                  control={form.control}
-                  name="softwareRate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center gap-2">
-                        <DollarSign className="h-4 w-4 text-blue-500" />
-                        {t('admin.pointsConfig.software')}
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          placeholder={t("admin.softwareRatePlaceholder")}
-                          data-testid="input-software-rate"
-                          {...field}
-                          onChange={(e) => field.onChange(Number(e.target.value))}
-                        />
-                      </FormControl>
-                      <FormDescription>{t('admin.dollarsPerPoint')}</FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              <div className="border-t pt-6">
+                <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <DollarSign className="h-5 w-5 text-blue-600" />
+                      {t('admin.pointsAssignmentByDealType')}
+                    </CardTitle>
+                    <CardDescription>
+                      {t('admin.pointsAssignmentByDealTypeDesc')}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid gap-6 md:grid-cols-2">
+                      <FormField
+                        control={form.control}
+                        name="newCustomerRate"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="flex items-center gap-2">
+                              <DollarSign className="h-4 w-4 text-blue-500" />
+                              {t('deals.newCustomer')}
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                placeholder="1000"
+                                data-testid="input-new-customer-rate"
+                                {...field}
+                                onChange={(e) => field.onChange(Number(e.target.value))}
+                              />
+                            </FormControl>
+                            <FormDescription>{t('admin.dollarsPerPoint')}</FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-                <FormField
-                  control={form.control}
-                  name="hardwareRate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center gap-2">
-                        <DollarSign className="h-4 w-4 text-purple-500" />
-                        {t('admin.pointsConfig.hardware')}
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          placeholder={t("admin.hardwareRatePlaceholder")}
-                          data-testid="input-hardware-rate"
-                          {...field}
-                          onChange={(e) => field.onChange(Number(e.target.value))}
-                        />
-                      </FormControl>
-                      <FormDescription>{t('admin.dollarsPerPoint')}</FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="equipmentRate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center gap-2">
-                        <DollarSign className="h-4 w-4 text-green-500" />
-                        {t('admin.pointsConfig.equipment')}
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          placeholder="10000"
-                          data-testid="input-equipment-rate"
-                          {...field}
-                          onChange={(e) => field.onChange(Number(e.target.value))}
-                        />
-                      </FormControl>
-                      <FormDescription>{t('admin.dollarsPerPoint')}</FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                      <FormField
+                        control={form.control}
+                        name="renewalRate"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="flex items-center gap-2">
+                              <DollarSign className="h-4 w-4 text-purple-500" />
+                              {t('deals.renewal')}
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                placeholder="2000"
+                                data-testid="input-renewal-rate"
+                                {...field}
+                                onChange={(e) => field.onChange(Number(e.target.value))}
+                              />
+                            </FormControl>
+                            <FormDescription>{t('admin.dollarsPerPoint')}</FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
 
               <div className="border-t pt-6">
@@ -406,65 +381,6 @@ export default function PointsConfigTab() {
                         </FormItem>
                       )}
                     />
-                  </CardContent>
-                </Card>
-              </div>
-
-              <div className="border-t pt-6">
-                <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-lg">
-                      <Calendar className="h-5 w-5 text-blue-600" />
-                      {t('admin.redemptionPeriod')}
-                    </CardTitle>
-                    <CardDescription>
-                      {t('admin.redemptionPeriodDesc')}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid gap-6 md:grid-cols-2">
-                      <FormField
-                        control={form.control}
-                        name="redemptionStartDate"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>{t('admin.startDate')}</FormLabel>
-                            <FormControl>
-                              <Input
-                                type="date"
-                                data-testid="input-redemption-start-date"
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormDescription>
-                              {t('admin.startDate')}
-                            </FormDescription>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="redemptionEndDate"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>{t('admin.endDate')}</FormLabel>
-                            <FormControl>
-                              <Input
-                                type="date"
-                                data-testid="input-redemption-end-date"
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormDescription>
-                              {t('admin.endDate')}
-                            </FormDescription>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
                   </CardContent>
                 </Card>
               </div>

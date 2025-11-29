@@ -23,6 +23,8 @@ interface GrandPrizeCriteria {
   region?: string;
   startDate?: string;
   endDate?: string;
+  redemptionStartDate?: string; // When winners can claim prize
+  redemptionEndDate?: string; // Deadline to claim prize
   pointsWeight?: number; // Para criterio combinado
   dealsWeight?: number; // Para criterio combinado
   isActive: boolean;
@@ -53,6 +55,8 @@ export default function GrandPrizeTab() {
     // region se asigna automáticamente del contexto
     startDate: "",
     endDate: "",
+    redemptionStartDate: "",
+    redemptionEndDate: "",
     pointsWeight: 60,
     dealsWeight: 40,
     isActive: true,
@@ -151,6 +155,8 @@ export default function GrandPrizeTab() {
         // region se asigna automáticamente del contexto
         startDate: "",
         endDate: "",
+        redemptionStartDate: "",
+        redemptionEndDate: "",
         pointsWeight: 60,
         dealsWeight: 40,
         isActive: true,
@@ -220,6 +226,8 @@ export default function GrandPrizeTab() {
       region: criteriaToEdit.region || "all",
       startDate: criteriaToEdit.startDate ? new Date(criteriaToEdit.startDate).toISOString().split('T')[0] : "",
       endDate: criteriaToEdit.endDate ? new Date(criteriaToEdit.endDate).toISOString().split('T')[0] : "",
+      redemptionStartDate: criteriaToEdit.redemptionStartDate ? new Date(criteriaToEdit.redemptionStartDate).toISOString().split('T')[0] : "",
+      redemptionEndDate: criteriaToEdit.redemptionEndDate ? new Date(criteriaToEdit.redemptionEndDate).toISOString().split('T')[0] : "",
       pointsWeight: criteriaToEdit.pointsWeight || 60,
       dealsWeight: criteriaToEdit.dealsWeight || 40,
       isActive: criteriaToEdit.isActive,
@@ -237,6 +245,8 @@ export default function GrandPrizeTab() {
       region: "all",
       startDate: "",
       endDate: "",
+      redemptionStartDate: "",
+      redemptionEndDate: "",
       pointsWeight: 60,
       dealsWeight: 40,
       isActive: true,
@@ -409,25 +419,62 @@ export default function GrandPrizeTab() {
           {/* Región - OCULTO: se usa automáticamente la región del contexto */}
           <input type="hidden" value={selectedRegion} />
 
-          {/* Rango de Fechas */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="start-date">{t("admin.startDate")}</Label>
-              <Input
-                id="start-date"
-                type="date"
-                value={criteria.startDate || ""}
-                onChange={(e) => setCriteria({ ...criteria, startDate: e.target.value })}
-              />
+          {/* Rango de Fechas - Evaluation Period */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-blue-600" />
+              <Label className="text-base font-semibold">{t("admin.evaluationPeriod")}</Label>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="end-date">{t("admin.endDate")}</Label>
-              <Input
-                id="end-date"
-                type="date"
-                value={criteria.endDate || ""}
-                onChange={(e) => setCriteria({ ...criteria, endDate: e.target.value })}
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="start-date">{t("admin.startDate")}</Label>
+                <Input
+                  id="start-date"
+                  type="date"
+                  value={criteria.startDate || ""}
+                  onChange={(e) => setCriteria({ ...criteria, startDate: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="end-date">{t("admin.endDate")}</Label>
+                <Input
+                  id="end-date"
+                  type="date"
+                  value={criteria.endDate || ""}
+                  onChange={(e) => setCriteria({ ...criteria, endDate: e.target.value })}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Redemption Period */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <Trophy className="w-4 h-4 text-yellow-600" />
+              <Label className="text-base font-semibold">{t("admin.redemptionPeriod")}</Label>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              {t("admin.redemptionPeriodGrandPrizeDesc")}
+            </p>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="redemption-start-date">{t("admin.redemptionStartDate")}</Label>
+                <Input
+                  id="redemption-start-date"
+                  type="date"
+                  value={criteria.redemptionStartDate || ""}
+                  onChange={(e) => setCriteria({ ...criteria, redemptionStartDate: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="redemption-end-date">{t("admin.redemptionEndDate")}</Label>
+                <Input
+                  id="redemption-end-date"
+                  type="date"
+                  value={criteria.redemptionEndDate || ""}
+                  onChange={(e) => setCriteria({ ...criteria, redemptionEndDate: e.target.value })}
+                />
+              </div>
             </div>
           </div>
 

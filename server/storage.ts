@@ -433,7 +433,7 @@ export class DatabaseStorage implements IStorage {
 
   // Calculate points based on product type and deal value using dynamic configuration
   private async calculatePointsForDeal(
-    productType: string,
+    dealType: string,
     dealValue: number,
   ): Promise<number> {
     const value = Number(dealValue);
@@ -441,19 +441,18 @@ export class DatabaseStorage implements IStorage {
 
     const config = await this.getPointsConfig();
 
-    const softwareRate = config?.softwareRate || 1000;
-    const hardwareRate = config?.hardwareRate || 5000;
-    const equipmentRate = config?.equipmentRate || 10000;
+    // Use new deal-type based rates
+    const newCustomerRate = (config as any)?.newCustomerRate || config?.softwareRate || 1000;
+    const renewalRate = (config as any)?.renewalRate || config?.hardwareRate || 2000;
 
-    switch (productType) {
-      case "software":
-        return Math.floor(value / softwareRate);
-      case "hardware":
-        return Math.floor(value / hardwareRate);
-      case "equipment":
-        return Math.floor(value / equipmentRate);
+    switch (dealType) {
+      case "new_customer":
+        return Math.floor(value / newCustomerRate);
+      case "renewal":
+        return Math.floor(value / renewalRate);
       default:
-        return 0;
+        // Fallback for backward compatibility
+        return Math.floor(value / newCustomerRate);
     }
   }
 
@@ -463,7 +462,7 @@ export class DatabaseStorage implements IStorage {
 
     // Calculate points based on dynamic configuration
     const pointsEarned = await this.calculatePointsForDeal(
-      deal.productType,
+      deal.dealType,
       Number(deal.dealValue),
     );
 
@@ -579,7 +578,7 @@ export class DatabaseStorage implements IStorage {
     for (const deal of allDeals) {
       try {
         const newPoints = await this.calculatePointsForDeal(
-          deal.productType,
+          deal.dealType,
           Number(deal.dealValue),
         );
 
