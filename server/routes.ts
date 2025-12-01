@@ -840,6 +840,69 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Delete deal endpoint (with audit log)
+  app.delete("/api/admin/deals/:id", async (req, res) => {
+    const userRole = req.session?.userRole;
+    const userId = req.session?.userId;
+    
+    if (!isAdminRole(userRole) || !userId) {
+      return res.status(403).json({ message: "Admin access required" });
+    }
+
+    try {
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(401).json({ message: "User not found" });
+      }
+
+      const ipAddress = req.ip || req.socket.remoteAddress;
+      const userAgent = req.get('user-agent');
+      
+      const deletedDeal = await storage.deleteDeal(
+        req.params.id,
+        user,
+        ipAddress,
+        userAgent
+      );
+      
+      if (!deletedDeal) {
+        return res.status(404).json({ message: "Deal not found" });
+      }
+      
+      res.json({ message: "Deal deleted successfully", deal: deletedDeal });
+    } catch (error) {
+      console.error("Error deleting deal:", error);
+      res.status(500).json({ message: "Failed to delete deal" });
+    }
+  });
+
+  // Get audit logs endpoint
+  app.get("/api/admin/audit-logs", async (req, res) => {
+    const userRole = req.session?.userRole;
+    
+    if (!isAdminRole(userRole)) {
+      return res.status(403).json({ message: "Admin access required" });
+    }
+
+    try {
+      const { entityType, entityId, performedByUserId, limit, offset } = req.query;
+      
+      const logs = await storage.getAuditLogs({
+        entityType: entityType as string | undefined,
+        entityId: entityId as string | undefined,
+        performedByUserId: performedByUserId as string | undefined,
+        limit: limit ? parseInt(limit as string) : 100,
+        offset: offset ? parseInt(offset as string) : 0,
+      });
+      
+      res.json(logs);
+    } catch (error) {
+      console.error("Error getting audit logs:", error);
+      res.status(500).json({ message: "Failed to get audit logs" });
+    }
+  });
+
+
   // Reward routes
   app.get("/api/rewards", async (req, res) => {
     try {
@@ -2161,13 +2224,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
 
     try {
-      const { ObjectStorageService } = await import("./objectStorage");
-      const objectStorageService = new ObjectStorageService();
-      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+      // Generate a unique upload ID
+      const uploadId = `csv-${Date.now()}-${Math.random().toString(36).substring(7)}`;
+      
+      // Get the base URL from environment or request
+      const protocol = req.protocol || 'https';
+      const host = req.get('host') || 'kasperskycup.com';
+      const baseUrl = process.env.APP_URL || `${protocol}://${host}`;
+      
+      const uploadURL = `${baseUrl}/api/admin/csv/upload/${uploadId}`;
+      console.log(`📋 Generated upload URL: ${uploadURL}`);
       res.json({ uploadURL });
     } catch (error) {
       console.error("Error getting upload URL:", error);
       res.status(500).json({ message: "Failed to get upload URL" });
+    }
+  });
+
+  // Receive CSV upload
+  app.put("/api/admin/csv/upload/:uploadId", async (req, res) => {
+    const userRole = req.session?.userRole;
+    if (!isAdminRole(userRole)) {
+      return res.status(403).json({ message: "Admin access required" });
+    }
+
+    try {
+      let csvContent = '';
+      
+      req.on('data', (chunk) => {
+        csvContent += chunk.toString();
+      });
+
+      req.on('end', () => {
+        // Store in memory temporarily
+        if (!global.csvUploads) {
+          global.csvUploads = {};
+        }
+        global.csvUploads[req.params.uploadId] = csvContent;
+        
+        console.log(`📤 CSV uploaded: ${req.params.uploadId}, size: ${csvContent.length} bytes`);
+        console.log(`📋 First 200 chars: ${csvContent.substring(0, 200)}`);
+        
+        res.json({ 
+          message: "CSV uploaded successfully",
+          path: req.params.uploadId
+        });
+      });
+
+      req.on('error', (error) => {
+        console.error("Error reading CSV upload:", error);
+        res.status(500).json({ message: "Failed to read CSV upload" });
+      });
+    } catch (error) {
+      console.error("Error uploading CSV:", error);
+      res.status(500).json({ message: "Failed to upload CSV" });
     }
   });
 
@@ -2179,13 +2289,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
 
     try {
-      const { ObjectStorageService } = await import("./objectStorage");
-      const objectStorageService = new ObjectStorageService();
-      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+      // Generate a unique upload ID
+      const uploadId = `users-csv-${Date.now()}-${Math.random().toString(36).substring(7)}`;
+      
+      // Get the base URL from environment or request
+      const protocol = req.protocol || 'https';
+      const host = req.get('host') || 'kasperskycup.com';
+      const baseUrl = process.env.APP_URL || `${protocol}://${host}`;
+      
+      const uploadURL = `${baseUrl}/api/admin/csv/users/upload/${uploadId}`;
+      console.log(`📋 Generated users upload URL: ${uploadURL}`);
       res.json({ uploadURL });
     } catch (error) {
       console.error("Error getting users CSV upload URL:", error);
       res.status(500).json({ message: "Failed to get upload URL" });
+    }
+  });
+
+  // Receive users CSV upload
+  app.put("/api/admin/csv/users/upload/:uploadId", async (req, res) => {
+    const userRole = req.session?.userRole;
+    if (!isAdminRole(userRole)) {
+      return res.status(403).json({ message: "Admin access required" });
+    }
+
+    try {
+      let csvContent = '';
+      
+      req.on('data', (chunk) => {
+        csvContent += chunk.toString();
+      });
+
+      req.on('end', () => {
+        // Store in memory temporarily
+        if (!global.csvUploads) {
+          global.csvUploads = {};
+        }
+        global.csvUploads[req.params.uploadId] = csvContent;
+        
+        res.json({ 
+          message: "Users CSV uploaded successfully",
+          path: req.params.uploadId
+        });
+      });
+    } catch (error) {
+      console.error("Error uploading users CSV:", error);
+      res.status(500).json({ message: "Failed to upload CSV" });
     }
   });
 
@@ -2214,98 +2363,237 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     try {
       const { csvPath } = req.body;
+      console.log(`🔄 Processing CSV request. csvPath:`, csvPath);
+      console.log(`📊 Request body:`, req.body);
+      console.log(`📂 Available uploads:`, Object.keys(global.csvUploads || {}));
+      
       if (!csvPath) {
         return res.status(400).json({ message: "CSV path is required" });
       }
 
-      const { ObjectStorageService } = await import("./objectStorage");
-      const objectStorageService = new ObjectStorageService();
+      // Extract upload ID from URL (csvPath might be full URL or just the ID)
+      let uploadId = csvPath;
+      if (csvPath.includes('/')) {
+        // Extract ID from URL like "http://localhost:5000/api/admin/csv/upload/csv-123456-abc"
+        const parts = csvPath.split('/');
+        uploadId = parts[parts.length - 1];
+      }
       
-      // Download and parse CSV content
-      const objectPath = objectStorageService.normalizeObjectEntityPath(csvPath);
-      const csvContent = await objectStorageService.downloadCSVContent(objectPath);
+      console.log(`🔑 Extracted upload ID: ${uploadId}`);
+
+      // Get CSV content from memory
+      const csvContent = global.csvUploads?.[uploadId];
+      if (!csvContent) {
+        console.error(`❌ CSV not found in memory with ID: ${uploadId}`);
+        return res.status(404).json({ message: "CSV file not found. Please upload again." });
+      }
+      
+      console.log(`✅ Found CSV in memory, length: ${csvContent.length} bytes`);
+      console.log(`📄 First 200 chars:`, csvContent.substring(0, 200));
+      
+      // Helper function to parse CSV line respecting quotes
+      function parseCSVLine(line: string): string[] {
+        const result = [];
+        let current = '';
+        let inQuotes = false;
+        
+        for (let i = 0; i < line.length; i++) {
+          const char = line[i];
+          
+          if (char === '"') {
+            inQuotes = !inQuotes;
+          } else if (char === ',' && !inQuotes) {
+            result.push(current.trim());
+            current = '';
+          } else {
+            current += char;
+          }
+        }
+        result.push(current.trim());
+        return result;
+      }
       
       // Parse CSV content
       const lines = csvContent.trim().split('\n');
+      console.log(`📝 Total lines: ${lines.length}`);
+      
       if (lines.length < 2) {
         return res.status(400).json({ message: "CSV file must have at least a header and one data row" });
       }
 
-      const header = lines[0].toLowerCase().split(',').map(h => h.trim());
-      const expectedHeaders = ['usuario', 'valor', 'status', 'tipo'];
-      const optionalHeaders = ['acuerdo']; // License Agreement Number column
+      const header = parseCSVLine(lines[0].toLowerCase());
+      console.log(`📋 Header columns:`, header);
       
-      // Validate required headers
-      const hasAllHeaders = expectedHeaders.every(h => header.includes(h));
-      if (!hasAllHeaders) {
+      // Check which format is being used
+      const isEnglishFormat = header.includes('user id') && header.includes('type of deal');
+      const isSpanishFormat = header.includes('usuario') && header.includes('tipo');
+      
+      console.log(`🌍 Format check: English=${isEnglishFormat}, Spanish=${isSpanishFormat}`);
+      
+      if (!isEnglishFormat && !isSpanishFormat) {
         return res.status(400).json({ 
-          message: `CSV must have columns: ${expectedHeaders.join(', ')}. Optional columns: ${optionalHeaders.join(', ')}. Found: ${header.join(', ')}` 
+          message: `CSV must have either English format (USER ID, TYPE OF DEAL, DEAL ID, AMOUNT USD, DATE) or Spanish format (usuario, valor, status, tipo). Found: ${header.join(', ')}` 
         });
       }
 
-      const userIndex = header.indexOf('usuario');
-      const valueIndex = header.indexOf('valor');
-      const statusIndex = header.indexOf('status');
-      const typeIndex = header.indexOf('tipo');
-      const licenseIndex = header.indexOf('acuerdo'); // Optional
+      let userIdIndex: number, typeIndex: number, dealIdIndex: number, amountIndex: number, dateIndex: number, statusIndex: number;
+      
+      if (isEnglishFormat) {
+        // English format: USER ID, TYPE OF DEAL, DEAL ID, AMOUNT USD, DATE
+        userIdIndex = header.indexOf('user id');
+        typeIndex = header.indexOf('type of deal');
+        dealIdIndex = header.indexOf('deal id');
+        amountIndex = header.indexOf('amount usd');
+        dateIndex = header.indexOf('date');
+        statusIndex = -1; // Not used in English format
+      } else {
+        // Spanish format: usuario, valor, status, tipo, acuerdo (optional)
+        userIdIndex = header.indexOf('usuario');
+        amountIndex = header.indexOf('valor');
+        statusIndex = header.indexOf('status');
+        typeIndex = header.indexOf('tipo');
+        dealIdIndex = header.indexOf('acuerdo'); // Optional
+        dateIndex = -1; // Not used in Spanish format
+      }
 
       const dealsToInsert = [];
       const errors = [];
 
       // Process each data row
       for (let i = 1; i < lines.length; i++) {
-        const row = lines[i].split(',').map(cell => cell.trim());
+        const row = parseCSVLine(lines[i]);
+        console.log(`📝 Row ${i + 1} parsed:`, row);
         
-        if (row.length !== header.length) {
+        if (row.length < header.length - 1) { // Allow optional columns
           errors.push(`Row ${i + 1}: Column count mismatch`);
           continue;
         }
 
-        const username = row[userIndex];
-        const value = row[valueIndex];
-        const status = row[statusIndex].toLowerCase();
-        const type = row[typeIndex].toLowerCase();
-        const licenseAgreementNumber = licenseIndex >= 0 ? row[licenseIndex] || '' : '';
+        let userIdentifier: string, typeOfDeal: string, dealId: string, amountStr: string, dateStr: string, status: string;
+        
+        if (isEnglishFormat) {
+          // English format processing
+          userIdentifier = row[userIdIndex]; // Email
+          typeOfDeal = row[typeIndex]?.toUpperCase() || '';
+          dealId = row[dealIdIndex] || '';
+          amountStr = row[amountIndex]?.replace(/[$,]/g, '') || '0'; // Remove $ and commas
+          dateStr = row[dateIndex] || '';
+          status = 'approved'; // Auto-approve English format imports
+          
+          console.log(`💰 Row ${i + 1} - Raw amount: "${row[amountIndex]}", Cleaned: "${amountStr}"`);
+        } else {
+          // Spanish format processing
+          userIdentifier = row[userIdIndex]; // Username
+          const tipo = row[typeIndex]?.toLowerCase() || '';
+          dealId = dealIdIndex >= 0 ? (row[dealIdIndex] || '') : '';
+          amountStr = row[amountIndex] || '0';
+          dateStr = ''; // Use current date for Spanish format
+          status = row[statusIndex]?.toLowerCase() || 'pending';
+          
+          // Map Spanish tipo to English type
+          if (tipo === 'software') typeOfDeal = 'NEW CLIENT';
+          else if (tipo === 'hardware') typeOfDeal = 'RENEWAL';
+          else if (tipo === 'equipment') typeOfDeal = 'UPSELL';
+          else typeOfDeal = tipo.toUpperCase();
+        }
 
         // Validate data
-        if (!username) {
-          errors.push(`Row ${i + 1}: Usuario is required`);
+        if (!userIdentifier) {
+          errors.push(`Row ${i + 1}: User identifier (email or username) is required`);
           continue;
         }
 
-        if (!value || isNaN(parseFloat(value))) {
-          errors.push(`Row ${i + 1}: Valor must be a valid number`);
+        if (!amountStr || isNaN(parseFloat(amountStr))) {
+          console.log(`❌ Row ${i + 1} - Invalid amount: "${amountStr}", isNaN: ${isNaN(parseFloat(amountStr))}`);
+          errors.push(`Row ${i + 1}: Amount must be a valid number`);
           continue;
         }
 
-        if (!['pending', 'approved', 'rejected'].includes(status)) {
-          errors.push(`Row ${i + 1}: Status must be pending, approved, or rejected`);
-          continue;
+        if (isEnglishFormat) {
+          if (!['NEW CLIENT', 'RENEWAL', 'UPSELL'].includes(typeOfDeal)) {
+            errors.push(`Row ${i + 1}: TYPE OF DEAL must be NEW CLIENT, RENEWAL, or UPSELL`);
+            continue;
+          }
+          if (!dealId) {
+            errors.push(`Row ${i + 1}: DEAL ID is required`);
+            continue;
+          }
+        } else {
+          if (!['pending', 'approved', 'rejected'].includes(status)) {
+            errors.push(`Row ${i + 1}: Status must be pending, approved, or rejected`);
+            continue;
+          }
         }
 
-        if (!['software', 'hardware', 'equipment'].includes(type)) {
-          errors.push(`Row ${i + 1}: Tipo must be software, hardware, or equipment`);
-          continue;
+        // Parse date (only for English format)
+        let closeDate: Date;
+        if (dateStr) {
+          try {
+            const dateParts = dateStr.split('/');
+            if (dateParts.length === 3) {
+              const month = parseInt(dateParts[0]);
+              const day = parseInt(dateParts[1]);
+              const year = parseInt(dateParts[2]);
+              
+              // If day > 12, it must be DD/MM/YYYY format
+              if (day > 12) {
+                closeDate = new Date(year, parseInt(dateParts[1]) - 1, month);
+              } else {
+                closeDate = new Date(year, month - 1, day);
+              }
+            } else {
+              closeDate = new Date(dateStr);
+            }
+            
+            if (isNaN(closeDate.getTime())) {
+              errors.push(`Row ${i + 1}: Invalid date format. Use MM/DD/YYYY or DD/MM/YYYY`);
+              continue;
+            }
+          } catch (error) {
+            errors.push(`Row ${i + 1}: Invalid date format`);
+            continue;
+          }
+        } else {
+          closeDate = new Date(); // Use current date if not provided
         }
 
-        // Find user by username
-        const user = await storage.getUserByUsername(username);
+        // Find user by email or username
+        let user;
+        if (isEnglishFormat || userIdentifier.includes('@')) {
+          user = await storage.getUserByEmail(userIdentifier);
+        } else {
+          user = await storage.getUserByUsername(userIdentifier);
+        }
+        
         if (!user) {
-          errors.push(`Row ${i + 1}: User '${username}' not found`);
+          errors.push(`Row ${i + 1}: User '${userIdentifier}' not found`);
           continue;
         }
+
+        // Map type to product type
+        let productType: "software" | "hardware" | "equipment";
+        if (typeOfDeal === "NEW CLIENT" || typeOfDeal === 'SOFTWARE') {
+          productType = "software";
+        } else if (typeOfDeal === "RENEWAL" || typeOfDeal === 'HARDWARE') {
+          productType = "hardware";
+        } else {
+          productType = "equipment";
+        }
+
+        const dealStatus = status as "pending" | "approved" | "rejected";
+        const pointsEarned = dealStatus === "approved" ? calculatePointsForDeal(productType, parseFloat(amountStr)) : 0;
 
         dealsToInsert.push({
           userId: user.id,
-          productType: type as "software" | "hardware" | "equipment",
-          productName: `Imported Deal - ${type}`,
-          dealValue: value, // Keep as string
+          productType: productType,
+          productName: dealId ? `${typeOfDeal} - Deal #${dealId}` : `${typeOfDeal} Deal`,
+          dealValue: amountStr,
           quantity: 1,
-          closeDate: new Date(),
-          clientInfo: `Bulk import from CSV on ${new Date().toISOString()}`,
-          licenseAgreementNumber: licenseAgreementNumber || undefined,
-          status: status as "pending" | "approved" | "rejected",
-          pointsEarned: status === "approved" ? calculatePointsForDeal(type, parseFloat(value)) : 0,
+          closeDate: closeDate,
+          clientInfo: `Imported from CSV on ${new Date().toISOString()}. Type: ${typeOfDeal}`,
+          licenseAgreementNumber: dealId || undefined,
+          status: dealStatus,
+          pointsEarned: pointsEarned,
         });
       }
 
@@ -2380,12 +2668,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "CSV path is required" });
       }
 
-      const { ObjectStorageService } = await import("./objectStorage");
-      const objectStorageService = new ObjectStorageService();
-      
-      // Download and parse CSV content
-      const objectPath = objectStorageService.normalizeObjectEntityPath(csvPath);
-      const csvContent = await objectStorageService.downloadCSVContent(objectPath);
+      // Extract upload ID from URL (csvPath might be full URL or just the ID)
+      let uploadId = csvPath;
+      if (csvPath.includes('/')) {
+        // Extract ID from URL like "http://localhost:5000/api/admin/csv/users/upload/users-csv-123456-abc"
+        const parts = csvPath.split('/');
+        uploadId = parts[parts.length - 1];
+      }
+
+      // Get CSV content from memory
+      const csvContent = global.csvUploads?.[uploadId];
+      if (!csvContent) {
+        console.error(`❌ Users CSV not found in memory with ID: ${uploadId}`);
+        return res.status(404).json({ message: "CSV file not found. Please upload again." });
+      }
       
       // Parse CSV content
       const lines = csvContent.trim().split('\n');

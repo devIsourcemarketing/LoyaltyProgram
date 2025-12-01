@@ -565,6 +565,26 @@ export const insertGrandPrizeWinnerSchema = createInsertSchema(grandPrizeWinners
   awardedAt: true,
 });
 
+// Audit log table for tracking actions
+export const auditLog = pgTable("audit_log", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  action: text("action").notNull(), // e.g., "delete_deal", "approve_reward", "reject_deal"
+  entityType: text("entity_type").notNull(), // e.g., "deal", "reward", "user"
+  entityId: text("entity_id").notNull(), // ID of the entity
+  entityData: text("entity_data"), // JSON string of the entity data before deletion/modification
+  performedByUserId: varchar("performed_by_user_id").notNull(),
+  performedByUsername: text("performed_by_username").notNull(),
+  performedByEmail: text("performed_by_email").notNull(),
+  performedAt: timestamp("performed_at").notNull().default(sql`now()`),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+});
+
+export const insertAuditLogSchema = createInsertSchema(auditLog).omit({
+  id: true,
+  performedAt: true,
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -601,6 +621,8 @@ export type InsertGrandPrizeCriteria = z.infer<typeof insertGrandPrizeCriteriaSc
 export type UpdateGrandPrizeCriteria = z.infer<typeof updateGrandPrizeCriteriaSchema>;
 export type GrandPrizeWinner = typeof grandPrizeWinners.$inferSelect;
 export type InsertGrandPrizeWinner = z.infer<typeof insertGrandPrizeWinnerSchema>;
+export type AuditLog = typeof auditLog.$inferSelect;
+export type InsertAuditLog = z.infer<typeof insertAuditLogSchema>;
 
 
 // Deal with user information for admin views

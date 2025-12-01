@@ -333,6 +333,28 @@ export default function Admin() {
     },
   });
 
+  const deleteDealMutation = useMutation({
+    mutationFn: async (dealId: string) => {
+      return apiRequest("DELETE", `/api/admin/deals/${dealId}`);
+    },
+    onSuccess: () => {
+      toast({
+        title: t("common.success"),
+        description: t("common.dealDeletedSuccessfully"),
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/deals"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/deals/pending"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/reports"] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: t("common.error"),
+        description: error.message || "Failed to delete deal",
+        variant: "destructive",
+      });
+    },
+  });
+
   const updateUserRoleMutation = useMutation({
     mutationFn: async ({ userId, role }: { userId: string; role: string }) => {
       return apiRequest("PATCH", `/api/admin/users/${userId}/role`, { role });
@@ -359,6 +381,12 @@ export default function Admin() {
 
   const handleRejectDeal = (dealId: string) => {
     rejectDealMutation.mutate(dealId);
+  };
+
+  const handleDeleteDeal = (dealId: string) => {
+    if (window.confirm(t("common.confirmDeleteDeal"))) {
+      deleteDealMutation.mutate(dealId);
+    }
   };
 
   const handleEditDeal = (deal: Deal) => {
@@ -479,7 +507,8 @@ export default function Admin() {
   // Users CSV processing mutation
   const processUsersCSVMutation = useMutation({
     mutationFn: async (csvPath: string) => {
-      return apiRequest("POST", `/api/admin/csv/users/process`, { csvPath });
+      const response = await apiRequest("POST", `/api/admin/csv/users/process`, { csvPath });
+      return await response.json();
     },
     onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
@@ -667,7 +696,8 @@ export default function Admin() {
 
   const processCSVMutation = useMutation({
     mutationFn: async (csvPath: string) => {
-      return apiRequest("POST", `/api/admin/csv/process`, { csvPath });
+      const response = await apiRequest("POST", `/api/admin/csv/process`, { csvPath });
+      return await response.json();
     },
     onSuccess: (data: any) => {
       toast({
@@ -1964,6 +1994,18 @@ export default function Admin() {
                                 data-testid={`button-edit-deal-${deal.id}`}
                               >
                                 <Edit className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleDeleteDeal(deal.id)}
+                                disabled={deleteDealMutation.isPending}
+                                className="hover:bg-red-50"
+                                style={{ color: '#EF4444' }}
+                                data-testid={`button-delete-deal-${deal.id}`}
+                                title="Delete deal (logged in audit trail)"
+                              >
+                                <Trash2 className="w-4 h-4" />
                               </Button>
                             </div>
                           </td>

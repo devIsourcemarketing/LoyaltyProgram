@@ -21,6 +21,7 @@ import {
   prizeTemplates,
   productTypesTable,
   categoriesMaster,
+  auditLog,
   type Campaign,
   type Deal,
   type DealWithUser,
@@ -49,6 +50,8 @@ import {
   type InsertMonthlyRegionPrize,
   type RewardRegionAssignment,
   type GoalsHistory,
+  type AuditLog,
+  type InsertAuditLog,
   type GrandPrizeCriteria,
   type InsertGrandPrizeCriteria,
   type UpdateGrandPrizeCriteria,
@@ -2665,6 +2668,76 @@ export class DatabaseStorage implements IStorage {
       console.error('❌ Error in getTopScorers:', error);
       throw error;
     }
+  }
+
+  // ───────────────────────────────────────────────
+  // Audit Log Methods
+  // ───────────────────────────────────────────────
+
+  async createAuditLog(data: InsertAuditLog): Promise<AuditLog> {
+    const [log] = await db.insert(auditLog).values(data).returning();
+    return log;
+  }
+
+  async getAuditLogs(filters?: {
+    entityType?: string;
+    entityId?: string;
+    performedByUserId?: string;
+    limit?: number;
+    offset?: number;
+  }): Promise<AuditLog[]> {
+    let query = db.select().from(auditLog);
+    
+    if (filters?.entityType) {
+      query = query.where(eq(auditLog.entityType, filters.entityType)) as any;
+    }
+    if (filters?.entityId) {
+      query = query.where(eq(auditLog.entityId, filters.entityId)) as any;
+    }
+    if (filters?.performedByUserId) {
+      query = query.where(eq(auditLog.performedByUserId, filters.performedByUserId)) as any;
+    }
+    
+    query = query.orderBy(desc(auditLog.performedAt)) as any;
+    
+    if (filters?.limit) {
+      query = query.limit(filters.limit) as any;
+    }
+    if (filters?.offset) {
+      query = query.offset(filters.offset) as any;
+    }
+    
+    return await query;
+  }
+
+  async deleteDeal(dealId: string, deletedBy: User, ipAddress?: string, userAgent?: string): Promise<Deal | undefined> {
+    // Get the deal before deletion for audit log
+    const [deal] = await db.select().from(deals).where(eq(deals.id, dealId));
+    
+    if (!deal) {
+      return undefined;
+    }
+
+    // First, delete related points_history records
+    await db.delete(pointsHistory).where(eq(pointsHistory.dealId, dealId));
+    
+    // Then delete the deal
+    const [deleted] = await db.delete(deals).where(eq(deals.id, dealId)).returning();
+    
+    // Log the deletion
+    await this.createAuditLog({
+      action: 'delete_deal',
+      entityType: 'deal',
+      entityId: dealId,
+      entityData: JSON.stringify(deal),
+      performedByUserId: deletedBy.id,
+      performedByUsername: deletedBy.username,
+      performedByEmail: deletedBy.email,
+      ipAddress,
+      userAgent,
+    });
+    
+    return deleted;
   }
 }
 

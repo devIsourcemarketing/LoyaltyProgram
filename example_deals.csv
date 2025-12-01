@@ -1,6 +1,6 @@
-usuario,valor,status,tipo
-user1,15000,pending,software
-user2,25000,approved,hardware
-user3,8000,rejected,software
-user4,50000,pending,hardware
-user5,12000,approved,software
+USER ID,TYPE OF DEAL,DEAL ID,AMOUNT USD,DATE
+user1@example.com,NEW CLIENT,123456,$15000.00,11/19/2025
+user2@example.com,RENEWAL,159765,$25000.00,11/28/2025
+user3@example.com,UPSELL,789012,$8000.00,12/01/2025
+user4@example.com,NEW CLIENT,345678,$50000.00,11/15/2025
+user5@example.com,RENEWAL,901234,$12000.00,11/20/2025
