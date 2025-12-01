@@ -84,6 +84,22 @@ export default function SupportButton() {
       question: t("support.faq.q8.question"),
       answer: t("support.faq.q8.answer"),
     },
+    {
+      question: t("support.faq.q9.question"),
+      answer: t("support.faq.q9.answer"),
+    },
+    {
+      question: t("support.faq.q10.question"),
+      answer: t("support.faq.q10.answer"),
+    },
+    {
+      question: t("support.faq.q11.question"),
+      answer: t("support.faq.q11.answer"),
+    },
+    {
+      question: t("support.faq.q12.question"),
+      answer: t("support.faq.q12.answer"),
+    },
   ];
   const [ticketDialogOpen, setTicketDialogOpen] = useState(false);
   const [faqDialogOpen, setFaqDialogOpen] = useState(false);
@@ -106,7 +122,7 @@ export default function SupportButton() {
       toast({
         title: t("admin.ticketSent"),
         description:
-          "Tu solicitud de soporte ha sido enviada. Te contactaremos pronto.",
+          t("support.requestSent")
       });
       setTicketDialogOpen(false);
       setMenuOpen(false);
@@ -139,7 +155,7 @@ export default function SupportButton() {
               data-testid="button-open-ticket"
             >
               <MessageCircle className="h-4 w-4" />
-              <span className="text-sm">Enviar Solicitud</span>
+              <span className="text-sm">{t('support.submitApplication')}</span>
             </button>
             <button
               onClick={() => {
@@ -150,7 +166,7 @@ export default function SupportButton() {
               data-testid="button-open-faq"
             >
               <HelpCircle className="h-4 w-4" />
-              <span className="text-sm">Preguntas Frecuentes</span>
+              <span className="text-sm">{t('support.faqTitle')}</span>
             </button>
           </div>
         )}
@@ -286,7 +302,7 @@ export default function SupportButton() {
                 <AccordionTrigger className="text-left" data-testid={`faq-question-${index}`}>
                   {faq.question}
                 </AccordionTrigger>
-                <AccordionContent className="text-gray-600" data-testid={`faq-answer-${index}`}>
+                <AccordionContent className="text-gray-600 faq-answer" data-testid={`faq-answer-${index}`}>
                   {faq.answer}
                 </AccordionContent>
               </AccordionItem>
@@ -294,17 +310,17 @@ export default function SupportButton() {
           </Accordion>
 
           <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-            <p className="text-sm text-gray-600">
-              ¿No encuentras lo que buscas?{" "}
+            <p className="text-sm text-gray-600 text-center">
+              {t("support.cantFind")}{" "}
               <button
                 onClick={() => {
                   setFaqDialogOpen(false);
                   setTicketDialogOpen(true);
                 }}
-                className="text-primary hover:underline font-medium"
+                className="text-primary hover:underline font-medium text-green-600"
                 data-testid="button-contact-support"
               >
-                Contacta con soporte
+                 {t("support.pleaseContact")}
               </button>
             </p>
           </div>

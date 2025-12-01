@@ -219,39 +219,105 @@ const translations = {
       adminResponsePlaceholder: "Write your response to the user...",
       newStatus: "New Status",
       submitResponse: "Submit Response",
+      warningCharacters: "The subject line must be at least 5 characters long.",
+      requestSent: "Your support request has been submitted. We will contact you soon.",
+      frequentlyAskedQuestions: "Frequently Asked Questions",
+      submitApplication: "Submit Application",
+      cantFind: "Can't find what you're looking for?",
+      pleaseContact: "Please contact the support team for personalized assistance.",
       faq: {
         q1: {
-          question: "How can I register a new deal?",
-          answer: "To register a new deal, go to the 'Deals' section in the main menu and click 'New Deal'. Fill in all required fields such as product type, name, value, quantity, and close date. Once submitted, the deal will be pending administrator approval."
+          question: 'What do you mean by "plays"?',
+          answer: "Plays are the sales you register during the month, whether from new customers or renewals. Each play translates into goals, which you can accumulate to redeem for monthly prizes."
         },
         q2: {
-          question: "How many points do I earn per deal?",
-          answer: "Points are calculated automatically based on the deal value. Normally, you earn 1 point per dollar of the deal. Points are only credited once the deal is approved by an administrator. Some products or special campaigns may have point multipliers."
+          question: "What are goals?",
+          answer: `Goals are the points you earn for each play registered.
+
+          - For every US$1,000 in sales to new customers, you earn 1 goal.
+
+          - For every US$2,000 in renewal sales, you also earn 1 goal.`
         },
         q3: {
-          question: "How do I redeem my points for rewards?",
-          answer: "Go to the 'Rewards' section where you can see all available rewards and the points needed for each one. Select the reward you want, verify that you have enough points, and click 'Redeem'. The request will be processed by an administrator and you'll receive a notification when it's approved."
+          question: "How can I be the top scorer of the season?",
+          answer: `The more plays you register, the more goals you will accumulate. You can see your progress on the "Top Scorers of the Season" leaderboard within the platform's main dashboard. The participant with the most accumulated goals by April 2026—by Partner level, market segment, and region—will win the Grand Prize: an all-inclusive ticket to a World Cup match.`
         },
         q4: {
-          question: "How long does it take to approve my deal?",
-          answer: "Deal approval time varies depending on the complexity and volume of requests. Generally, deals are reviewed within 24-48 business hours. You'll receive an email notification when your deal is approved or if additional information is required."
+          question: "How do I register a play?",
+          answer: `To register a play and start scoring goals, follow these steps:
+
+          1. Log in to the KUDOS platform and register your sale.
+
+          2. The Kaspersky Cup team will review and validate the information.
+
+          3. If the sale is valid, it will be converted into a play, and the goals will be automatically added.
+
+          4. You will receive an email notification and an in-platform notification when a play is registered in your name.
+
+          5. You can view all your accumulated goals on the main dashboard.
+
+          Important: Only sales registered and validated on KUDOS will be considered plays within the Kaspersky Cup. Unvalidated sales will not generate goals.`
         },
         q5: {
-          question: "Can I cancel or modify a deal after submitting it?",
-          answer: "Once a deal has been submitted, you cannot modify it directly. If you need to make changes, contact support through this button or send an email to the administrator. Pending deals can be modified by an administrator before approval."
+          question: "How do I redeem my goals for the prize of the month?",
+          answer: `Go to the “My Prizes” section to see the available prize, its image, and the number of goals required to redeem it. If you meet the requirements, click “Redeem.” Your request will be reviewed by the Kaspersky Cup team, and you will be notified when it is approved.`
         },
         q6: {
-          question: "What should I do if I don't see my points reflected?",
-          answer: "Points are credited automatically when your deal is approved. If your deal was approved and you don't see the points, check your points history. If the problem persists after 24 hours, contact support with the affected deal number."
+          question: "When can I redeem my goals?",
+          answer: `Sales can be registered throughout the month (for example, from December 1st to 31st). As they are validated, the goals accumulate.
+
+          - The valid date will always be the date of the transaction processed by Kaspersky, regardless of when it was registered in KUDOS.
+
+          - If you reach the required goals before the end of the month, you can redeem your reward immediately.
+
+          - You also have a grace period until the 10th of the following month to redeem the previous month's reward, provided the sale that generated the goals has the corresponding valid date.
+
+          Redemption is subject to reward availability at the time of the request.`
         },
         q7: {
-          question: "Do rewards have an expiration date?",
-          answer: "Accumulated points do not expire, but some rewards may have limited availability due to stock. Special or seasonal rewards may only be available for a limited time. We recommend regularly checking the rewards catalog."
+          question: "How long does it take for my reward redemption to be approved?",
+          answer: "Your request will be reviewed within a maximum of 5 days. You will receive a confirmation email when your reward has been approved and is ready for shipment. You can also check the status in the 'My Redemptions' section of the platform."
         },
         q8: {
-          question: "How can I track my reward shipment?",
-          answer: "Once your reward request is approved and shipped, you'll receive an email with tracking information. You can also check the status in the 'My Rewards' section where you'll see the current status (Pending, Approved, Shipped, Delivered)."
-        }
+          question: "What should I do if I don't see my goals reflected?",
+          answer: `Goals are automatically assigned once your sales are registered and approved.
+          If more than 15 days have passed since you registered with KUDOS and you still don't see your goals reflected, please contact the support team.`
+        },
+        q9: {
+          question: "Do the prizes have an expiration date?",
+          answer: `Yes. Prizes change every month and require different amounts of goals to redeem.
+
+          - We recommend checking the catalog frequently, as prizes are limited and are assigned on a first-come, first-served basis.
+
+          - If a prize is sold out, you will not be able to redeem it, even if you have the required goals.
+
+          - Prize images are for illustrative purposes only; the final product may vary depending on availability in each country.
+
+          Remember that at the end of the season, if you are the top scorer, you can win the Grand Prize: an all-inclusive ticket to a World Cup match.`
+        },
+        q10: {
+          question: "What does the Grand Prize include?",
+          answer: `The grand prize includes:
+
+          - One (1) single ticket to a 2026 FIFA World Cup match
+
+          - Round-trip flights
+
+          - Accommodation
+
+          - Meals
+
+          This prize is personal and non-transferable. If the winner is unable to travel, the prize will automatically be awarded to the runner-up.`
+        },
+        q11: {
+          question: "How is the Grand Prize awarded?",
+          answer: `You don't need to take any further action. If you are the top scorer in your category (Partner level, market segment, and region), we will send you an email notification, and the Kaspersky Cup team will contact you to coordinate the official delivery.`
+        },
+        q12: {
+          question: "How can I track my prize shipment?",
+          answer: `Once your prize has been approved and shipped, the Kaspersky Cup team will confirm the delivery details, and you will receive an email with the shipping confirmation.
+          You can also check the status in the "My Redemptions" section of the platform. There you will see if your request is Pending, Approved, Shipped, or Delivered.`
+        }        
       }
     },
     dashboard: {
@@ -1144,39 +1210,105 @@ const translations = {
       adminResponsePlaceholder: "Escribe tu respuesta al usuario...",
       newStatus: "Nuevo Estado",
       submitResponse: "Enviar Respuesta",
+      warningCharacters: "El asunto debe tener al menos 5 caracteres",
+      requestSent: "Tu solicitud de soporte ha sido enviada. Te contactaremos pronto.",
+      frequentlyAskedQuestions: "Preguntas Frecuentes",
+      submitApplication: "Enviar Solicitud",
+      cantFind: "¿No encuentra lo que busca?",
+      pleaseContact: "Por favor, contáctese con el equipo de soporte para recibir asistencia personalizada.",
       faq: {
         q1: {
-          question: "¿Cómo puedo registrar un nuevo deal?",
-          answer: "Para registrar un nuevo deal, dirígete a la sección 'Deals' en el menú principal y haz clic en 'Nuevo Deal'. Completa todos los campos requeridos como tipo de producto, nombre, valor, cantidad y fecha de cierre. Una vez enviado, el deal quedará pendiente de aprobación por un administrador."
+          question: '¿A qué se refieren con "jugadas"?',
+          answer: "Las jugadas son las ventas que usted registra durante el mes, ya sean de nuevos clientes o renovaciones. Cada jugada se traduce en goles, que puede acumular para canjear premios mensuales."
         },
         q2: {
-          question: "¿Cuántos puntos gano por cada deal?",
-          answer: "Los puntos se calculan automáticamente basándose en el valor del deal. Normalmente, ganas 1 punto por cada dólar del deal. Los puntos solo se acreditan una vez que el deal es aprobado por un administrador. Algunos productos o campañas especiales pueden tener multiplicadores de puntos."
+          question: "¿Qué son los goles?",
+          answer: `Los goles son los puntos que obtiene por cada jugada registrada. 
+
+           - Por cada US$1,000 en ventas a nuevos clientes, usted gana 1 gol.
+
+           - Por cada US$2,000 en ventas de renovaciones, también gana 1 gol.`
         },
         q3: {
-          question: "¿Cómo canjeo mis puntos por recompensas?",
-          answer: "Ve a la sección 'Recompensas' donde podrás ver todas las recompensas disponibles y los puntos necesarios para cada una. Selecciona la recompensa que deseas, verifica que tienes suficientes puntos y haz clic en 'Canjear'. La solicitud será procesada por un administrador y recibirás una notificación cuando sea aprobada."
+          question: "¿Cómo puedo ser el goleador de la temporada?",
+          answer: 'Cuantas más jugadas registre, más goles acumulará. Puede ver su progreso en el marcador "Los goleadores de la temporada" dentro del panel principal de la plataforma. El participante con más goles acumulados hasta abril de 2026 —por nivel de Partner, segmento de mercado y región— será el ganador del Gran Premio: una entrada para un partido del Mundial con todo incluido.'
         },
         q4: {
-          question: "¿Cuánto tiempo tarda en aprobarse mi deal?",
-          answer: "El tiempo de aprobación de deals varía dependiendo de la complejidad y el volumen de solicitudes. Generalmente, los deals son revisados en un plazo de 24-48 horas hábiles. Recibirás una notificación por correo cuando tu deal sea aprobado o si se requiere información adicional."
+          question: "¿Cómo registro una jugada?",
+          answer: `Para registrar una jugada y comenzar a sumar goles, siga estos pasos: 
+
+          1. Ingrese a la plataforma KUDOS y registre su venta. 
+
+          2. El equipo de Kaspersky Cup revisará y validará la información. 
+
+          3. Si la venta es válida, será convertida en una jugada y los goles serán sumados automáticamente. 
+
+          4. Recibirá una notificación por correo y dentro de la plataforma cuando se registre una jugada a su nombre. 
+
+          5. Podrá ver todos sus goles acumulados en el panel principal. 
+
+          Importante: solo las ventas registradas y validadas en KUDOS serán consideradas como jugadas dentro de Kaspersky Cup. Las ventas no validadas no generarán goles.`
         },
         q5: {
-          question: "¿Puedo cancelar o modificar un deal después de enviarlo?",
-          answer: "Una vez que un deal ha sido enviado, no puedes modificarlo directamente. Si necesitas realizar cambios, contacta al soporte a través de este botón o envía un correo al administrador. Los deals pendientes pueden ser modificados por un administrador antes de su aprobación."
+          question: "¿Cómo canjeo mis goles por el premio del mes?",
+          answer: `Ingrese a la sección “Mis premios” para ver el premio disponible, su imagen y la cantidad de goles necesarios para canjearlo. Si cumple con los requisitos, haga clic en “Canjear”. Su solicitud será revisada por el equipo de Kaspersky Cup y se le notificará cuando sea aprobada.`
         },
         q6: {
-          question: "¿Qué hago si no veo mis puntos reflejados?",
-          answer: "Los puntos se acreditan automáticamente cuando tu deal es aprobado. Si tu deal fue aprobado y no ves los puntos, verifica en tu historial de puntos. Si el problema persiste después de 24 horas, contacta al soporte con el número de deal afectado."
+          question: "¿Cuándo puedo redimir mis goles?",
+          answer: `Las ventas se pueden registrar durante todo el mes (por ejemplo, del 1 al 31 de diciembre). A medida que se validan, los goles se van acumulando.
+          
+          - La fecha válida siempre será la de la transacción procesada por Kaspersky, sin importar cuándo se haya registrado en KUDOS.
+
+          - Si alcanza los goles necesarios antes de finalizar el mes, puede canjear su premio de inmediato.
+
+          - Además, dispone de un período de gracia hasta el día 10 del mes siguiente para redimir el premio del mes anterior, siempre que la venta que generó los goles tenga la fecha válida correspondiente.
+
+          El canje está sujeto a la disponibilidad del premio en el momento de la solicitud.`
         },
         q7: {
-          question: "¿Las recompensas tienen fecha de expiración?",
-          answer: "Los puntos acumulados no expiran, pero algunas recompensas pueden tener disponibilidad limitada por stock. Las recompensas especiales o de temporada pueden estar disponibles solo por tiempo limitado. Te recomendamos revisar regularmente el catálogo de recompensas."
+          question: "¿Cuánto tiempo tarda en aprobarse la redención de mi premio?",
+          answer: "Su solicitud será revisada en un plazo máximo de 5 días. Recibirá un correo de confirmación cuando su premio haya sido aprobado y esté listo para el envío. También puede verificar el estado en la sección “Mis redenciones” de la plataforma."
         },
         q8: {
-          question: "¿Cómo puedo rastrear el envío de mi recompensa?",
-          answer: "Una vez que tu solicitud de recompensa sea aprobada y enviada, recibirás un correo con la información de seguimiento. También puedes verificar el estado en la sección 'Mis Recompensas' donde verás el estado actual (Pendiente, Aprobado, Enviado, Entregado)."
-        }
+          question: "¿Qué hago si no veo mis goles reflejados?",
+          answer: `Los goles se asignan automáticamente una vez que sus ventas son registradas y aprobadas.
+          Si han pasado más de 15 días desde el registro en KUDOS y no ve reflejados sus goles, por favor, comuníquese con el equipo de soporte.`
+        },
+        q9: {
+          question: "¿Los premios tienen fecha de vencimiento?",
+          answer: `Sí. Los premios cambian cada mes y requieren diferentes cantidades de goles para ser canjeados.
+
+          - Le recomendamos revisar el catálogo con frecuencia, ya que los premios son limitados y se asignan por orden de canje.
+
+          - Si un premio se agota, no podrá redimirlo, incluso si cuenta con los goles necesarios.
+
+          - Las imágenes de los premios son referenciales; el producto final puede variar según disponibilidad en cada país.
+
+          Recuerde que al final de la temporada, si usted es el máximo goleador, podrá ganar el Gran Premio: una entrada para un partido del Mundial con todo incluido.`
+        },
+        q10: {
+          question: "¿Qué incluye el Gran Premio?",
+          answer: `El premio mayor incluye:
+
+          - Una (1) entrada individual para un partido del Mundial de Fútbol FIFA 2026
+
+          - Vuelos ida y vuelta
+
+          - Hospedaje
+
+          - Alimentación
+
+          Este premio es personal e intransferible. Si el ganador no puede realizar el viaje, el premio será otorgado automáticamente al participante que ocupe el segundo lugar.`
+        },
+        q11: {
+          question: "¿Cómo se entrega el Gran Premio?",
+          answer: `No necesita realizar ninguna acción adicional. Si resulta ser el máximo goleador por categoría (nivel de Partner, segmento de mercado y región), le enviaremos una notificación por correo y el equipo de Kaspersky Cup se pondrá en contacto con usted para coordinar la entrega oficial.`
+        },
+        q12: {
+          question: "¿Cómo puedo rastrear el envío de mi premio?",
+          answer: `Una vez aprobado y enviado su premio, el equipo de Kaspersky Cup le confirmará los datos de entrega y recibirá un correo con la confirmación del envío.
+          También puede revisar el estado en la sección “Mis redenciones” de la plataforma. Allí verá si su solicitud está Pendiente, Aprobada, Enviada o Entregada.`
+        }        
       }
     },
     dashboard: {
@@ -2066,40 +2198,106 @@ const translations = {
       adminResponsePlaceholder: "Escreva sua resposta ao usuário...",
       newStatus: "Novo Status",
       submitResponse: "Enviar Resposta",
+      warningCharacters: "O assunto do e-mail deve ter pelo menos 5 caracteres.",
+      requestSent: "Sua solicitação de suporte foi enviada. Entraremos em contato em breve.",
+      frequentlyAskedQuestions: "Perguntas frequentes",
+      submitApplication: "Enviar candidatura",
+      cantFind: "Não encontrou o que procura?",
+      pleaseContact: "Entre em contato com o suporte.",
       faq: {
         q1: {
-          question: "Como posso registrar um novo negócio?",
-          answer: "Para registrar um novo negócio, vá para a seção 'Negócios' no menu principal e clique em 'Novo Negócio'. Preencha todos os campos obrigatórios, como tipo de produto, nome, valor, quantidade e data de fechamento. Depois de enviado, o negócio ficará pendente de aprovação do administrador."
+          question: 'O que são as jogadas?',
+          answer: "As jogadas são os negócios ou vendas que você realiza durante o mês, seja com novos clientes ou renovações. Cada jogada se transforma em gols que você pode acumular para resgatar prêmios todos os meses."
         },
         q2: {
-          question: "Quantos pontos ganho por cada negócio?",
-          answer: "Os pontos são calculados automaticamente com base no valor do negócio. Normalmente, você ganha 1 ponto por cada dólar do negócio. Os pontos só são creditados depois que o negócio é aprovado por um administrador. Alguns produtos ou campanhas especiais podem ter multiplicadores de pontos."
+          question: "O que são os gols?",
+          answer: `Os gols são os pontos que você ganha por cada jogada registrada.
+
+          - A cada US$ 1.000 em pedidos de novos clientes, você recebe 1 gol.
+
+          - A cada US$ 2.000 em pedidos de renovações, você recebe 1 gol.`
         },
         q3: {
-          question: "Como resgato meus pontos por recompensas?",
-          answer: "Vá para a seção 'Recompensas' onde você pode ver todas as recompensas disponíveis e os pontos necessários para cada uma. Selecione a recompensa que deseja, verifique se tem pontos suficientes e clique em 'Resgatar'. A solicitação será processada por um administrador e você receberá uma notificação quando for aprovada."
+          question: "Como posso me tornar o artilheiro da temporada?",
+          answer: `Quanto mais jogadas você realizar a cada mês, mais gols irá acumular. Seu total de gols aparece no marcador “Os artilheiros da temporada” dentro do painel principal.
+          O participante que tiver o maior número de gols acumulados até abril de 2026, considerando cada nível de Parceiro, Segmento de Mercado e Região, ganhará o Grande Prêmio: um ingresso para assistir a um jogo da Copa do Mundo com tudo incluído.`
         },
         q4: {
-          question: "Quanto tempo leva para aprovar meu negócio?",
-          answer: "O tempo de aprovação do negócio varia dependendo da complexidade e do volume de solicitações. Geralmente, os negócios são revisados em 24-48 horas úteis. Você receberá uma notificação por e-mail quando seu negócio for aprovado ou se informações adicionais forem necessárias."
+          question: "Como uma nova jogada é registrada?",
+          answer: `Para registrar uma jogada e começar a acumular gols, siga estes passos:
+
+          1. Registre suas vendas na plataforma KUDOS. Somente as vendas registradas ali poderão ser consideradas para o programa.
+
+          2. A equipe do Kaspersky Cup revisará e validará as suas vendas no KUDOS. Se uma venda não for válida, ela não poderá se converter em gol.
+
+          3. As vendas validadas se transformarão em jogadas dentro do programa e serão adicionadas diretamente pela equipe do Kaspersky Cup. Com cada jogada, você acumulará gols.
+
+          4. Quando uma jogada for registrada em seu nome, você receberá uma notificação por e-mail e dentro da plataforma para verificar os gols somados.
+
+          5. Você poderá ver seus gols acumulados no painel principal da plataforma.
+
+          Importante: Somente as vendas registradas e validadas no KUDOS serão consideradas jogadas dentro do Kaspersky Cup. Vendas não validadas não gerarão gols.`
         },
         q5: {
-          question: "Posso cancelar ou modificar um negócio depois de enviá-lo?",
-          answer: "Depois que um negócio foi enviado, você não pode modificá-lo diretamente. Se precisar fazer alterações, entre em contato com o suporte através deste botão ou envie um e-mail para o administrador. Os negócios pendentes podem ser modificados por um administrador antes da aprovação."
+          question: "Como posso resgatar meus gols pelo prêmio do mês?",
+          answer: `Acesse a seção “Meus prêmios”, onde você verá a imagem do prêmio disponível e a quantidade de gols necessária para resgatá-lo. Se você tiver gols suficientes, basta clicar em “Resgatar”. Sua solicitação será analisada pela equipe do Kaspersky Cup e você receberá uma notificação quando o resgate for aprovado.`
         },
         q6: {
-          question: "O que fazer se não vejo meus pontos refletidos?",
-          answer: "Os pontos são creditados automaticamente quando seu negócio é aprovado. Se seu negócio foi aprovado e você não vê os pontos, verifique seu histórico de pontos. Se o problema persistir após 24 horas, entre em contato com o suporte com o número do negócio afetado."
+          question: "Quando posso resgatar meus gols?",
+          answer: `As vendas são registradas ao longo de todo o mês (por exemplo, de 1º a 31 de dezembro), e os gols são acumulados conforme essas vendas são validadas pela equipe do Kaspersky Cup dentro do KUDOS.
+
+          - A data válida da venda será sempre a data real da transação processada pela Kaspersky, independentemente de quando ela tenha sido registrada no KUDOS ou validada na plataforma.
+
+          - Durante cada mês, você poderá ver quantos gols acumulou e, se alcançar a quantidade necessária para resgatar o Prêmio do Mês, poderá fazer o resgate. Se você atingir os gols necessários antes do fim do mês, poderá resgatar o prêmio a qualquer momento dentro desse mesmo período.
+
+          - Além disso, você terá um período de tolerância até o dia 10 do mês seguinte para realizar o resgate do prêmio referente ao mês anterior, desde que a venda que gerou os gols tenha a data válida correspondente ao mês do prêmio.
+
+          O resgate está sujeito à disponibilidade do prêmio no momento da solicitação.`
         },
         q7: {
-          question: "As recompensas têm data de validade?",
-          answer: "Os pontos acumulados não expiram, mas algumas recompensas podem ter disponibilidade limitada devido ao estoque. Recompensas especiais ou sazonais podem estar disponíveis apenas por tempo limitado. Recomendamos verificar regularmente o catálogo de recompensas."
+          question: "Em quanto tempo meu resgate é aprovado?",
+          answer: "Sua solicitação será analisada em um prazo de (5 dias). Você receberá um e-mail quando o seu prêmio for aprovado e estiver pronto para envio. Você também pode verificar o status diretamente na plataforma, na seção “Minhas redações”."
         },
         q8: {
-          question: "Como posso rastrear o envio da minha recompensa?",
-          answer: "Depois que sua solicitação de recompensa for aprovada e enviada, você receberá um e-mail com as informações de rastreamento. Você também pode verificar o status na seção 'Minhas Recompensas' onde verá o status atual (Pendente, Aprovado, Enviado, Entregue)."
+          question: "O que faço se eu não visualizar meus gols?",
+          answer: `Os gols são atribuídos automaticamente quando suas vendas são registradas e aprovadas dentro do programa. Se já se passaram mais de 15 dias desde o registro da venda no KUDOS e os gols ainda não apareceram, entre em contato com a equipe de suporte.`
+        },
+        q9: {
+          question: "Os prêmios têm data de expiração?",
+          answer: `Sim. Os prêmios mudam a cada mês e exigem uma quantidade diferente de gols para serem resgatados. Cada prêmio é melhor que o anterior, por isso recomendamos que você confira o catálogo regularmente para não perder nenhuma oportunidade.
+          
+          - Lembre-se de que os prêmios mensais têm quantidade limitada e são concedidos de acordo com a ordem em que o resgate é solicitado. Se o prêmio se esgotar, não será possível resgatá-lo, mesmo que você tenha os gols necessários.
+          
+          - Além disso, as imagens exibidas dos prêmios são ilustrativas; o prêmio real pode variar ligeiramente conforme a disponibilidade em cada país.
+          
+          E, no final da temporada, se você for o maior goleador, terá a chance de ganhar o Grande Prêmio: um ingresso para assistir a um jogo da Copa do Mundo com tudo incluído.`
+        },
+        q10: {
+          question: "O que inclui o Grande Prêmio?",
+          answer: `O Grande Prêmio inclui:
+
+          - Um (1) ingresso individual para um jogo da Copa do Mundo FIFA 2026
+          
+          - Passagens aéreas de ida e volta
+          
+          - Hospedagem
+          
+          - Alimentação
+
+          Este prêmio é pessoal e intransferível, portanto só pode ser utilizado pelo próprio vencedor.
+          Se, por qualquer motivo, o vencedor não puder realizar a viagem, o prêmio será automaticamente transferido para o participante que estiver em segundo lugar.
+`
+        },
+        q11: {
+          question: "Como o Grande Prêmio é entregue?",
+          answer: `Você não precisa realizar nenhuma ação adicional. Se for o maior goleador por nível de Parceiro, Segmento de Mercado e Região, você será notificado por e-mail, e a equipe do Kaspersky Cup entrará em contato com você para coordenar a entrega oficial do prêmio.`
+        },
+        q12: {
+          question: "Como posso rastrear o envio do meu prêmio?",
+          answer: `Quando o seu prêmio for aprovado e enviado, a equipe do Kaspersky Cup entrará em contato para confirmar os dados de entrega. Depois disso, você receberá um e-mail com a confirmação do envio.
+          Você também pode acompanhar o status do seu prêmio na seção “Minhas redensões”, onde poderá ver se ele está como Pendente, Aprovado, Enviado ou Entregue.`
         }
-      }
+      }      
     },
     dashboard: {
       welcome: "Olá,",
