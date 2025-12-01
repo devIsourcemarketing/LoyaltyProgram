@@ -12,10 +12,19 @@ const BREVO_API_KEY = process.env.BREVO_API_KEY || '';
 const FROM_EMAIL = process.env.FROM_EMAIL || 'noreply@loyaltyprogram.com';
 const APP_URL = process.env.APP_URL || 'http://localhost:5000';
 
+// Logging mejorado para diagnóstico
+console.log('📧 Configuración de Email:');
+console.log('   BREVO_API_KEY:', BREVO_API_KEY ? '✓ Configurada' : '✗ NO CONFIGURADA');
+console.log('   FROM_EMAIL:', FROM_EMAIL);
+console.log('   APP_URL:', APP_URL);
+
 // Inicializar cliente de Brevo
 const apiInstance = new brevo.TransactionalEmailsApi();
 if (BREVO_API_KEY) {
   apiInstance.setApiKey(brevo.TransactionalEmailsApiApiKeys.apiKey, BREVO_API_KEY);
+  console.log('✅ Cliente Brevo inicializado correctamente');
+} else {
+  console.warn('⚠️  BREVO_API_KEY no configurada - los emails no se enviarán');
 }
 
 /**

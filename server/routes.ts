@@ -22,6 +22,15 @@ import {
   sendPendienteAprobacionEmail,
   sendGanadorPremioMayorEmail
 } from "./email.js";
+import { 
+  sendEmailWithRetry,
+  getEmailStats,
+  getFailedEmails,
+  retryFailedEmail,
+  BREVO_API_KEY,
+  FROM_EMAIL,
+  APP_URL
+} from "./emailService.js";
 
 // Extend session data interface
 declare module 'express-session' {
@@ -405,17 +414,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         loginTokenExpiry: expiryDate,
       });
 
-      // Enviar email con magic link
-      await sendMagicLinkEmail({
+      // Enviar email con magic link usando el nuevo servicio con reintentos
+      const emailResult = await sendMagicLinkEmail({
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
         loginToken,
       });
 
+      if (!emailResult) {
+        console.error("⚠️ Magic link email failed to send, but token was created");
+      }
+
       res.json({ 
         userExists: true,
-        message: "Te hemos enviado un enlace de acceso a tu correo electrónico." 
+        message: "Te hemos enviado un enlace de acceso a tu correo electrónico.",
+        emailSent: emailResult
       });
     } catch (error) {
       console.error("Request magic link error:", error);
@@ -4282,6 +4296,246 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({
         success: false,
         message: "Failed to upload image",
+      });
+    }
+  });
+
+  // ═══════════════════════════════════════════════════════════
+  // EMAIL DIAGNOSTICS & MONITORING ENDPOINTS (Admin only)
+  // ═══════════════════════════════════════════════════════════
+
+  /**
+   * GET /api/admin/emails/stats
+   * Obtener estadísticas de emails (últimas 24h por defecto)
+   */
+  app.get("/api/admin/emails/stats", async (req, res) => {
+    const userRole = req.session?.userRole;
+    
+    if (!isAdminRole(userRole)) {
+      return res.status(403).json({ message: "Admin access required" });
+    }
+
+    try {
+      const hours = parseInt(req.query.hours as string) || 24;
+      const stats = await getEmailStats(hours);
+      
+      res.json({
+        success: true,
+        timeframe: `${hours} hours`,
+        stats,
+        config: {
+          brevoConfigured: !!BREVO_API_KEY,
+          fromEmail: FROM_EMAIL,
+          appUrl: APP_URL,
+        }
+      });
+    } catch (error) {
+      console.error("Get email stats error:", error);
+      res.status(500).json({ 
+        success: false, 
+        message: "Failed to get email stats" 
+      });
+    }
+  });
+
+  /**
+   * GET /api/admin/emails/failed
+   * Obtener emails que fallaron recientemente
+   */
+  app.get("/api/admin/emails/failed", async (req, res) => {
+    const userRole = req.session?.userRole;
+    
+    if (!isAdminRole(userRole)) {
+      return res.status(403).json({ message: "Admin access required" });
+    }
+
+    try {
+      const limit = parseInt(req.query.limit as string) || 20;
+      const failedEmails = await getFailedEmails(limit);
+      
+      res.json({
+        success: true,
+        count: failedEmails.length,
+        emails: failedEmails,
+      });
+    } catch (error) {
+      console.error("Get failed emails error:", error);
+      res.status(500).json({ 
+        success: false, 
+        message: "Failed to get failed emails" 
+      });
+    }
+  });
+
+  /**
+   * POST /api/admin/emails/retry/:logId
+   * Reintentar envío de un email fallido
+   */
+  app.post("/api/admin/emails/retry/:logId", async (req, res) => {
+    const userRole = req.session?.userRole;
+    
+    if (!isAdminRole(userRole)) {
+      return res.status(403).json({ message: "Admin access required" });
+    }
+
+    try {
+      const { logId } = req.params;
+      const success = await retryFailedEmail(logId);
+      
+      if (success) {
+        res.json({
+          success: true,
+          message: "Email retry queued successfully",
+        });
+      } else {
+        res.status(404).json({
+          success: false,
+          message: "Email log not found or already sent",
+        });
+      }
+    } catch (error) {
+      console.error("Retry email error:", error);
+      res.status(500).json({ 
+        success: false, 
+        message: "Failed to retry email" 
+      });
+    }
+  });
+
+  /**
+   * POST /api/admin/emails/test
+   * Endpoint de prueba para verificar que los emails funcionan
+   */
+  app.post("/api/admin/emails/test", async (req, res) => {
+    const userRole = req.session?.userRole;
+    const userId = req.session?.userId;
+    
+    if (!isAdminRole(userRole) || !userId) {
+      return res.status(403).json({ message: "Admin access required" });
+    }
+
+    try {
+      const { testEmail } = req.body;
+      
+      // Si no se proporciona email, usar el del admin
+      let recipientEmail = testEmail;
+      let recipientName = "Admin";
+      
+      if (!recipientEmail) {
+        const admin = await storage.getUser(userId);
+        if (!admin) {
+          return res.status(404).json({ message: "Admin user not found" });
+        }
+        recipientEmail = admin.email;
+        recipientName = `${admin.firstName} ${admin.lastName}`;
+      }
+
+      console.log(`📧 Enviando email de prueba a: ${recipientEmail}`);
+
+      // Enviar email de prueba usando el nuevo servicio con reintentos
+      const result = await sendEmailWithRetry({
+        to: [{ email: recipientEmail, name: recipientName }],
+        subject: '🧪 Email de Prueba - Kaspersky Cup',
+        htmlContent: `
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="utf-8">
+            <style>
+              body { 
+                font-family: Arial, sans-serif; 
+                line-height: 1.6; 
+                color: #333; 
+                max-width: 600px; 
+                margin: 0 auto; 
+                padding: 20px; 
+              }
+              .header { 
+                background: linear-gradient(135deg, #29CCB1 0%, #1D9B85 100%); 
+                color: white; 
+                padding: 30px; 
+                text-align: center; 
+                border-radius: 10px 10px 0 0; 
+              }
+              .content { 
+                background: #f9fafb; 
+                padding: 30px; 
+                border: 1px solid #e5e7eb; 
+              }
+              .status { 
+                background: #d1fae5; 
+                border-left: 4px solid #10b981; 
+                padding: 15px; 
+                margin: 15px 0; 
+              }
+              .info { 
+                background: white; 
+                padding: 15px; 
+                margin: 15px 0; 
+                border-radius: 5px; 
+              }
+            </style>
+          </head>
+          <body>
+            <div class="header">
+              <h1>✅ Email de Prueba Exitoso</h1>
+            </div>
+            <div class="content">
+              <div class="status">
+                <strong>🎉 ¡Sistema de Emails Funcionando!</strong>
+                <p>Este es un email de prueba del sistema Kaspersky Cup.</p>
+              </div>
+              <div class="info">
+                <p><strong>Destinatario:</strong> ${recipientEmail}</p>
+                <p><strong>Fecha:</strong> ${new Date().toLocaleString('es-ES')}</p>
+                <p><strong>Servidor:</strong> Brevo API</p>
+              </div>
+              <p>Si recibes este email, significa que:</p>
+              <ul>
+                <li>✅ Brevo API está correctamente configurado</li>
+                <li>✅ El servicio de correos está funcionando</li>
+                <li>✅ Los reintentos automáticos están activos</li>
+                <li>✅ El logging de emails está operativo</li>
+              </ul>
+              <p><em>Este es un email automático de prueba del sistema.</em></p>
+            </div>
+          </body>
+          </html>
+        `,
+        textContent: `Email de Prueba - Kaspersky Cup
+
+✅ ¡Sistema de Emails Funcionando!
+
+Destinatario: ${recipientEmail}
+Fecha: ${new Date().toLocaleString('es-ES')}
+
+Si recibes este email, significa que el sistema está funcionando correctamente.`,
+        emailType: 'test',
+        maxRetries: 3,
+      });
+
+      if (result.success) {
+        res.json({
+          success: true,
+          message: `Email de prueba enviado exitosamente a ${recipientEmail}`,
+          details: {
+            recipient: recipientEmail,
+            attempts: result.attempts,
+            messageId: result.messageId,
+          }
+        });
+      } else {
+        res.status(500).json({
+          success: false,
+          message: `Failed to send test email after ${result.attempts} attempts`,
+          error: result.error,
+        });
+      }
+    } catch (error) {
+      console.error("Test email error:", error);
+      res.status(500).json({ 
+        success: false, 
+        message: "Failed to send test email" 
       });
     }
   });

@@ -2,6 +2,8 @@ import "dotenv/config";
 import { webcrypto } from "crypto";
 import express, { type Request, Response, NextFunction } from "express";
 import session from "express-session";
+import connectPgSimple from "connect-pg-simple";
+import pg from "pg";
 import path from "path";
 import { registerRoutes } from "./routes";
 import { initializeSocket } from "./socket";
@@ -20,16 +22,28 @@ app.use(express.urlencoded({ extended: false, limit: '5mb' }));
 // Servir imágenes estáticas para emails
 app.use('/email-assets', express.static(path.join(process.cwd(), 'client/src/assets')));
 
-// Session configuration
+// PostgreSQL session store configuration
+const PgSession = connectPgSimple(session);
+const pgPool = new pg.Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : undefined,
+});
+
+// Session configuration with PostgreSQL store
 app.use(
   session({
+    store: new PgSession({
+      pool: pgPool,
+      tableName: 'session', // Default table name
+      createTableIfMissing: true, // Auto-create session table
+    }),
     secret: process.env.SESSION_SECRET || "your-secret-key-here",
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: false, // Set to true in production with HTTPS
+      secure: process.env.NODE_ENV === "production", // HTTPS only in production
       httpOnly: true,
-      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     },
   }),
 );
