@@ -238,3 +238,7 @@ button#radix-\:r7\::hover {
 .display-hero-dashboard {
     align-items: center;
 }
+/*--FAQ--*/
+.faq-answer {
+  white-space: pre-line;
+}
