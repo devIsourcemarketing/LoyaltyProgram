@@ -18,6 +18,7 @@ import {
   sendMagicLinkEmail,
   sendExpectationEmail,
   sendRegistroExitosoEmail,
+  sendRegistroPasswordlessEmail,
   sendBienvenidaEmail,
   sendPendienteAprobacionEmail,
   sendGanadorPremioMayorEmail
@@ -286,7 +287,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         regionSubcategory: subcategory || null,
         role: "user",
         isActive: true,
-        isApproved: true, // Auto-aprobado para registro passwordless
+        isApproved: false, // REQUIERE APROBACIÓN de administrador
         isPasswordless: true, // Usuario passwordless
       });
 
@@ -300,12 +301,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         loginTokenExpiry: expiryDate,
       });
 
-      // Enviar email de bienvenida con magic link
-      await sendBienvenidaEmail({
+      // Enviar email de REGISTRO PASSWORDLESS (con diseño específico)
+      await sendRegistroPasswordlessEmail({
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
-        loginToken, // Incluir loginToken para acceso directo
+        loginToken, // Magic link para acceso
       });
 
       // Enviar notificaciones a los admins correspondientes
@@ -458,6 +459,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ 
           valid: false,
           message: "Este enlace ha expirado. Solicita uno nuevo." 
+        });
+      }
+
+      // VALIDAR SI EL USUARIO ESTÁ APROBADO
+      if (!user.isApproved) {
+        // Limpiar el token para que no se pueda reutilizar
+        await storage.updateUser(user.id, {
+          loginToken: null,
+          loginTokenExpiry: null,
+        });
+
+        return res.status(403).json({ 
+          valid: false,
+          pendingApproval: true,
+          message: "Tu cuenta está pendiente de aprobación. Un administrador debe aprobarla antes de que puedas acceder." 
         });
       }
 
@@ -1658,23 +1674,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         region: finalRegion,
         regionCategory: finalCategory,
         regionSubcategory: finalSubcategory,
-        isApproved: true, // Auto-approve invited users
-        approvedAt: new Date(),
-        approvedBy: 'system', // System approval for invited users
+        isApproved: false, // REQUIERE aprobación de administrador
         inviteToken: null, // Clear the token after use
       });
 
-      // Send welcome email (account is ready to use)
-      await sendBienvenidaEmail({
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName
-      });
+      // NO enviar email de bienvenida aún - se enviará cuando sea aprobado
+      // await sendBienvenidaEmail(...)
 
       res.status(200).json({ 
-        message: "Registration completed successfully. You can now log in!",
+        message: "Registro completado. Tu cuenta está pendiente de aprobación por un administrador.",
         regionAutoAssigned: user.invitedFromRegion && user.invitedBy ? true : false,
         assignedRegion: finalRegion,
+        needsApproval: true,
         user: {
           id: updatedUser!.id,
           username: updatedUser!.username,
@@ -1783,13 +1794,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const autoPassword = nanoid(32); // Strong random password
       const hashedPassword = await bcrypt.hash(autoPassword, 10);
 
-      // Update user: set username, password, approve, and clear invite token
+      // Update user: set username, password, and clear invite token
+      // NO auto-aprobar - requiere aprobación de administrador
       const updatedUser = await storage.updateUser(user.id, {
         username,
         password: hashedPassword,
-        isApproved: true,
-        approvedAt: new Date(),
-        approvedBy: 'passwordless',
+        isApproved: false, // REQUIERE aprobación de administrador
         inviteToken: null, // Clear token (one-time use)
       });
 
@@ -1801,24 +1811,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Create session (auto-login)
-      if (req.session) {
-        req.session.userId = updatedUser.id;
-        req.session.userRole = updatedUser.role;
-      }
+      // NO crear sesión automáticamente - el usuario debe esperar aprobación
+      // NO enviar email de bienvenida aún
 
-      // Send welcome email
-      await sendBienvenidaEmail({
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName
-      });
-
-      console.log("✅ Passwordless login successful for:", updatedUser.email);
+      console.log("✅ User registration completed, pending approval for:", updatedUser.email);
 
       res.json({ 
         success: true,
-        message: "Welcome! Your account has been activated.",
+        needsApproval: true,
+        message: "Cuenta creada exitosamente. Está pendiente de aprobación por un administrador.",
         user: {
           id: updatedUser.id,
           username: updatedUser.username,
@@ -2557,7 +2558,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Approve user registration
+    // Approve user registration
   app.put("/api/admin/users/:userId/approve", async (req, res) => {
     const userRole = req.session?.userRole;
     const adminUserId = req.session?.userId;

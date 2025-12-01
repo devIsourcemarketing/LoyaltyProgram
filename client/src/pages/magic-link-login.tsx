@@ -15,6 +15,7 @@ export default function MagicLinkLogin() {
   
   const [isVerifying, setIsVerifying] = useState(true);
   const [isValid, setIsValid] = useState(false);
+  const [isPendingApproval, setIsPendingApproval] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
@@ -67,6 +68,17 @@ export default function MagicLinkLogin() {
           setTimeout(() => {
             window.location.href = "/";
           }, 1500);
+        } else if (data.pendingApproval) {
+          // Usuario pendiente de aprobación
+          setIsValid(false);
+          setIsPendingApproval(true);
+          setErrorMessage(data.message || t("auth.accountPendingApprovalMessage"));
+          toast({
+            title: t("auth.accountPendingApproval"),
+            description: data.message,
+            variant: "destructive",
+          });
+          // No redirigir automáticamente para que el usuario lea el mensaje
         } else {
           setIsValid(false);
           setErrorMessage(data.message || t("auth.invalidOrExpiredLink"));
@@ -114,19 +126,34 @@ export default function MagicLinkLogin() {
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
             <div className="flex justify-center mb-4">
-              <div className="h-12 w-12 rounded-full bg-red-100 flex items-center justify-center">
-                <AlertCircle className="h-6 w-6 text-red-600" />
+              <div className={`h-12 w-12 rounded-full ${isPendingApproval ? 'bg-yellow-100' : 'bg-red-100'} flex items-center justify-center`}>
+                <AlertCircle className={`h-6 w-6 ${isPendingApproval ? 'text-yellow-600' : 'text-red-600'}`} />
               </div>
             </div>
-            <CardTitle className="text-2xl text-red-600">{t("auth.invalidLinkTitle")}</CardTitle>
+            <CardTitle className={`text-2xl ${isPendingApproval ? 'text-yellow-600' : 'text-red-600'}`}>
+              {isPendingApproval ? t("auth.accountPendingApproval") : t("auth.invalidLinkTitle")}
+            </CardTitle>
             <CardDescription>{errorMessage}</CardDescription>
           </CardHeader>
           <CardContent>
-            <Alert variant="destructive">
+            <Alert variant={isPendingApproval ? "default" : "destructive"}>
               <AlertDescription>
-                Serás redirigido a la página de inicio de sesión...
+                {isPendingApproval 
+                  ? t("auth.adminWillNotifyByEmail")
+                  : "Serás redirigido a la página de inicio de sesión..."
+                }
               </AlertDescription>
             </Alert>
+            {isPendingApproval && (
+              <div className="mt-4 text-center">
+                <button
+                  onClick={() => navigate("/login")}
+                  className="text-primary-600 hover:text-primary-700 underline"
+                >
+                  {t("auth.backToLogin")}
+                </button>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

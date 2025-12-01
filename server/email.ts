@@ -2110,7 +2110,8 @@ export interface RegistroExitosoEmailData {
   email: string;
   firstName?: string;
   lastName?: string;
-  inviteToken: string;
+  inviteToken?: string; // Para invitaciones (completar registro)
+  loginToken?: string; // Para passwordless (acceso directo con magic link)
 }
 
 /**
@@ -2135,7 +2136,13 @@ export async function sendRegistroExitosoEmail(data: RegistroExitosoEmailData): 
     const heroImage2xUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764342187/loyalty-program/emails/registro-exitoso/Group%2065%402x.png';
     const footerImageUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764337229/loyalty-program/emails/expectativa/footer.png';
     const userName = data.firstName || 'Usuario';
-    const registrationLink = `${APP_URL}/register?token=${data.inviteToken}`;
+    
+    // Determinar el link correcto según el tipo de token
+    const actionLink = data.inviteToken 
+      ? `${APP_URL}/register?token=${data.inviteToken}` // Invitación: completar registro
+      : data.loginToken 
+        ? `${APP_URL}/auth/verify-magic-link/${data.loginToken}` // Passwordless: magic link
+        : `${APP_URL}/login`; // Fallback
     
     const sendSmtpEmail = new brevo.SendSmtpEmail();
     sendSmtpEmail.to = [{ 
@@ -2329,7 +2336,7 @@ export async function sendRegistroExitosoEmail(data: RegistroExitosoEmailData): 
               Complete su registro e ingrese al programa donde sus ventas se transforman en goles.
             </p>
             
-            <a href="${registrationLink}" class="cta-button">Regístrese ahora</a>
+            <a href="${actionLink}" class="cta-button">Regístrese ahora</a>
             
             <div class="info-box">
               <div class="info-text">
@@ -2393,7 +2400,7 @@ Lo estamos esperando con la camiseta lista para Kaspersky Cup.
 
 Complete su registro e ingrese al programa donde sus ventas se transforman en goles.
 
-Regístrese ahora: ${registrationLink}
+Regístrese ahora: ${actionLink}
 
 Una vez finalizado su registro, le enviaremos un correo confirmando que su inscripción fue aprobada.
 Desde ese momento, podrá ingresar a la plataforma y comenzar a sumar goles.
@@ -2418,6 +2425,306 @@ Kaspersky Cup
     return true;
   } catch (error: any) {
     console.error('❌ Error sending registro exitoso email:', error);
+    
+    if (error.response) {
+      console.error('   Response status:', error.response.status);
+      console.error('   Response data:', JSON.stringify(error.response.data, null, 2));
+    }
+    
+    if (error.body) {
+      console.error('   Error body:', JSON.stringify(error.body, null, 2));
+    }
+    
+    console.error('   Error message:', error.message);
+    
+    return false;
+  }
+}
+
+export interface RegistroPasswordlessEmailData {
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  loginToken: string; // Magic link token
+}
+
+/**
+ * Envía el email de registro exitoso para usuarios passwordless
+ * Asunto: !Registro exitoso! ¡Fue convocado a jugar en Kasperksy Cup! 🏆
+ */
+export async function sendRegistroPasswordlessEmail(data: RegistroPasswordlessEmailData): Promise<boolean> {
+  try {
+    if (!BREVO_API_KEY) {
+      console.warn('⚠️  BREVO_API_KEY no configurada. Email no enviado.');
+      console.log('📧 Simulated registro passwordless email to:', data.email);
+      console.log('🔗 Magic link:', `${APP_URL}/auth/verify-magic-link/${data.loginToken}`);
+      return true;
+    }
+
+    console.log('📤 Intentando enviar email de registro passwordless...');
+    console.log('   Destinatario:', data.email);
+    console.log('   Remitente:', FROM_EMAIL);
+    
+    // Imágenes alojadas en Cloudinary (Europa)
+    const leftImageUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764594519/loyalty-program/emails/registro-passwordless/Group%2065.png';
+    const leftImage2xUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764594521/loyalty-program/emails/registro-passwordless/Group%2065%402x.png';
+    const logoUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764594525/loyalty-program/emails/registro-passwordless/Logo%20-%20Kaspersky%20Cup.png';
+    const logo2xUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764594526/loyalty-program/emails/registro-passwordless/Logo%20-%20Kaspersky%20Cup%402x.png';
+    const footerImageUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764337229/loyalty-program/emails/expectativa/footer.png';
+    const userName = data.firstName || 'Usuario';
+    const magicLink = `${APP_URL}/auth/verify-magic-link/${data.loginToken}`;
+    
+    const sendSmtpEmail = new brevo.SendSmtpEmail();
+    sendSmtpEmail.to = [{ 
+      email: data.email, 
+      name: data.firstName && data.lastName ? `${data.firstName} ${data.lastName}` : undefined 
+    }];
+    sendSmtpEmail.sender = { email: FROM_EMAIL, name: 'Kaspersky Cup' };
+    sendSmtpEmail.subject = '!Registro exitoso! ¡Fue convocado a jugar en Kasperksy Cup! 🏆';
+    sendSmtpEmail.htmlContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+          * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+          }
+          
+          body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #FFFFFF;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+          }
+          
+          .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #FFFFFF;
+          }
+          
+          .hero-image-section {
+            position: relative;
+            text-align: center;
+            background-color: #FFFFFF;
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+          }
+          
+          .hero-image {
+            width: 536px;
+            height: 850px;
+            max-width: 100%;
+            display: block;
+            margin: 0 auto;
+            background: transparent no-repeat padding-box;
+            opacity: 1;
+          }
+          
+          .content-section {
+            background-color: #FFFFFF;
+            padding: 40px 68px;
+            text-align: center;
+          }
+          
+          .greeting {
+            font: normal normal 900 45px/50px Arial;
+            letter-spacing: 0.36px;
+            text-transform: uppercase;
+            color: #1D1D1B;
+            opacity: 1;
+            margin-bottom: 20px;
+          }
+          
+          .greeting-name {
+            color: #29CCB1;
+            font-weight: 900;
+          }
+          
+          .welcome-message {
+            font: normal normal bold 18px/24px Arial;
+            letter-spacing: 0.14px;
+            color: #1D1D1B;
+            text-align: center;
+            opacity: 1;
+            margin-bottom: 20px;
+          }
+          
+          .description {
+            font: normal normal bold 18px/24px Arial;
+            letter-spacing: 0.14px;
+            color: #1D1D1B;
+            text-align: center;
+            opacity: 1;
+            margin-bottom: 20px;
+          }
+          
+          .instructions {
+            font: normal normal normal 18px/24px Arial;
+            letter-spacing: 0.14px;
+            color: #1D1D1B;
+            text-align: center;
+            opacity: 1;
+            margin-bottom: 20px;
+          }
+          
+          .instructions a {
+            color: #29CCB1;
+            text-decoration: none;
+            font-weight: bold;
+          }
+          
+          .cta-button {
+            display: inline-block;
+            padding: 16px 40px;
+            background-color: #29CCB1;
+            color: #FFFFFF !important;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 18px;
+            margin: 20px 0;
+            text-align: center;
+            opacity: 1;
+          }
+          
+          .cta-button:hover {
+            background-color: #25B89F;
+          }
+          
+          .logo-kaspersky {
+            width: 232px;
+            height: 333px;
+            max-width: 100%;
+            display: block;
+            margin: 30px auto;
+            background: transparent no-repeat padding-box;
+            opacity: 1;
+          }
+          
+          .footer-section {
+            background-color: #FFFFFF;
+            padding: 0;
+            text-align: center;
+          }
+          
+          .footer-image {
+            width: 100%;
+            max-width: 600px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+          }
+          
+          @media only screen and (max-width: 600px) {
+            .content-section {
+              padding: 20px;
+            }
+            
+            .greeting, .welcome-message {
+              font-size: 16px;
+            }
+            
+            .description, .instructions, .important-text {
+              font-size: 14px;
+            }
+            
+            .cta-button {
+              padding: 14px 30px;
+              font-size: 14px;
+            }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="email-container">
+          <!-- Hero Image Section -->
+          <div class="hero-image-section">
+            <img 
+              src="${leftImageUrl}" 
+              srcset="${leftImageUrl} 1x, ${leftImage2xUrl} 2x"
+              alt="Kaspersky Cup - Aplique su mejor táctica" 
+              class="hero-image"
+              style="width: 536px; height: 850px; max-width: 100%; display: block; margin: 0 auto;"
+            />
+          </div>
+          
+          <!-- Content Section -->
+          <div class="content-section" style="text-align: center; padding: 40px 68px;">
+            <h1 class="greeting" style="font: normal normal 900 45px/50px Arial; letter-spacing: 0.36px; text-transform: uppercase; color: #1D1D1B; margin-bottom: 20px;">
+              HOLA <span style="color: #29CCB1;">${userName.toUpperCase()}</span>
+            </h1>
+            
+            <p class="welcome-message" style="font: normal normal bold 18px/24px Arial; letter-spacing: 0.14px; color: #1D1D1B; margin-bottom: 20px;">
+              ¡Le damos la bienvenida a
+            </p>
+            
+            <!-- Logo Kaspersky Cup -->
+            <div style="margin: 30px 0;">
+              <img 
+                src="${logoUrl}" 
+                srcset="${logoUrl} 1x, ${logo2xUrl} 2x"
+                alt="Logo Kaspersky Cup" 
+                style="width: 232px; height: 333px; max-width: 100%; display: block; margin: 0 auto;"
+              />
+            </div>
+            
+            <p class="description" style="font: normal normal bold 18px/24px Arial; letter-spacing: 0.14px; color: #1D1D1B; margin-bottom: 20px;">
+              El programa donde sus ventas se transforman en goles y le permiten ganar premios mes a mes.
+            </p>
+            
+            <p class="instructions" style="font: normal normal normal 18px/24px Arial; letter-spacing: 0.14px; color: #1D1D1B; margin-bottom: 30px;">
+              Para ingresar a la plataforma, visite <a href="${magicLink}" style="color: #29CCB1; text-decoration: none; font-weight: bold;">kasperskycup.com</a>, ingrese el correo electrónico con el que se registró y recibirá un enlace de acceso para consultar su marcador y los goles que vaya acumulando.
+            </p>
+            
+            <!-- Magic Link Button -->
+            <div style="margin: 30px 0;">
+              <a href="${magicLink}" class="cta-button" style="display: inline-block; padding: 16px 40px; background-color: #29CCB1; color: #FFFFFF !important; text-decoration: none; border-radius: 8px; font-weight: 700; font-size: 18px;">
+                Ingresar a Kaspersky Cup
+              </a>
+            </div>
+          </div>
+          
+          <!-- Footer Section -->
+          <div class="footer-section">
+            <img 
+              src="${footerImageUrl}" 
+              alt="Kaspersky Cup Footer" 
+              class="footer-image"
+            />
+          </div>
+        </div>
+      </body>
+      </html>
+    `.trim();
+
+    sendSmtpEmail.textContent = `
+HOLA ${userName.toUpperCase()}
+
+¡Le damos la bienvenida a KASPERSKY CUP!
+
+El programa donde sus ventas se transforman en goles y le permiten ganar premios mes a mes.
+
+Para ingresar a la plataforma, visite kasperskycup.com, ingrese el correo electrónico con el que se registró y recibirá un enlace de acceso para consultar su marcador y los goles que vaya acumulando.
+
+Ingrese aquí: ${magicLink}
+
+Saludos,
+Kaspersky Cup
+    `.trim();
+
+    await apiInstance.sendTransacEmail(sendSmtpEmail);
+    console.log('✅ Registro passwordless email sent successfully to:', data.email);
+    return true;
+  } catch (error: any) {
+    console.error('❌ Error sending registro passwordless email:', error);
     
     if (error.response) {
       console.error('   Response status:', error.response.status);

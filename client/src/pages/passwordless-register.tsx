@@ -188,13 +188,23 @@ export default function PasswordlessRegister() {
     },
     onSuccess: (data) => {
       toast({
-        title: "¡Registro exitoso! 🎉",
-        description: data.message || "Te hemos enviado un email de bienvenida con tu enlace de acceso.",
+        title: t("auth.registrationCompleted"),
+        description: data.message || t("auth.registrationPendingApproval"),
+        duration: 5000,
       });
-      // Redirigir al login después de 2 segundos
+      
+      // Mostrar mensaje adicional de notificación
+      setTimeout(() => {
+        toast({
+          description: t("auth.youWillBeNotified"),
+          duration: 5000,
+        });
+      }, 1000);
+      
+      // Redirigir al login después de 4 segundos
       setTimeout(() => {
         setLocation("/login");
-      }, 2000);
+      }, 4000);
     },
     onError: (error: any) => {
       toast({
