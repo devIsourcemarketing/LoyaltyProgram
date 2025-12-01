@@ -1165,7 +1165,7 @@ export class DatabaseStorage implements IStorage {
 
   async getAllUsers(regionName?: string): Promise<User[]> {
     if (regionName) {
-      // Regional admin: solo ve usuarios de su REGIÓN (NOLA, SOLA, BRASIL, MEXICO)
+      // Regional admin: solo ve usuarios APROBADOS de su REGIÓN (NOLA, SOLA, BRASIL, MEXICO)
       // Excluir super-admins (que tienen region diferente o roles especiales)
       return await db
         .select()
@@ -1173,13 +1173,18 @@ export class DatabaseStorage implements IStorage {
         .where(
           and(
             eq(users.region, regionName as "NOLA" | "SOLA" | "BRASIL" | "MEXICO"),
-            ne(users.role, "super-admin") // Excluir super-admins
+            ne(users.role, "super-admin"), // Excluir super-admins
+            eq(users.isApproved, true) // Solo usuarios aprobados
           )
         )
         .orderBy(desc(users.createdAt));
     }
-    // Super admin: ve todos los usuarios
-    return await db.select().from(users).orderBy(desc(users.createdAt));
+    // Super admin: ve todos los usuarios APROBADOS
+    return await db
+      .select()
+      .from(users)
+      .where(eq(users.isApproved, true))
+      .orderBy(desc(users.createdAt));
   }
 
   async getPendingUsers(regionName?: string): Promise<User[]> {
