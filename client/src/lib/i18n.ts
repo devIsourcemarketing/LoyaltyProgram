@@ -20,6 +20,7 @@ const translations = {
     common: {
       dashboard: "Dashboard",
       deals: "My Deals",
+      termsAndConditions: "Terms and Conditions",
       rewards: "Rewards",
       reports: "Reports",
       profile: "Profile",
@@ -402,6 +403,127 @@ const translations = {
       updateDeal: "Update Deal",
       submitDeal: "Submit Deal",
       status: "Status",
+      TyCtitle1: "1. Organization",
+      TyCtext1: `The Kaspersky Cup program (hereinafter, “the Program”) is organized by Kaspersky to recognize and reward the sales performance of its business partners in the region through a goal accumulation system. Goals can be redeemed for monthly prizes and a final Grand Prize.`,
+      TyCtitle2: "2. Duration",
+      TyCtext2: `The Program begins in December 2025 and ends with the awarding of the Grand Prize to the top scorer, scheduled for April 2026, unless Kaspersky announces an official extension.`,
+      TyCtitle3: "3. Participation",
+      TyCtext3: `Authorized Kaspersky partner salespeople who meet the Program requirements are eligible to participate. By participating, you agree to be bound by these Terms and Conditions.`,
+      TyCtitle4: "4. Definitions",
+      TyCtext4: `- Play: Each registered sale, whether to new customers or renewals.
+
+      - Goal: A unit of value obtained based on the USD amount of each play, according to the Program rules.
+
+      - Prize of the Month: Monthly reward redeemable upon accumulating the required number of goals.
+
+      - Grand Prize: Main prize awarded to the participant with the most accumulated goals as of the end of April 2026, by Partner category, market segment, and region.`,
+      TyCtitle5: "5. Goal Accumulation and Play Registration",
+      TyCtext5: `Plays will be converted into goals as follows:
+
+      - For every US$1,000 in sales to new customers = 1 goal
+
+      - For every US$2,000 in renewals = 1 goal
+
+      To accumulate goals, please note the following:
+
+      1. KUDOS Registration: Sales must be registered by you on the KUDOS platform. Only sales registered and validated in this system will be considered valid.
+
+      2. Sales Validation: The Kaspersky Cup team will verify each registered sale. Only valid sales will be added as plays to the Program.
+
+      3. Conversion into Plays:
+      Once validated, sales will be registered as plays and will allow you to accumulate goals.
+
+      4. Notification:
+      You will receive an email notification and an in-platform notification when a play has been registered in your name, with details of the goals scored.
+
+      5. Checking Goals:
+      You can view your total accumulated goals on the platform's main dashboard.`,
+      TyCtitle6: "6. Redeem Monthly Prizes:",
+      TyCtext6: `Each month, you can redeem your accumulated goals for the Prize of the Month, available in the "My Prizes" section of the platform.
+
+      - Once you reach the required number of goals, you can click "Redeem."
+
+      - Your request will be reviewed and approved by the Kaspersky Cup team.
+
+      - Prizes have limited quantities and are awarded on a first-come, first-served basis.
+
+      The valid sale date will be the date it was processed by Kaspersky, regardless of the registration or validation date on KUDOS.
+
+      Redemption and Key Dates:
+
+      - You can redeem your prize at any time during the month if you have already reached the required number of goals.
+
+      - There will be a grace period until the 10th of the following month to redeem the previous month's prize.
+
+      - Redemption is subject to prize availability at the time of the request.
+
+      Prize images are for illustrative purposes only. Design, color, or features may vary depending on the country or provider.`,
+      TyCtitle7: "7. Grand Prize",
+      TyCtext7: `The participant with the highest number of accumulated goals by April 2026 in each of the following categories will be declared the Grand Prize winner:
+
+      - Partner Level
+
+      - Market Segment
+
+      - Region
+
+      The Grand Prize includes:
+
+      - One (1) individual ticket to a 2026 FIFA World Cup match
+
+      - Round-trip flights
+
+      - Accommodation
+
+      - Meals
+
+      This prize is personal and non-transferable. If the winner is unable to travel for any reason, the prize will automatically be awarded to the participant who finishes second in the corresponding ranking.`,
+      TyCtitle8: "8. Travel Prize Conditions",
+      TyCtext8: `- You are responsible for having a valid passport, visa (if applicable), and complying with all applicable health and immigration requirements.
+
+      - Any additional expenses not specified as included (airport transfers, tips, personal expenses, local taxes, etc.) are your responsibility.
+
+      - The match ticket cannot be exchanged for another event or transferred to third parties.
+
+      - Goals cannot be donated, transferred, or accumulated between participants.
+
+      If the winner does not meet the travel requirements, they forfeit the prize without compensation. No transfer, refund, or substitution will be permitted.`,
+      TyCtitle9: "9. Validity and Expiration of Prizes",
+      TyCtext9: `- Monthly prizes must be redeemed exclusively within the month in which they were offered.
+
+      - Once this period has ended, participants will have an additional grace period until the 10th of the following month to redeem their prize, provided the sale that generated the goals has a valid date within the prize month.
+
+      - If participants do not redeem their prize within the indicated period, they will forfeit the right to redeem that prize, without the right to compensation or replacement.
+
+      - Prizes are subject to availability at the time of the request. If the prize inventory for the month is depleted, no further redemptions can be processed, even if the participant has the required goals.
+
+      - Goals not used in a given month cannot be used to redeem prizes for subsequent months, although they will continue to be added to the calculation of the season's Grand Prize.
+
+      - Goals cannot be exchanged for cash or additional rewards after the Program closes.
+
+      - In the event that the monthly prize is not available in the participant's country, and only in exceptional circumstances, Kaspersky may award a prize of equivalent value in the form of an electronic gift card (e.g., Amazon Gift Card), subject to local availability and the provider's terms and conditions.
+
+      - The images or photographs of the prizes displayed on the platform or in Program communications are for illustrative purposes only. The prizes awarded may vary in features, design, color, or availability, depending on the country and the local provider. In such cases, a prize of equivalent value or category will be awarded, without this constituting a breach of contract on the part of Kaspersky.`,
+      TyCtitle10: "10. Program Modifications",
+      TyCtext10: `Kaspersky reserves the right to modify, suspend, or cancel the Program, its terms, prizes, or conditions at any time and without prior notice. Modifications will be communicated through the official Kaspersky Cup channels.`,
+      TyCtitle11: "11. Limitation of Liability",
+      TyCtext11: `Kaspersky will not be liable for:
+
+      - Delays in prize delivery
+
+      - Event cancellations
+
+      - Logistical or administrative problems of third parties (airlines, hotels, suppliers)
+
+      - Damages, losses, or harm arising directly or indirectly from participation in the Program
+
+      Kaspersky's liability is limited exclusively to the value of the prize won.`,
+      TyCtitle12: "12. Processing of Personal Data",
+      TyCtext12: `By participating, you authorize Kaspersky to collect and process your personal data (name, email, contact information, sales data, among others) for purposes related to the management of the Program and the delivery of prizes. You also authorize the receipt of communications and notifications related to your participation.`,
+      TyCtitle13: "13. Acceptance of Terms",
+      TyCtext13: `Participation in the Program implies full and unreserved acceptance of these Terms and Conditions, as well as all decisions made by Kaspersky in relation to it.`,
+      TyCtitle14: "14. Contact and support",
+      TyCtext14: `For any questions, queries or complaints related to the Program, please contact the support team through the official channels available on the platform.`,    
     },
     rewards: {
       catalog: "Rewards Catalog",
@@ -996,7 +1118,7 @@ const translations = {
           duplicateConfig: "A configuration already exists for this region, category, and subcategory combination",
         },
       },
-    },
+    },    
   },
   es: {
     validation: {
@@ -1019,6 +1141,7 @@ const translations = {
     common: {
       dashboard: "Panel de Control",
       deals: "Mis Tratos",
+      termsAndConditions: "Términos y Condiciones",
       rewards: "Recompensas",
       reports: "Reportes",
       profile: "Perfil",
@@ -1401,6 +1524,132 @@ const translations = {
       updateDeal: "Actualizar Trato",
       submitDeal: "Enviar Trato",
       status: "Estado",
+      TyCtitle1: "1. Organización",
+      TyCtext1: "El programa Kaspersky Cup (en adelante, “el Programa”) es organizado por Kaspersky con el objetivo de reconocer y premiar el desempeño de ventas de sus socios comerciales en la región, mediante un sistema de acumulación de goles que pueden canjearse por premios mensuales y un Gran Premio final.",
+      TyCtitle2: "2. Vigencia",
+      TyCtext2: "El Programa inicia en diciembre de 2025 y finaliza con la entrega del Gran Premio al máximo goleador, prevista para abril de 2026, salvo que Kaspersky anuncie una prórroga oficial.",
+      TyCtitle3: "3. Participación",
+      TyCtext3: "Podrán participar los vendedores de socios autorizados por Kaspersky que cumplan con los requisitos del Programa.  Al participar, usted acepta quedar sujeto a estos Términos y Condiciones.",
+      TyCtitle4: "4. Definiciones",
+      TyCtext4: `- Jugada: Cada venta registrada, ya sea a nuevos clientes o por renovación.
+
+      - Gol: Unidad de valor obtenida según el monto en USD de cada jugada, conforme a las reglas del Programa.
+
+      - Premio del mes: Recompensa mensual que puede canjearse al acumular la cantidad de goles requerida.
+
+      - Gran Premio: Premio principal otorgado al participante con más goles acumulados al cierre de abril de 2026, por categoría de Partner, segmento de mercado y región.`,
+      TyCtitle5: "5. Acumulación de goles y registro de jugadas",
+      TyCtext5: `Las jugadas se convertirán en goles de la siguiente forma:
+      
+      - Por cada US$1,000 en ventas a nuevos clientes = 1 gol
+
+      - Por cada US$2,000 en renovaciones = 1 gol
+      
+      Para acumular goles, tenga en cuenta lo siguiente:
+      
+      1. Registro en KUDOS:
+      Las ventas deben ser registradas por usted en la plataforma KUDOS. Solo se considerarán válidas las ventas registradas y validadas en dicho sistema.
+
+      2. Validación de ventas:
+      El equipo de Kaspersky Cup verificará cada venta registrada. Solo las ventas válidas serán añadidas como jugadas al Programa.
+
+
+      3. Conversión en jugadas:
+      Una vez validadas, las ventas serán registradas como jugadas y permitirán la acumulación de goles.
+
+
+      4. Notificación:
+      Usted recibirá una notificación por correo electrónico y dentro de la plataforma cuando una jugada haya sido registrada a su nombre, con el detalle de los goles obtenidos.
+
+
+      5. Consulta de goles:
+      Podrá visualizar su total de goles acumulados en el panel principal de la plataforma.`,
+      TyCtitle6: "6. Canje de premios del mes",
+      TyCtext6: `Cada mes, usted podrá canjear sus goles acumulados por el Premio del Mes, disponible en la sección “Mis premios” de la plataforma.
+      
+      - Al alcanzar la cantidad de goles requerida, podrá hacer clic en “Canjear”.
+
+      - Su solicitud será revisada y aprobada por el equipo de Kaspersky Cup.
+
+      - Los premios tienen unidades limitadas y se entregan por orden de solicitud.
+
+      La fecha válida de la venta será la fecha en que fue procesada por Kaspersky, independientemente del momento de registro o validación en KUDOS.
+
+      Redención y fechas clave:
+      
+      - Podrá canjear su premio en cualquier momento dentro del mes si ya ha alcanzado los goles necesarios.
+
+      - Habrá un período de gracia hasta el día 10 del mes siguiente para redimir el premio del mes anterior.
+
+      - El canje está sujeto a la disponibilidad del premio al momento de la solicitud.
+
+      Las imágenes de los premios son referenciales. El diseño, color o características pueden variar según país o proveedor.`,
+      TyCtitle7: "7. Gran Premio",
+      TyCtext7: `Será declarado ganador del Gran Premio el participante con mayor cantidad de goles acumulados hasta abril de 2026, en cada una de las siguientes categorías:
+      
+      - Nivel de Partner
+
+      - Segmento de mercado
+
+      - Región
+
+      El Gran Premio incluye:
+
+      - Una (1) entrada individual para un partido del Mundial de Fútbol FIFA 2026
+
+      - Vuelos de ida y vuelta
+
+      - Hospedaje
+
+      - Alimentación
+
+      Este premio es personal e intransferible. Si el ganador no puede viajar por cualquier motivo, el premio será automáticamente asignado al participante que ocupe el segundo lugar en la tabla correspondiente.`,
+      TyCtitle8: "8. Condiciones del Premio de Viaje",
+      TyCtext8: `- Usted es responsable de contar con pasaporte vigente, visa (si corresponde), y de cumplir con todos los requisitos sanitarios y migratorios aplicables.
+
+      - Cualquier gasto adicional no especificado como incluido (traslados al aeropuerto, propinas, gastos personales, impuestos locales, etc.) correrá por su cuenta.
+
+      - La entrada al partido no podrá cambiarse por otro evento ni transferirse a terceros.
+
+      - Los goles no pueden ser donados, transferidos o acumulados entre participantes.
+
+      Si el ganador no cumple con los requisitos de viaje, pierde el derecho al premio sin compensación alguna. No se permitirá transferencia, reembolso ni sustitución.`,
+      TyCtitle9: "9. Vigencia y validez de los premios",
+      TyCtext9: `- Los premios mensuales deben ser canjeados exclusivamente dentro del período correspondiente al mes en el que se ofrecieron.
+
+      - Una vez finalizado ese período, el participante contará con un plazo de gracia adicional hasta el día 10 del mes siguiente para realizar el canje, siempre que la venta que generó los goles tenga una fecha válida dentro del mes del premio.
+
+      - Si el participante no realiza el canje dentro del plazo indicado, perderá el derecho a redimir ese premio, sin derecho a compensación ni sustitución.
+
+      - Los premios están sujetos a disponibilidad en el momento de la solicitud. Si el inventario del premio del mes se agota, no se podrán procesar nuevas redenciones, incluso si el participante cuenta con los goles requeridos.
+
+      - Los goles no utilizados en un mes no podrán usarse para canjear premios de meses posteriores, aunque seguirán sumándose para el cálculo del Gran Premio de la temporada.
+
+      - No se permitirá canjear goles por dinero en efectivo ni por recompensas adicionales al cierre del Programa.
+
+      - En caso de que el premio mensual no esté disponible en el país del participante, y únicamente en situaciones excepcionales, Kaspersky podrá entregar un premio equivalente en valor en forma de tarjeta de regalo electrónica (por ejemplo, Amazon Gift Card), según la disponibilidad local y las condiciones del proveedor.
+
+      - Las imágenes o fotografías de los premios presentadas en la plataforma o en las comunicaciones del Programa son referenciales. Los premios entregados podrían presentar variaciones en características, diseño, color o disponibilidad, dependiendo del país y del proveedor local. En esos casos, se entregará una versión equivalente al valor o categoría del premio anunciado, sin que esto represente incumplimiento de parte de Kaspersky.`,
+      TyCtitle10: "10. Modificaciones del Programa",
+      TyCtext10: `Kaspersky se reserva el derecho de modificar, suspender o cancelar el Programa, sus términos, premios o condiciones, en cualquier momento y sin previo aviso. Las modificaciones serán comunicadas a través de los canales oficiales de Kaspersky Cup.`,
+      TyCtitle11: "11. Limitación de responsabilidad",
+      TyCtext11: `Kaspersky no será responsable por:
+      
+      - Retrasos en la entrega de premios
+
+      - Cancelaciones de eventos
+
+      - Problemas logísticos o administrativos de terceros (aerolíneas, hoteles, proveedores)
+
+      - Daños, pérdidas o perjuicios derivados directa o indirectamente de la participación en el Programa
+
+      La responsabilidad de Kaspersky queda limitada exclusivamente al valor del premio ganado.`,
+      TyCtitle12: "12. Tratamiento de datos personales",
+      TyCtext12: `Al participar, usted autoriza a Kaspersky a recolectar y procesar sus datos personales (nombre, correo, contacto, datos de ventas, entre otros) con fines relacionados a la gestión del Programa y entrega de premios. Asimismo, autoriza la recepción de comunicaciones y notificaciones relativas a su participación.`,
+      TyCtitle13: "13. Aceptación de términos",
+      TyCtext13: `La participación en el Programa implica la aceptación plena y sin reservas de estos Términos y Condiciones, así como de todas las decisiones adoptadas por Kaspersky en relación con el mismo.`,
+      TyCtitle14: "14. Contacto y soporte",
+      TyCtext14: "Para cualquier duda, consulta o reclamo relacionado con el Programa, por favor comuníquese con el equipo de soporte a través de los canales oficiales disponibles en la plataforma.",    
     },
     rewards: {
       catalog: "Catálogo de Recompensas",
@@ -1995,7 +2244,7 @@ const translations = {
           duplicateConfig: "Ya existe una configuración para esta combinación de región, categoría y subcategoría",
         },
       },
-    },
+    },    
   },
   pt: {
     validation: {
@@ -2020,6 +2269,7 @@ const translations = {
       rewardNotFound: "Recompensa não encontrada",
       dashboard: "Painel de Controle",
       deals: "Meus Negócios",
+      termsAndConditions: "Termos e Condições",
       rewards: "Recompensas",
       reports: "Relatórios",
       profile: "Perfil",
@@ -2397,6 +2647,106 @@ const translations = {
       updateDeal: "Atualizar Negócio",
       submitDeal: "Enviar Negócio",
       status: "Status",
+      TyCtitle1: "1. Organização",
+      TyCtext1: `O programa Kaspersky Cup (o “Programa”) é organizado pela Kaspersky para seus parceiros em toda a região, com o objetivo de reconhecer e recompensar as vendas por meio de um sistema de “gols” e prêmios.`,
+      TyCtitle2: "2. Vigência",
+      TyCtext2: `O Programa terá início em dezembro de 2025 e terminará com a entrega do Grande Prêmio ao artilheiro, prevista para abril de 2026, salvo prorrogação previamente anunciada pela Kaspersky.`,
+      TyCtitle3: "3. Participação",
+      TyCtext3: `Poderão participar todos os vendedores dos parceiros autorizados pela Kaspersky que cumprirem os requisitos do Programa. Ao ser registrado pela Kaspersky e participar, o participante aceita estar sujeito a estes Termos e Condições.`,
+      TyCtitle4: "4. Definições",
+      TyCtext4: `- Jogada: Cada negócio ou venda concluída durante o mês, seja para novos clientes ou renovações.
+      
+      - Gol: Unidade de valor atribuída conforme o valor em dólares (USD) de cada jogada, de acordo com as regras de conversão do Programa.
+      
+      - Prêmio do Mês: Recompensa que pode ser resgatada a cada mês ao acumular a quantidade necessária de gols.
+      
+      - Grande Prêmio: O prêmio máximo concedido ao maior goleador acumulado até abril de 2026, considerando cada nível de Parceiro, Segmento de Mercado e Região.`,
+      TyCtitle5: "5. Acumulação de gols e registro de jogadas",
+      TyCtext5: `As jogadas serão convertidas em gols conforme as seguintes regras:
+
+      - A cada US$ 1.000 em pedidos de novos clientes = 1 gol.
+
+      - A cada US$ 2.000 em pedidos de renovações = 1 gol.
+
+      As vendas e jogadas do mês são acumuladas durante todo o período mensal (por exemplo, de 1º a 31 de dezembro). As jogadas serão registradas com base nas vendas que o participante tiver previamente registrado na plataforma KUDOS, o sistema oficial de registro de negócios.
+      
+      Para que uma jogada seja registrada, o participante deve observar as seguintes etapas:
+      
+      1. Registro das vendas no KUDOS: Todas as vendas devem ser registradas previamente pelo participante na plataforma KUDOS. Somente essas vendas serão consideradas para participação no Kaspersky Cup.
+      
+      2. Revisão pela equipe do Kaspersky Cup: A equipe do Kaspersky Cup revisará as vendas registradas no KUDOS, verificará sua validade e adicionará ao Programa apenas as vendas consideradas válidas.
+      
+      3. Conversão em jogada: As vendas validadas no KUDOS serão convertidas em jogadas e adicionadas ao Programa pela equipe do Kaspersky Cup. Cada jogada permitirá ao participante acumular gols.
+      
+      4. Notificação de jogada registrada: Quando uma jogada for registrada em nome do participante, ele receberá uma notificação por e-mail e dentro da plataforma com o detalhamento dos gols acumulados.
+      
+      5. Visualização dos gols: Os gols acumulados estarão disponíveis no painel principal da plataforma.
+      
+      Importante: As vendas que não estiverem registradas e validadas no KUDOS não serão consideradas jogadas e, portanto, não gerarão gols.
+      
+      - Durante cada mês, os participantes poderão visualizar seu total de gols acumulados no painel da plataforma e poderão resgatar o Prêmio do Mês caso tenham alcançado a quantidade necessária.
+      
+      - Se o participante atingir os gols necessários antes do final do mês, poderá realizar o resgate imediatamente e em qualquer momento dentro desse mesmo período.
+      
+      Além disso, o participante contará com um período de tolerância até o dia 10 do mês seguinte para concluir o resgate do prêmio referente ao mês anterior, desde que a venda tenha uma data válida dentro do mês correspondente ao prêmio.
+      
+      O resgate estará sempre sujeito à disponibilidade do prêmio no momento da solicitação`,
+      TyCtitle6: "6. Resgate dos prêmios do mês",
+      TyCtext6: `O participante poderá resgatar seus gols acumulados a cada mês pelo “Prêmio do Mês” disponível, selecionando a opção “Resgatar” na seção “Meus prêmios”. A equipe do Kaspersky Cup revisará a solicitação e notificará sua aprovação. Os prêmios mudam a cada mês e cada um é melhor do que o anterior.
+      
+      A data válida da venda será sempre a data real da transação processada pela Kaspersky, independentemente da data de registro no KUDOS ou de sua validação.
+      
+      Os prêmios mensais possuem quantidade limitada e serão concedidos conforme a ordem em que as solicitações de resgate forem recebidas. Uma vez esgotado o estoque do mês, não será possível processar novos resgates, mesmo que o participante tenha a quantidade necessária de gols.
+      
+      É importante mencionar que as imagens ou fotografias dos prêmios mensais exibidas na plataforma ou nas comunicações do Programa são meramente ilustrativas. Os prêmios entregues podem apresentar variações em características, design ou disponibilidade, dependendo do país ou fornecedor.`,
+      TyCtitle7: "7. Grande Prêmio",
+      TyCtext7: `O participante que acumular o maior número de gols por nível de Parceiro, Segmento de Mercado e Região até o final de abril de 2026 será declarado o vencedor do Grande Prêmio. O Grande Prêmio consiste em:
+      
+      - Um (1) ingresso individual para um jogo da Copa do Mundo FIFA 2026
+
+      - Passagens aéreas de ida e volta, hospedagem e alimentação incluídas
+      
+      Este prêmio é pessoal e intransferível. O vencedor não poderá delegá-lo, cedê-lo ou transferi-lo a outra pessoa sob nenhuma circunstância.
+      
+      Caso o vencedor não possa viajar por qualquer motivo, o prêmio será automaticamente atribuído ao participante que ocupar o segundo lugar na tabela de posições correspondente.`,
+      TyCtitle8: "8. Termos específicos do Prêmio de Viagem",
+      TyCtext8: `- O vencedor é responsável por possuir passaporte válido, vistos (quando aplicável), seguro de viagem e por cumprir todos os requisitos necessários para viajar (documentação, requisitos de saúde, entre outros).
+      
+      - Custos adicionais não especificados como incluídos — como transporte até o aeroporto, gorjetas, gastos pessoais, impostos locais, entre outros — serão de responsabilidade exclusiva do vencedor.
+      
+      - O ingresso para o jogo não poderá ser alterado para outro evento ou data. O vencedor deverá comparecer ao jogo designado.
+      
+      - Os prêmios, incluindo o ingresso para a Copa do Mundo, não poderão ser convertidos em dinheiro, nem transferidos ou cedidos a outra pessoa.
+      
+      - O vencedor não poderá doar nem transferir seus gols para outro participante em nenhuma circunstância.
+      
+      - Este prêmio é estritamente pessoal, e não poderá ser transferido, delegado, presenteado ou cedido a qualquer outra pessoa sob hipótese alguma.
+      
+      - Caso o vencedor não possa realizar a viagem por falta de documentação, requisitos, restrições pessoais ou qualquer outro motivo, ele perderá o prêmio, sem direito a compensação em dinheiro, e não será permitido transferir a experiência para outra pessoa. A atribuição do prêmio seguirá as regras estabelecidas neste documento.`,
+      TyCtitle9: "9. Vigência e validade dos prêmios",
+      TyCtext9: `Os prêmios mensais devem ser consultados e resgatados dentro do período indicado. Caso isso não ocorra, o participante perderá o direito ao prêmio. A equipe do Kaspersky Cup reserva-se o direito de modificar os prêmios, as quantidades de gols necessárias ou até mesmo cancelar o Programa em circunstâncias de força maior.
+      
+      Os gols não utilizados em um mês continuarão acumulando para o cálculo do Grande Prêmio, mas não poderão ser usados para resgatar o prêmio do mês seguinte. Também não poderão ser convertidos em dinheiro ou recompensas adicionais ao final do Programa.
+      
+      Caso o prêmio mensal não esteja disponível no país do participante, e somente em situações extremas, será entregue um equivalente em valor, no formato de gift cards da Amazon.
+      
+      É importante esclarecer que as imagens ou fotografias dos prêmios mensais exibidas na plataforma ou nas comunicações do Programa são meramente ilustrativas. Os prêmios poderão apresentar variações em características, design, cor ou disponibilidade, dependendo do país ou fornecedor. Nesses casos, será entregue uma versão equivalente ao prêmio anunciado.`,
+      TyCtitle10: "10. Dados pessoais e comunicação",
+      TyCtext10: `Ao participar do Programa, o participante autoriza a Kaspersky a coletar e processar seus dados pessoais para fins de administração do Programa. Isso inclui, mas não se limita a: número de contato, e-mail e informações relacionadas às jogadas e prêmios.
+      
+      O participante também autoriza a Kaspersky a entrar em contato para fins de acompanhamento do Programa e envio de notificações.`,
+      TyCtitle11: "11. Responsabilidades",
+      TyCtext11: `A Kaspersky não se responsabiliza por atrasos ou demoras na entrega dos prêmios enviados ao domicílio.
+      
+      Também não se responsabiliza por atrasos, cancelamentos ou modificações de viagens, nem por falhas de terceiros (companhias aéreas, serviços de hospedagem, entre outros). A responsabilidade do vencedor em relação ao prêmio de viagem limita-se ao cumprimento dos requisitos estabelecidos.`,
+      TyCtitle12: "12. Legal e tributário",
+      TyCtext12: `O Grande Prêmio não é transferível e não pode ser convertido em dinheiro. Qualquer obrigação fiscal aplicável ao prêmio é de responsabilidade do vencedor.
+      
+      O prêmio deverá ser utilizado exclusivamente pelo vencedor e não poderá ser delegado, cedido ou utilizado por terceiros sob nenhuma circunstância.`,
+      TyCtitle13: "13. Aceitação",
+      TyCtext13: `A participação no Programa implica a aceitação integral destes Termos e Condições e das decisões adotadas pela Kaspersky em relação ao Programa.`,
+      TyCtitle14: "14. Contato e suporte",
+      TyCtext14: `Se você tiver qualquer dúvida ou problema relacionado ao Programa, poderá entrar em contato conosco por meio dos canais oficiais de suporte disponíveis na plataforma.`,
     },
     rewards: {
       catalog: "Catálogo de Recompensas",
@@ -2960,7 +3310,7 @@ const translations = {
           duplicateConfig: "Já existe uma configuração para esta combinação de região, categoria e subcategoria",
         },
       },
-    },
+    },    
   },
 };
 

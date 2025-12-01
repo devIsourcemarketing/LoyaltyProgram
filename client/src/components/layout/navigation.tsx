@@ -103,7 +103,7 @@ export default function Navigation({ user }: NavigationProps) {
       ]
     : [
         { href: "/", label: t("common.dashboard"), current: location === "/" },
-        { href: "/deals", label: t("common.deals"), current: location === "/deals" },
+        { href: "/deals", label: t("common.termsAndConditions"), current: location === "/deals" },
         { href: "/rewards", label: t("common.rewards"), current: location === "/rewards" },
       ];
 
