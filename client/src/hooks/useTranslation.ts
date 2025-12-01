@@ -1,25 +1,15 @@
-import { useState, useEffect } from "react";
-import { t, getLanguage, setLanguage, type Language } from "@/lib/i18n";
+import { useLanguage } from "@/contexts/LanguageContext";
 
+/**
+ * Hook para usar traducciones en componentes
+ * Wrapper sobre useLanguage para mantener compatibilidad
+ */
 export function useTranslation() {
-  const [currentLanguage, setCurrentLanguage] = useState<Language>(getLanguage());
-
-  useEffect(() => {
-    // Initialize language from localStorage
-    const savedLanguage = getLanguage();
-    setCurrentLanguage(savedLanguage);
-  }, []);
-
-  const changeLanguage = (newLanguage: Language) => {
-    setLanguage(newLanguage);
-    setCurrentLanguage(newLanguage);
-    // Force a re-render by reloading the page
-    window.location.reload();
-  };
+  const { language, setLanguage, t } = useLanguage();
 
   return {
     t,
-    currentLanguage,
-    changeLanguage,
+    currentLanguage: language,
+    changeLanguage: setLanguage,
   };
 }

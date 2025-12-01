@@ -7,6 +7,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useQuery } from "@tanstack/react-query";
 import { getCurrentUser } from "./lib/auth";
 import { isAdminRole } from "@/lib/roles";
+import { LanguageProvider } from "@/contexts/LanguageContext";
 
 // Pages
 import Login from "@/pages/login";
@@ -125,12 +126,14 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <AuthProvider>
-          <Router />
-        </AuthProvider>
-      </TooltipProvider>
+      <LanguageProvider>
+        <TooltipProvider>
+          <Toaster />
+          <AuthProvider>
+            <Router />
+          </AuthProvider>
+        </TooltipProvider>
+      </LanguageProvider>
     </QueryClientProvider>
   );
 }

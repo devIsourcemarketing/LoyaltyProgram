@@ -18,6 +18,7 @@ import backgroundImage from "@assets/login.jpg";
 import kasperskyLogo from "@/assets/logo-kaspersky-cup.png";
 import { t } from '@/lib/i18n';
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { LanguageSelector } from "@/components/LanguageSelector";
 
 const loginSchema = z.object({
   username: z.string().min(1, "Username is required"),
@@ -324,6 +325,11 @@ export default function Login() {
       {/* Overlay for better readability */}
       <div className="absolute inset-0 bg-black/20 z-10"></div>
       
+      {/* Language Selector - Top Right */}
+      <div className="absolute top-4 right-4 z-30">
+        <LanguageSelector />
+      </div>
+      
       <Card className="relative z-20 w-full max-w-md bg-white/95 backdrop-blur-sm background-form-login">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
@@ -336,7 +342,7 @@ export default function Login() {
             {t('loginScreen.loginMainSubtitle')}            
           </p>          
           <p className="text-gray-600 mt-2">
-            {isLogin ? "Log in to your account" : "Crea tu cuenta"}
+            {isLogin ? t('auth.logInToYourAccount') : t('auth.signUp')}
           </p>
         </CardHeader>
         <CardContent>
@@ -396,11 +402,11 @@ export default function Login() {
             <div className="space-y-4">
               {/* Email input - siempre visible */}
               <div className="space-y-2">
-                <Label htmlFor="email-login">{t("common.email")}</Label>
+                <Label htmlFor="email-login">{t("auth.emailLabel")}</Label>
                 <Input
                   id="email-login"
                   type="email"
-                  placeholder={t("auth.yourEmail")}
+                  placeholder={t("auth.yourEmailPlaceholder")}
                   value={emailForLogin}
                   onChange={(e) => {
                     setEmailForLogin(e.target.value);
@@ -420,11 +426,11 @@ export default function Login() {
                       name="password"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Password</FormLabel>
+                          <FormLabel>{t("auth.passwordLabel")}</FormLabel>
                           <FormControl>
                             <Input
                               type="password"
-                              placeholder="Enter your password"
+                              placeholder={t("auth.enterYourPassword")}
                               data-testid="input-password"
                               value={field.value}
                               onChange={field.onChange}
@@ -443,7 +449,7 @@ export default function Login() {
                       disabled={loginMutation.isPending}
                       data-testid="button-login"
                     >
-                      {loginMutation.isPending ? "Signing in..." : "Sign In"}
+                      {loginMutation.isPending ? t("auth.signingIn") : t("auth.signInButton")}
                     </Button>
                   </form>
                 </Form>
@@ -473,7 +479,7 @@ export default function Login() {
 
               {!emailForLogin && (
                 <div className="text-center text-sm text-muted-foreground py-4">
-                  Enter your email to continue
+                  {t("auth.enterEmailToContinue")}
                 </div>
               )}
             </div>
@@ -620,18 +626,7 @@ export default function Login() {
             </Form>
           )}
 
-          <div className="mt-6 text-center">
-            <button
-              type="button"
-              onClick={() => setIsLogin(!isLogin)}
-              className="text-primary-600 hover:text-primary-700 text-sm"
-              data-testid="button-toggle-auth"
-            >
-              {isLogin
-                ? "Don't have an account? Sign up"
-                : "Already have an account? Sign in"}
-            </button>
-          </div>
+          
         </CardContent>
       </Card>
     </div>

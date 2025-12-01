@@ -31,6 +31,7 @@ import {
   FROM_EMAIL,
   APP_URL
 } from "./emailService.js";
+import { detectPreferredLanguage } from "./geolocation.js";
 
 // Extend session data interface
 declare module 'express-session' {
@@ -4399,6 +4400,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         success: false, 
         message: "Failed to retry email" 
       });
+    }
+  });
+
+  /**
+   * GET /api/detect-language
+   * Endpoint para detectar el idioma preferido del usuario basado en su IP
+   */
+  app.get("/api/detect-language", async (req, res) => {
+    try {
+      const language = await detectPreferredLanguage(req);
+      res.json({ language });
+    } catch (error) {
+      console.error("Error detecting language:", error);
+      // Siempre retornar español por defecto en caso de error
+      res.json({ language: 'es' });
     }
   });
 

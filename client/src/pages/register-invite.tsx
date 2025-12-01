@@ -14,6 +14,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 import { REGION_HIERARCHY } from "@/../../shared/constants";
 import { useQuery } from "@tanstack/react-query";
+import { LanguageSelector } from "@/components/LanguageSelector";
 
 // Tipo para la jerarquía de regiones desde la API
 type RegionHierarchy = Record<string, {
@@ -317,6 +318,11 @@ export default function RegisterWithInvite() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-primary-100 p-4">
+      {/* Language Selector - Top Right */}
+      <div className="absolute top-4 right-4 z-30">
+        <LanguageSelector />
+      </div>
+      
       <Card className="w-full max-w-md">
         <CardHeader>
           <div className="flex items-center justify-center mb-4">
@@ -324,9 +330,9 @@ export default function RegisterWithInvite() {
               <CheckCircle className="h-6 w-6 text-primary-600" />
             </div>
           </div>
-          <CardTitle className="text-center text-2xl">Completa tu Registro</CardTitle>
+          <CardTitle className="text-center text-2xl">{t("auth.completeYourRegistration")}</CardTitle>
           <CardDescription className="text-center">
-            Bienvenido al Programa de Lealtad
+            {t("auth.welcomeToLoyaltyProgram")}
           </CardDescription>
         </CardHeader>
         <CardContent>

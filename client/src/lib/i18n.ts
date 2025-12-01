@@ -90,6 +90,8 @@ const translations = {
       emailPlaceholder: "user@example.com",
       usernamePlaceholder: "Choose a username",
       passwordPlaceholder: "Minimum 6 characters",
+      enterYourPassword: "Enter your password",
+      passwordLabel: "Password",
       confirmPasswordPlaceholder: "Repeat your password",
       selectRegion: "Select your region",
       selectCity: "Select your city",
@@ -97,7 +99,9 @@ const translations = {
       selectSubcategory: "Select your subcategory",
       selectLevel: "Select your level",
       alreadyHaveAccount: "Already have an account?",
+      alreadyHaveAccountSignIn: "Already have an account? Sign in",
       dontHaveAccount: "Don't have an account?",
+      dontHaveAccountSignUp: "Don't have an account? Sign up",
       loginFailed: "Login failed",
       registrationSuccess: "Registration successful",
       accessDenied: "Access Denied",
@@ -113,7 +117,7 @@ const translations = {
       passwordlessAccess: "🔐 Passwordless Access",
       magicLinkDescription: "Enter your email and we'll send you a magic link to access your account.",
       yourEmail: "Your email",
-      sendMagicLink: "Send Magic Link",
+      sendMagicLink: "Send Link",
       magicLinkSent: "If the email exists in our system, you will receive an access link. Check your inbox.",
       tokenNotProvided: "No valid access token was provided",
       successfulAccess: "✅ Successful access!",
@@ -150,6 +154,36 @@ const translations = {
       tooManyAttempts: "Too many attempts. Try again in 15 minutes.",
       linkExpired: "Your link expired. Request a new one.",
       linkAlreadyUsed: "This link was already used. Request another one.",
+      // Registration form
+      passwordlessRegistration: "Passwordless Registration",
+      completeYourInformation: "Complete your information to access Kaspersky Cup",
+      youWillReceiveEmail: "You will receive an email with a link to access your account",
+      emailLabel: "Email",
+      emailPlaceholderSimple: "email@example.com",
+      firstNameLabel: "First Name",
+      firstNamePlaceholder: "John",
+      lastNameLabel: "Last Name",
+      lastNamePlaceholder: "Smith",
+      regionLabel: "Region",
+      selectYourRegion: "Select your region",
+      categoryLabel: "Category",
+      selectYourCategory: "Select your category",
+      subcategoryLabel: "Subcategory",
+      selectYourSubcategory: "Select your subcategory",
+      countryLabel: "Country",
+      selectYourCountry: "Select your country",
+      cityLabel: "City",
+      selectYourCity: "Select your city",
+      completeRegistration: "Complete Registration",
+      completingRegistration: "Completing Registration...",
+      backToLogin: "← Back to login",
+      importantNotice: "Important: You will receive a welcome email with an access link. Your account will be activated once approved by an administrator.",
+      loadingRegistrationForm: "Loading registration form...",
+      completeYourRegistration: "Complete your Registration",
+      welcomeToLoyaltyProgram: "Welcome to the Loyalty Program",
+      enterEmailToContinue: "Enter your email to continue",
+      yourEmailPlaceholder: "Your email",
+      logInToYourAccount: "Log in to your account",
     },
     profile: {
       myProfile: "My Profile",
@@ -984,6 +1018,8 @@ const translations = {
       emailPlaceholder: "usuario@ejemplo.com",
       usernamePlaceholder: "Elige un nombre de usuario",
       passwordPlaceholder: "Mínimo 6 caracteres",
+      enterYourPassword: "Ingresa tu contraseña",
+      passwordLabel: "Contraseña",
       confirmPasswordPlaceholder: "Repite tu contraseña",
       selectRegion: "Selecciona tu región",
       selectCity: "Selecciona tu ciudad",
@@ -991,7 +1027,9 @@ const translations = {
       selectSubcategory: "Selecciona tu subcategoría",
       selectLevel: "Selecciona tu nivel",
       alreadyHaveAccount: "¿Ya tienes una cuenta?",
+      alreadyHaveAccountSignIn: "¿Ya tienes una cuenta? Inicia sesión",
       dontHaveAccount: "¿No tienes una cuenta?",
+      dontHaveAccountSignUp: "¿No tienes una cuenta? Regístrate",
       loginFailed: "Error al iniciar sesión",
       registrationSuccess: "Registro exitoso",
       accessDenied: "Acceso Denegado",
@@ -1007,7 +1045,7 @@ const translations = {
       passwordlessAccess: "🔐 Acceso sin Contraseña",
       magicLinkDescription: "Ingresa tu email y te enviaremos un enlace mágico para acceder a tu cuenta.",
       yourEmail: "Tu email",
-      sendMagicLink: "Enviar Enlace Mágico",
+      sendMagicLink: "Enviar Enlace",
       magicLinkSent: "Si el email existe en nuestro sistema, recibirás un enlace de acceso. Revisa tu bandeja de entrada.",
       tokenNotProvided: "No se proporcionó un token de acceso válido",
       successfulAccess: "✅ ¡Acceso exitoso!",
@@ -1044,6 +1082,36 @@ const translations = {
       tooManyAttempts: "Demasiados intentos. Intenta de nuevo en 15 minutos.",
       linkExpired: "Tu enlace venció. Solicita uno nuevo.",
       linkAlreadyUsed: "Este enlace ya fue utilizado. Pide otro.",
+      // Registration form
+      passwordlessRegistration: "Registro sin Contraseña",
+      completeYourInformation: "Completa tu información para acceder a Kaspersky Cup",
+      youWillReceiveEmail: "Recibirás un correo con un enlace para acceder a tu cuenta",
+      emailLabel: "Correo Electrónico",
+      emailPlaceholderSimple: "correo@ejemplo.com",
+      firstNameLabel: "Nombre",
+      firstNamePlaceholder: "Juan",
+      lastNameLabel: "Apellido",
+      lastNamePlaceholder: "García",
+      regionLabel: "Región",
+      selectYourRegion: "Selecciona tu región",
+      categoryLabel: "Categoría",
+      selectYourCategory: "Selecciona tu categoría",
+      subcategoryLabel: "Subcategoría",
+      selectYourSubcategory: "Selecciona tu subcategoría",
+      countryLabel: "País",
+      selectYourCountry: "Selecciona tu país",
+      cityLabel: "Ciudad",
+      selectYourCity: "Selecciona tu ciudad",
+      completeRegistration: "Completar Registro",
+      completingRegistration: "Completando Registro...",
+      backToLogin: "← Volver al inicio de sesión",
+      importantNotice: "Importante: Recibirás un correo de bienvenida con un enlace de acceso. Tu cuenta será activada una vez aprobada por un administrador.",
+      loadingRegistrationForm: "Cargando formulario de registro...",
+      completeYourRegistration: "Completa tu Registro",
+      welcomeToLoyaltyProgram: "Bienvenido al Programa de Lealtad",
+      enterEmailToContinue: "Ingresa tu correo para continuar",
+      yourEmailPlaceholder: "Tu correo electrónico",
+      logInToYourAccount: "Inicia sesión en tu cuenta",
     },
     profile: {
       myProfile: "Mi Perfil",
@@ -1875,6 +1943,8 @@ const translations = {
       emailPlaceholder: "usuario@exemplo.com",
       usernamePlaceholder: "Escolha um nome de usuário",
       passwordPlaceholder: "Mínimo 6 caracteres",
+      enterYourPassword: "Digite sua senha",
+      passwordLabel: "Senha",
       confirmPasswordPlaceholder: "Repita sua senha",
       selectRegion: "Selecione sua região",
       selectCity: "Selecione sua cidade",
@@ -1923,8 +1993,40 @@ const translations = {
       tooManyAttempts: "Muitas tentativas. Tente novamente em 15 minutos.",
       linkExpired: "Seu link expirou. Solicite um novo.",
       linkAlreadyUsed: "Este link já foi usado. Solicite outro.",
+      // Registration form
+      passwordlessRegistration: "Registro sem Senha",
+      completeYourInformation: "Complete suas informações para acessar Kaspersky Cup",
+      youWillReceiveEmail: "Você receberá um e-mail com um link para acessar sua conta",
+      emailLabel: "E-mail",
+      emailPlaceholderSimple: "email@exemplo.com",
+      firstNameLabel: "Nome",
+      firstNamePlaceholder: "João",
+      lastNameLabel: "Sobrenome",
+      lastNamePlaceholder: "Silva",
+      regionLabel: "Região",
+      selectYourRegion: "Selecione sua região",
+      categoryLabel: "Categoria",
+      selectYourCategory: "Selecione sua categoria",
+      subcategoryLabel: "Subcategoria",
+      selectYourSubcategory: "Selecione sua subcategoria",
+      countryLabel: "País",
+      selectYourCountry: "Selecione seu país",
+      cityLabel: "Cidade",
+      selectYourCity: "Selecione sua cidade",
+      completeRegistration: "Concluir Registro",
+      completingRegistration: "Concluindo Registro...",
+      backToLogin: "← Voltar ao login",
+      importantNotice: "Importante: Você receberá um e-mail de boas-vindas com um link de acesso. Sua conta será ativada após aprovação de um administrador.",
+      loadingRegistrationForm: "Carregando formulário de registro...",
+      completeYourRegistration: "Complete seu Registro",
+      welcomeToLoyaltyProgram: "Bem-vindo ao Programa de Fidelidade",
+      enterEmailToContinue: "Digite seu e-mail para continuar",
+      yourEmailPlaceholder: "Seu e-mail",
+      logInToYourAccount: "Faça login em sua conta",
       alreadyHaveAccount: "Já tem uma conta?",
+      alreadyHaveAccountSignIn: "Já tem uma conta? Faça login",
       dontHaveAccount: "Não tem uma conta?",
+      dontHaveAccountSignUp: "Não tem uma conta? Registre-se",
       loginFailed: "Falha no login",
       registrationSuccess: "Registro bem-sucedido",
       accessDenied: "Acesso Negado",
@@ -1934,7 +2036,7 @@ const translations = {
       passwordlessAccess: "🔐 Acesso sem Senha",
       magicLinkDescription: "Digite seu email e enviaremos um link mágico para acessar sua conta.",
       yourEmail: "Seu email",
-      sendMagicLink: "Enviar Link Mágico",
+      sendMagicLink: "Enviar Link",
     },
     profile: {
       myProfile: "Meu Perfil",
@@ -2650,35 +2752,56 @@ const translations = {
 
 export type Language = keyof typeof translations;
 
-let currentLanguage: Language = "en";
+/**
+ * Exportar traducciones para uso en el contexto
+ */
+export { translations };
 
-// Initialize language from localStorage on module load
-if (typeof window !== "undefined") {
-  const saved = localStorage.getItem("preferred-language") as Language;
-  if (saved && translations[saved]) {
-    currentLanguage = saved;
-  }
-}
-
-export const setLanguage = (lang: Language) => {
-  currentLanguage = lang;
-  localStorage.setItem("preferred-language", lang);
-};
-
-export const getLanguage = (): Language => {
-  if (typeof window !== "undefined") {
+/**
+ * Detecta automáticamente el idioma del usuario basado en su IP
+ * y lo guarda en localStorage
+ */
+export const autoDetectLanguage = async (): Promise<Language> => {
+  try {
+    // Primero verificar si ya hay un idioma guardado
     const saved = localStorage.getItem("preferred-language") as Language;
     if (saved && translations[saved]) {
-      currentLanguage = saved;
       return saved;
     }
+
+    // Intentar detectar por IP
+    const response = await fetch("/api/detect-language");
+    if (!response.ok) {
+      console.warn("Failed to detect language, using default: es");
+      return "es";
+    }
+
+    const data = await response.json();
+    const detectedLang = data.language as Language;
+
+    // Validar que el idioma detectado existe
+    if (detectedLang && translations[detectedLang]) {
+      localStorage.setItem("preferred-language", detectedLang);
+      return detectedLang;
+    }
+
+    return "es"; // Español por defecto
+  } catch (error) {
+    console.error("Error auto-detecting language:", error);
+    return "es"; // Español por defecto en caso de error
   }
-  return currentLanguage;
 };
 
+/**
+ * Función de traducción simple (para compatibilidad)
+ * Recomendado usar useLanguage().t en su lugar
+ */
 export const t = (key: string): string => {
+  const saved = (typeof window !== "undefined" ? localStorage.getItem("preferred-language") : null) as Language | null;
+  const lang = (saved && translations[saved] ? saved : 'es') as Language;
+  
   const keys = key.split(".");
-  let result: any = translations[currentLanguage];
+  let result: any = translations[lang];
   
   for (const k of keys) {
     result = result?.[k];

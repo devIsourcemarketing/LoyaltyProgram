@@ -16,6 +16,7 @@ import { AlertCircle, Loader2 } from "lucide-react";
 import backgroundImage from "@assets/login.jpg";
 import kasperskyLogo from "@/assets/logo-kaspersky-cup.png";
 import { REGION_HIERARCHY } from "@/../../shared/constants";
+import { LanguageSelector } from "@/components/LanguageSelector";
 
 // Tipo para la jerarquía de regiones desde la API
 type RegionHierarchy = Record<string, {
@@ -233,11 +234,16 @@ export default function PasswordlessRegister() {
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/20 z-10"></div>
       
+      {/* Language Selector - Top Right */}
+      <div className="absolute top-4 right-4 z-30">
+        <LanguageSelector />
+      </div>
+      
       {isLoadingHierarchy ? (
         <Card className="relative z-20 w-full max-w-md bg-white/95 backdrop-blur-sm">
           <CardContent className="pt-6 flex flex-col items-center">
             <Loader2 className="h-8 w-8 animate-spin text-[#29CCB1] mb-4" />
-            <p className="text-gray-600">Cargando formulario de registro...</p>
+            <p className="text-gray-600">{t("auth.loadingRegistrationForm")}</p>
           </CardContent>
         </Card>
       ) : (
@@ -247,13 +253,13 @@ export default function PasswordlessRegister() {
             <img src={kasperskyLogo} alt="Kaspersky Cup" className="w-auto" />
           </div>
           <h2 className="text-2xl font-bold text-[#1D1D1B] mb-2">
-            Passwordless Registration
+            {t("auth.passwordlessRegistration")}
           </h2>
           <p className="text-lg font-semibold text-[#29CCB1]">
-            Complete your information to access Kaspersky Cup
+            {t("auth.completeYourInformation")}
           </p>
           <p className="text-sm text-gray-600 mt-2">
-            You will receive an email with a link to access your account
+            {t("auth.youWillReceiveEmail")}
           </p>
         </CardHeader>
         
@@ -266,11 +272,11 @@ export default function PasswordlessRegister() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email *</FormLabel>
+                    <FormLabel>{t("auth.emailLabel")} *</FormLabel>
                     <FormControl>
                       <Input 
                         type="email" 
-                        placeholder="email@example.com" 
+                        placeholder={t("auth.emailPlaceholderSimple")} 
                         {...field}
                         readOnly={!!prefilledEmail}
                         disabled={!!prefilledEmail}
@@ -289,9 +295,9 @@ export default function PasswordlessRegister() {
                   name="firstName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>First Name *</FormLabel>
+                      <FormLabel>{t("auth.firstNameLabel")} *</FormLabel>
                       <FormControl>
-                        <Input placeholder="John" {...field} />
+                        <Input placeholder={t("auth.firstNamePlaceholder")} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -303,9 +309,9 @@ export default function PasswordlessRegister() {
                   name="lastName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Last Name *</FormLabel>
+                      <FormLabel>{t("auth.lastNameLabel")} *</FormLabel>
                       <FormControl>
-                        <Input placeholder="Smith" {...field} />
+                        <Input placeholder={t("auth.lastNamePlaceholder")} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -319,7 +325,7 @@ export default function PasswordlessRegister() {
                 name="region"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Region *</FormLabel>
+                    <FormLabel>{t("auth.regionLabel")} *</FormLabel>
                     <Select
                       value={selectedRegion}
                       onValueChange={(value) => {
@@ -333,7 +339,7 @@ export default function PasswordlessRegister() {
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select your region" />
+                          <SelectValue placeholder={t("auth.selectYourRegion")} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -356,7 +362,7 @@ export default function PasswordlessRegister() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>
-                        {selectedRegion === "NOLA" ? "Subcategoría" : "País"} *
+                        {selectedRegion === "NOLA" ? t("auth.subcategoryLabel") : t("auth.countryLabel")} *
                       </FormLabel>
                       <Select
                         value={selectedCountry}
@@ -368,7 +374,7 @@ export default function PasswordlessRegister() {
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder={selectedRegion === "NOLA" ? "Selecciona subcategoría" : "Selecciona tu país"} />
+                            <SelectValue placeholder={selectedRegion === "NOLA" ? t("auth.selectYourSubcategory") : t("auth.selectYourCountry")} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -392,7 +398,7 @@ export default function PasswordlessRegister() {
                   name="city"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Ciudad (Opcional)</FormLabel>
+                      <FormLabel>{t("auth.cityLabel")} ({t("common.optional")})</FormLabel>
                       <Select
                         value={selectedCity}
                         onValueChange={(value) => {
@@ -403,7 +409,7 @@ export default function PasswordlessRegister() {
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Selecciona tu ciudad" />
+                            <SelectValue placeholder={t("auth.selectYourCity")} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -427,7 +433,7 @@ export default function PasswordlessRegister() {
                   name="category"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Categoría *</FormLabel>
+                      <FormLabel>{t("auth.categoryLabel")} *</FormLabel>
                       <Select
                         value={selectedCategory}
                         onValueChange={(value) => {
@@ -439,7 +445,7 @@ export default function PasswordlessRegister() {
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Selecciona tu categoría" />
+                            <SelectValue placeholder={t("auth.selectYourCategory")} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -493,8 +499,7 @@ export default function PasswordlessRegister() {
               <Alert>
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription className="text-sm">
-                  <strong>Important:</strong> You will receive a welcome email with an access link. 
-                  Your account will be activated once approved by an administrator.
+                  {t("auth.importantNotice")}
                 </AlertDescription>
               </Alert>
 
@@ -507,10 +512,10 @@ export default function PasswordlessRegister() {
                 {registerMutation.isPending ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Registering...
+                    {t("auth.completingRegistration")}
                   </>
                 ) : (
-                  "Complete Registration"
+                  t("auth.completeRegistration")
                 )}
               </Button>
 
@@ -522,7 +527,7 @@ export default function PasswordlessRegister() {
                   className="text-[#29CCB1] hover:text-[#23B39E]"
                   onClick={() => setLocation("/login")}
                 >
-                  ← Back to login
+                  {t("auth.backToLogin")}
                 </Button>
               </div>
             </form>
