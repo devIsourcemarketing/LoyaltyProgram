@@ -8,7 +8,7 @@ interface LanguageContextType {
   t: (key: string) => string;
 }
 
-const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+export const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>('es');
@@ -17,24 +17,29 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   // Auto-detectar idioma al cargar la aplicación
   useEffect(() => {
     const detectLanguage = async () => {
+      console.log('🌍 [LanguageContext] Starting language detection...');
       setIsDetecting(true);
       try {
         // Primero intentar desde localStorage
         const saved = localStorage.getItem('preferred-language') as Language;
         if (saved && translations[saved]) {
+          console.log(`🌍 [LanguageContext] Using saved language from localStorage: ${saved}`);
           setLanguageState(saved);
           setIsDetecting(false);
           return;
         }
 
         // Si no hay guardado, detectar por IP
+        console.log('🌍 [LanguageContext] No saved language, calling autoDetectLanguage...');
         const detectedLang = await autoDetectLanguage();
+        console.log(`🌍 [LanguageContext] Detected language: ${detectedLang}`);
         setLanguageState(detectedLang);
       } catch (error) {
-        console.error('Error detecting language:', error);
+        console.error('🌍 [LanguageContext] Error detecting language:', error);
         setLanguageState('es'); // Español por defecto
       } finally {
         setIsDetecting(false);
+        console.log('🌍 [LanguageContext] Detection complete');
       }
     };
 
@@ -63,12 +68,4 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       {children}
     </LanguageContext.Provider>
   );
-}
-
-export function useLanguage() {
-  const context = useContext(LanguageContext);
-  if (context === undefined) {
-    throw new Error('useLanguage must be used within a LanguageProvider');
-  }
-  return context;
 }

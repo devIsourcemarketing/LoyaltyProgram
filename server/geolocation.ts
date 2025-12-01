@@ -72,13 +72,16 @@ function getClientIP(req: Request): string | undefined {
 export async function detectLanguageFromIP(req: Request): Promise<Language> {
   try {
     const ip = getClientIP(req);
+    console.log(`🌍 [Language Detection] Client IP: ${ip}`);
     
     // Si es localhost o IP privada, retornar español por defecto
     if (!ip || ip === '::1' || ip === '127.0.0.1' || ip.startsWith('192.168.') || ip.startsWith('10.')) {
+      console.log(`🌍 [Language Detection] Local/Private IP detected, using default: es`);
       return 'es';
     }
     
     // Llamar a la API de geolocalización
+    console.log(`🌍 [Language Detection] Calling ipapi.co for IP: ${ip}`);
     const response = await fetch(`https://ipapi.co/${ip}/json/`, {
       headers: {
         'User-Agent': 'LoyaltyPilot/1.0'
@@ -87,7 +90,7 @@ export async function detectLanguageFromIP(req: Request): Promise<Language> {
     });
     
     if (!response.ok) {
-      console.warn(`Geolocation API error: ${response.status}`);
+      console.warn(`🌍 [Language Detection] Geolocation API error: ${response.status}`);
       return 'es'; // Español por defecto en caso de error
     }
     
@@ -97,12 +100,12 @@ export async function detectLanguageFromIP(req: Request): Promise<Language> {
     // Buscar el idioma para el país
     const language = countryToLanguage[countryCode];
     
-    console.log(`IP ${ip} → Country ${countryCode} → Language ${language || 'es (default)'}`);
+    console.log(`🌍 [Language Detection] IP ${ip} → Country ${countryCode} → Language ${language || 'es (default)'}`);
     
     return language || 'es'; // Español por defecto si el país no está mapeado
     
   } catch (error) {
-    console.error('Error detecting language from IP:', error);
+    console.error('🌍 [Language Detection] Error:', error);
     return 'es'; // Español por defecto en caso de error
   }
 }

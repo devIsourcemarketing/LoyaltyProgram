@@ -701,7 +701,6 @@ const translations = {
       regionCategories: "Region Categories",
       regionCategoriesDescription: "Manage available categories for each region. Each region can have its own custom categories (Ex: NOLA → ENTERPRISE/SMB/MSSP, SOLA → Diamond/Gold/Silver).",
       newRegionCategory: "New Category",
-      category: "category",
       categoriesCount: "categories",
       configuredCategoriesForRegion: "Categories configured for the region",
       // Prize Templates translations
@@ -781,7 +780,6 @@ const translations = {
       generatingUserRanking: "Generating User Ranking",
       rankingDownloaded: "Ranking Downloaded",
       sessionExpired: "Session Expired",
-      onlyDeals: "Deals Only",
       assignedReward: "Assigned Reward",
       selectReward: "Select reward",
       assigned: "Assigned",
@@ -813,7 +811,6 @@ const translations = {
       // Grand prize criteria
       updateCriteria: "Update Criteria",
       createNewCriteria: "Create New Criteria",
-      onlyPoints: "Points Only",
       criteriaDeleted: "Criteria deleted",
       // CSV and user management
       noValidUsersFound: "No valid users found in CSV file",
@@ -1629,7 +1626,6 @@ const translations = {
       regionCategories: "Categorías por Región",
       regionCategoriesDescription: "Gestiona las categorías disponibles para cada región. Cada región puede tener sus propias categorías personalizadas (Ej: NOLA → ENTERPRISE/SMB/MSSP, SOLA → Diamond/Gold/Silver).",
       newRegionCategory: "Nueva Categoría",
-      category: "categoría",
       categoriesCount: "categorías",
       configuredCategoriesForRegion: "Categorías configuradas para la región",
       // Prize Templates translations
@@ -1709,7 +1705,6 @@ const translations = {
       generatingUserRanking: "Generando Ranking de Usuarios",
       rankingDownloaded: "Ranking Descargado",
       sessionExpired: "Sesión Expirada",
-      onlyDeals: "Solo Tratos",
       assignedReward: "Premio Asignado",
       selectReward: "Seleccionar reward",
       assigned: "Asignado",
@@ -1741,7 +1736,6 @@ const translations = {
       // Grand prize criteria
       updateCriteria: "Actualizar Criterios",
       createNewCriteria: "Crear Nuevo Criterio",
-      onlyPoints: "Solo Puntos",
       criteriaDeleted: "Criterios eliminados",
       // CSV and user management
       noValidUsersFound: "No se encontraron usuarios válidos en el archivo CSV",
@@ -2507,7 +2501,6 @@ const translations = {
       generatingUserRanking: "Gerando Ranking de Usuários",
       rankingDownloaded: "Ranking Baixado",
       sessionExpired: "Sessão Expirada",
-      onlyDeals: "Apenas Negócios",
       ticketUpdatedSuccessfully: "O ticket foi atualizado com sucesso.",
       couldNotUpdateTicket: "Não foi possível atualizar o ticket",
       invitationSent: "Convite enviado",
@@ -2586,7 +2579,6 @@ const translations = {
       regionCategories: "Categorias por Região",
       regionCategoriesDescription: "Gerencie as categorias disponíveis para cada região. Cada região pode ter suas próprias categorias personalizadas (Ex: NOLA → ENTERPRISE/SMB/MSSP, SOLA → Diamond/Gold/Silver).",
       newRegionCategory: "Nova Categoria",
-      category: "categoria",
       categoriesCount: "categorias",
       configuredCategoriesForRegion: "Categorias configuradas para a região",
       // Prize Templates translations
@@ -2763,31 +2755,39 @@ export { translations };
  */
 export const autoDetectLanguage = async (): Promise<Language> => {
   try {
+    console.log("🌍 [i18n/autoDetectLanguage] Starting auto-detection");
+    
     // Primero verificar si ya hay un idioma guardado
     const saved = localStorage.getItem("preferred-language") as Language;
     if (saved && translations[saved]) {
+      console.log(`🌍 [i18n/autoDetectLanguage] Using saved language: ${saved}`);
       return saved;
     }
 
+    console.log("🌍 [i18n/autoDetectLanguage] No saved language, calling /api/detect-language");
+    
     // Intentar detectar por IP
     const response = await fetch("/api/detect-language");
     if (!response.ok) {
-      console.warn("Failed to detect language, using default: es");
+      console.warn("🌍 [i18n/autoDetectLanguage] API request failed, using default: es");
       return "es";
     }
 
     const data = await response.json();
     const detectedLang = data.language as Language;
+    console.log(`🌍 [i18n/autoDetectLanguage] API returned language: ${detectedLang}`);
 
     // Validar que el idioma detectado existe
     if (detectedLang && translations[detectedLang]) {
       localStorage.setItem("preferred-language", detectedLang);
+      console.log(`🌍 [i18n/autoDetectLanguage] Language saved to localStorage: ${detectedLang}`);
       return detectedLang;
     }
 
+    console.log("🌍 [i18n/autoDetectLanguage] Invalid language detected, using default: es");
     return "es"; // Español por defecto
   } catch (error) {
-    console.error("Error auto-detecting language:", error);
+    console.error("🌍 [i18n/autoDetectLanguage] Error auto-detecting language:", error);
     return "es"; // Español por defecto en caso de error
   }
 };

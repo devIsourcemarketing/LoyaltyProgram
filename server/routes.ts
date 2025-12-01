@@ -4409,10 +4409,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
    */
   app.get("/api/detect-language", async (req, res) => {
     try {
+      console.log(`🌍 [API] /api/detect-language called from IP: ${req.socket.remoteAddress}`);
       const language = await detectPreferredLanguage(req);
+      console.log(`🌍 [API] Returning language: ${language}`);
       res.json({ language });
     } catch (error) {
-      console.error("Error detecting language:", error);
+      console.error("🌍 [API] Error detecting language:", error);
       // Siempre retornar español por defecto en caso de error
       res.json({ language: 'es' });
     }
