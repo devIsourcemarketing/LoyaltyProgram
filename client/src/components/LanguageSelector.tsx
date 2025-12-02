@@ -15,6 +15,9 @@ const languageNames: Record<Language, { name: string; flag: string }> = {
   pt: { name: "Português", flag: "🇧🇷" },
 };
 
+// Solo mostrar español y portugués
+const availableLanguages: Language[] = ['es', 'pt'];
+
 export function LanguageSelector() {
   const { language, setLanguage } = useLanguage();
 
@@ -30,7 +33,7 @@ export function LanguageSelector() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        {(Object.keys(languageNames) as Language[]).map((lang) => (
+        {availableLanguages.map((lang) => (
           <DropdownMenuItem
             key={lang}
             onClick={() => setLanguage(lang)}

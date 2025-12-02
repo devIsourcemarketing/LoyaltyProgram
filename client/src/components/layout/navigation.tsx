@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { Bell, ChevronDown, Menu, X, Globe, Database, Settings } from "lucide-react";
+import { ChevronDown, Menu, X, Globe, Database, Settings } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { logout } from "@/lib/auth";
 import { useToast } from "@/hooks/use-toast";
@@ -13,6 +12,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 import type { AuthUser } from "@/lib/auth";
 import kasperskyLogo from "@/assets/logo-kaspersky-cup.png";
 import { NotificationBell } from "@/components/NotificationBell";
+import { LanguageSelector } from "@/components/LanguageSelector";
 import { isAdminRole } from "@/lib/roles";
 
 interface NavigationProps {
@@ -22,7 +22,7 @@ interface NavigationProps {
 export default function Navigation({ user }: NavigationProps) {
   const [location, setLocation] = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { t, currentLanguage, changeLanguage } = useTranslation();
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -88,10 +88,6 @@ export default function Navigation({ user }: NavigationProps) {
       setLocation("/login");
     },
   });
-
-  const handleLanguageChange = (lang: string) => {
-    changeLanguage(lang as any);
-  };
 
   const handleLogout = () => {
     logoutMutation.mutate();
@@ -237,16 +233,7 @@ export default function Navigation({ user }: NavigationProps) {
           {/* Right side - Language, Notifications, User Menu */}
           <div className="flex items-center space-x-3">
             {/* Language Selector */}
-            <Select value={currentLanguage} onValueChange={handleLanguageChange}>
-              <SelectTrigger className="w-24 h-9 border border-gray-200 bg-gray-50 text-[#1D1D1B] hover:bg-gray-100" data-testid="select-language">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="en">English</SelectItem>
-                <SelectItem value="es">Español</SelectItem>
-                <SelectItem value="pt">Português</SelectItem>
-              </SelectContent>
-            </Select>
+            <LanguageSelector />
 
             {/* Notifications */}
             <NotificationBell userId={user.id} />
