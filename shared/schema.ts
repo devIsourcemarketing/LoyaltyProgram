@@ -26,6 +26,15 @@ export const users = pgTable("users", {
   firstName: text("first_name").notNull(),
   lastName: text("last_name").notNull(),
   role: userRoleEnum("role").notNull().default("user"),
+  // Company and contact information
+  companyName: text("company_name"),
+  partnerCategory: text("partner_category"),
+  marketSegment: text("market_segment"),
+  address: text("address"),
+  city: text("city"),
+  zipCode: text("zip_code"),
+  contactNumber: text("contact_number"),
+  // Region and location
   country: text("country"), // Set during registration
   region: regionEnum("region"),
   regionCategory: regionCategoryEnum("region_category"),

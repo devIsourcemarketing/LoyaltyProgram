@@ -27,8 +27,14 @@ const passwordlessRegisterSchema = z.object({
   email: z.string().email("Correo electrónico inválido"),
   firstName: z.string().min(1, "El nombre es requerido"),
   lastName: z.string().min(1, "El apellido es requerido"),
+  companyName: z.string().optional(),
+  partnerCategory: z.string().optional(),
+  marketSegment: z.string().optional(),
   country: z.string().optional(),
   city: z.string().optional(),
+  address: z.string().optional(),
+  zipCode: z.string().optional(),
+  contactNumber: z.string().optional(),
   region: z.enum(["NOLA", "SOLA", "BRASIL", "MEXICO"], {
     required_error: "La región es requerida",
   }),
@@ -70,8 +76,14 @@ export default function PasswordlessRegister() {
       email: "",
       firstName: "",
       lastName: "",
+      companyName: "",
+      partnerCategory: "",
+      marketSegment: "",
       country: "",
       city: "",
+      address: "",
+      zipCode: "",
+      contactNumber: "",
       region: undefined,
       category: undefined,
       subcategory: "",
@@ -329,6 +341,52 @@ export default function PasswordlessRegister() {
                 />
               </div>
 
+              {/* Company Name */}
+              <FormField
+                control={form.control}
+                name="companyName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nombre de la Empresa</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Nombre de la empresa" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Partner Category & Market Segment */}
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="partnerCategory"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Categoría del Partner</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Ej: Enterprise, SMB" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="marketSegment"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Segmento del Mercado</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Segmento del mercado" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
               {/* Region */}
               <FormField
                 control={form.control}
@@ -504,6 +562,52 @@ export default function PasswordlessRegister() {
                   )}
                 />
               )}
+
+              {/* Address */}
+              <FormField
+                control={form.control}
+                name="address"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Dirección</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Dirección completa" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Zip Code & Contact Number */}
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="zipCode"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Código Postal</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Código postal" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="contactNumber"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Número de Contacto</FormLabel>
+                      <FormControl>
+                        <Input type="tel" placeholder="+57 123 456 7890" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
               {/* Info Alert */}
               <Alert>

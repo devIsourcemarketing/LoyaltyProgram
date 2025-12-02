@@ -256,7 +256,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Passwordless registration endpoint
   app.post("/api/auth/register-passwordless", async (req, res) => {
     try {
-      const { email, firstName, lastName, country, region, category, subcategory } = req.body;
+      const { 
+        email, 
+        firstName, 
+        lastName, 
+        companyName,
+        partnerCategory,
+        marketSegment,
+        country, 
+        region, 
+        category, 
+        subcategory,
+        address,
+        city,
+        zipCode,
+        contactNumber
+      } = req.body;
       
       if (!email || !firstName || !lastName || !country || !region || !category) {
         return res.status(400).json({ 
@@ -281,7 +296,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         password: tempPassword,
         firstName,
         lastName,
+        companyName: companyName || null,
+        partnerCategory: partnerCategory || null,
+        marketSegment: marketSegment || null,
         country,
+        address: address || null,
+        city: city || null,
+        zipCode: zipCode || null,
+        contactNumber: contactNumber || null,
         region: region as "NOLA" | "SOLA" | "BRASIL" | "MEXICO",
         regionCategory: category as "ENTERPRISE" | "SMB" | "MSSP",
         regionSubcategory: subcategory || null,
@@ -1450,7 +1472,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
 
     try {
-      const { email, firstName, lastName } = req.body;
+      const { 
+        email, 
+        firstName, 
+        lastName,
+        companyName,
+        partnerCategory,
+        marketSegment,
+        country,
+        address,
+        city,
+        zipCode,
+        contactNumber
+      } = req.body;
       
       if (!email || !firstName || !lastName) {
         return res.status(400).json({ 
@@ -1495,7 +1529,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ? `${adminUser.firstName} ${adminUser.lastName}` 
         : "Administrator";
 
-      // Create user with pending status and invitation tracking
+      // Create user with pending status, invitation tracking and company fields
       const hashedPassword = await bcrypt.hash(nanoid(16), 10); // temporary password
       
       const newUser = await storage.createUser({
@@ -1504,7 +1538,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         password: hashedPassword,
         firstName,
         lastName,
-        country: null, // Will be set during registration
+        companyName: companyName || null,
+        partnerCategory: partnerCategory || null,
+        marketSegment: marketSegment || null,
+        country: country || null,
+        address: address || null,
+        city: city || null,
+        zipCode: zipCode || null,
+        contactNumber: contactNumber || null,
         role: "user",
         isActive: true,
         isApproved: false,
@@ -1572,7 +1613,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       for (const userData of users) {
         try {
-          const { email, firstName, lastName } = userData;
+          const { 
+            email, 
+            firstName, 
+            lastName,
+            companyName,
+            partnerCategory,
+            marketSegment,
+            country,
+            address,
+            city,
+            zipCode,
+            contactNumber
+          } = userData;
           
           if (!email || !firstName || !lastName) {
             results.failed.push({
@@ -1614,14 +1667,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const tempUsername = `user_${nanoid(8)}`;
           const hashedPassword = await bcrypt.hash(nanoid(16), 10);
           
-          // Create user
+          // Create user with company fields
           const newUser = await storage.createUser({
             username: tempUsername,
             email,
             password: hashedPassword,
             firstName,
             lastName,
-            country: null, // Will be set during registration
+            companyName: companyName || null,
+            partnerCategory: partnerCategory || null,
+            marketSegment: marketSegment || null,
+            country: country || null,
+            address: address || null,
+            city: city || null,
+            zipCode: zipCode || null,
+            contactNumber: contactNumber || null,
             role: "user",
             isActive: true,
             isApproved: false,
@@ -1672,9 +1732,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { inviteToken, username, password, country, region, category, subcategory } = req.body;
       
-      if (!inviteToken || !username || !password || !country || !region || !category) {
+      if (!inviteToken || !username || !country || !region || !category) {
         return res.status(400).json({ 
-          message: "Invite token, username, password, country, region, and category are required" 
+          message: "Invite token, username, country, region, and category are required" 
         });
       }
 
@@ -1727,19 +1787,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         finalCategory = category as "ENTERPRISE" | "SMB" | "MSSP";
       }
 
-      // Update user with new credentials and auto-approve (invited users are pre-approved)
-      const hashedPassword = await bcrypt.hash(password, 10);
-      
-      const updatedUser = await storage.updateUser(user.id, {
+      // Update user - password is optional (if not provided, user will use magic link)
+      const updateData: any = {
         username,
-        password: hashedPassword,
         country,
         region: finalRegion,
         regionCategory: finalCategory,
         regionSubcategory: finalSubcategory,
         isApproved: false, // REQUIERE aprobación de administrador
         inviteToken: null, // Clear the token after use
-      });
+      };
+
+      // Si se proporciona contraseña, actualizar con hash
+      if (password && password.trim() !== "") {
+        updateData.password = await bcrypt.hash(password, 10);
+        updateData.isPasswordless = false;
+      } else {
+        // Sin contraseña - marcar como passwordless para usar magic link
+        updateData.isPasswordless = true;
+      }
+      
+      const updatedUser = await storage.updateUser(user.id, updateData);
 
       // NO enviar email de bienvenida aún - se enviará cuando sea aprobado
       // await sendBienvenidaEmail(...)
@@ -2658,6 +2726,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Users CSV processing endpoint
   app.post("/api/admin/csv/users/process", async (req, res) => {
     const userRole = req.session?.userRole;
+    const userId = req.session?.userId;
+    
     if (!isAdminRole(userRole)) {
       return res.status(403).json({ message: "Admin access required" });
     }
@@ -2667,6 +2737,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!csvPath) {
         return res.status(400).json({ message: "CSV path is required" });
       }
+
+      // Get admin info for invitation tracking
+      const adminUser = await storage.getUser(userId!);
 
       // Extract upload ID from URL (csvPath might be full URL or just the ID)
       let uploadId = csvPath;
@@ -2690,6 +2763,167 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const header = lines[0].toLowerCase().split(',').map(h => h.trim());
+      
+      // Detectar formato del CSV - puede ser formato completo o formato de invitación
+      const isInvitationFormat = header.includes('user id') || header.includes('company name');
+      const isFullUserFormat = header.includes('first name') && header.includes('password');
+      
+      if (!isInvitationFormat && !isFullUserFormat) {
+        return res.status(400).json({ 
+          message: `CSV must be either invitation format (USER ID, COMPANY NAME, etc.) or full user format (first name, last name, username, email, password, country, role, partner level)` 
+        });
+      }
+
+      // Si es formato de invitación, procesarlo como invitaciones
+      if (isInvitationFormat) {
+        console.log("📧 Detected invitation format CSV, processing as bulk invitations");
+        
+        const users = [];
+        const errors = [];
+        
+        for (let i = 1; i < lines.length; i++) {
+          const row = lines[i].split(',').map(cell => cell.trim());
+          if (row.length === 0 || row.every(cell => !cell)) continue;
+          
+          const rowData: any = {};
+          header.forEach((col, idx) => {
+            rowData[col] = row[idx] || '';
+          });
+          
+          const email = rowData['user id'] || rowData['email'] || '';
+          
+          if (!email) {
+            errors.push(`Row ${i + 1}: Email/User ID is required`);
+            continue;
+          }
+          
+          // Generar firstName/lastName del email si no existen
+          let firstName = rowData['first name'] || '';
+          let lastName = rowData['last name'] || '';
+          
+          if (!firstName && !lastName && email) {
+            const emailName = email.split('@')[0];
+            firstName = emailName.charAt(0).toUpperCase() + emailName.slice(1);
+            lastName = "User";
+          }
+          
+          users.push({
+            email,
+            firstName,
+            lastName,
+            companyName: rowData['company name'] || '',
+            partnerCategory: rowData['partner category'] || '',
+            marketSegment: rowData['market segment'] || '',
+            country: rowData['kl region'] || rowData['country'] || '',
+            address: rowData['address'] || '',
+            city: rowData['city'] || '',
+            zipCode: rowData['zip code'] || '',
+            contactNumber: rowData['contact number'] || '',
+          });
+        }
+        
+        if (errors.length > 0) {
+          return res.status(400).json({ 
+            message: "CSV validation errors",
+            errors 
+          });
+        }
+        
+        // Procesar como invitaciones bulk
+        const results = {
+          success: [] as any[],
+          failed: [] as any[],
+        };
+
+        for (const userData of users) {
+          try {
+            const { email, firstName, lastName } = userData;
+            
+            // Check if user already exists
+            let existingUser;
+            
+            if (adminUser?.role === 'regional-admin' && adminUser.region) {
+              existingUser = await storage.getUserByEmailAndRegion(email, adminUser.region);
+              
+              if (existingUser) {
+                results.failed.push({
+                  email,
+                  reason: `Usuario ya existe en la región ${adminUser.region}`,
+                });
+                continue;
+              }
+            } else {
+              existingUser = await storage.getUserByEmail(email);
+              
+              if (existingUser) {
+                results.failed.push({
+                  email,
+                  reason: 'Usuario ya existe en el sistema',
+                });
+                continue;
+              }
+            }
+
+            // Generate invite token
+            const inviteToken = nanoid(32);
+            const tempUsername = `user_${nanoid(8)}`;
+            const hashedPassword = await bcrypt.hash(nanoid(16), 10);
+            
+            // Create user with company fields
+            const newUser = await storage.createUser({
+              username: tempUsername,
+              email,
+              password: hashedPassword,
+              firstName,
+              lastName,
+              companyName: userData.companyName || null,
+              partnerCategory: userData.partnerCategory || null,
+              marketSegment: userData.marketSegment || null,
+              country: userData.country || null,
+              address: userData.address || null,
+              city: userData.city || null,
+              zipCode: userData.zipCode || null,
+              contactNumber: userData.contactNumber || null,
+              role: "user",
+              isActive: true,
+              isApproved: false,
+              inviteToken,
+              invitedBy: userId,
+              invitedFromRegion: adminUser?.region || null,
+            });
+
+            // Send invitation email
+            const emailSent = await sendRegistroExitosoEmail({
+              email,
+              firstName,
+              lastName,
+              inviteToken
+            });
+
+            results.success.push({
+              email,
+              firstName,
+              lastName,
+              emailSent,
+            });
+          } catch (error) {
+            results.failed.push({
+              email: userData.email || 'unknown',
+              reason: error instanceof Error ? error.message : 'Unknown error',
+            });
+          }
+        }
+        
+        return res.json({
+          message: `Processed ${users.length} invitations from CSV`,
+          inserted: results.success.length,
+          errorCount: results.failed.length,
+          errors: results.failed.map(f => `${f.email}: ${f.reason}`),
+          results,
+        });
+      }
+      
+      // Formato completo de usuarios (código original)
       const expectedHeaders = ['first name', 'last name', 'username', 'email', 'password', 'country', 'role', 'partner level'];
       
       // Validate headers
