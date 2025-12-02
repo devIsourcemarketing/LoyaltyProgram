@@ -24,6 +24,7 @@ import backgroundImage from "@assets/hero-usuario.png";
 import logoHero from "@assets/logo-kaspersky-cup.png";
 import { useTranslation } from "@/hooks/useTranslation";
 import { isAdminRole } from "@/lib/roles";
+import { Footer } from "@/components/layout/footer";
 
 interface UserStats {
   totalPoints: number;
@@ -532,12 +533,20 @@ export default function Dashboard() {
                         {t('deals.points').toUpperCase()}
                       </th>
                       <th className="px-6 py-4 text-left text-sm font-semibold text-white uppercase tracking-wider">
+                        FECHA
+                      </th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-white uppercase tracking-wider">
                         {t('deals.status').toUpperCase()}
                       </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-blue-800">
-                    {recentDeals.map((deal) => (
+                    {recentDeals.map((deal) => {
+                      // Calcular goles: cada $2000 = 1 gol
+                      const dealValueNum = Number(deal.dealValue);
+                      const goals = (dealValueNum / 2000).toFixed(1);
+                      
+                      return (
                       <tr key={deal.id} data-testid={`row-deal-${deal.id}`} className="transition-colors">
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-white font-medium">
                           {deal.productName}
@@ -546,7 +555,14 @@ export default function Dashboard() {
                           {formatCurrency(deal.dealValue)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-white font-medium">
-                          {deal.pointsEarned?.toLocaleString() || 0}
+                          {goals}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-white">
+                          {new Date(deal.createdAt).toLocaleDateString('es-ES', { 
+                            year: 'numeric', 
+                            month: '2-digit', 
+                            day: '2-digit' 
+                          })}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span 
@@ -563,7 +579,8 @@ export default function Dashboard() {
                           </span>
                         </td>
                       </tr>
-                    ))}
+                      );
+                    })}
                   </tbody>
                 </table>
               ) : (
@@ -581,6 +598,9 @@ export default function Dashboard() {
         isOpen={isDealModalOpen}
         onClose={() => setIsDealModalOpen(false)}
       />
+
+      {/* Footer - Only show for regular users */}
+      {user.role !== "admin" && <Footer />}
     </div>
   );
 }
