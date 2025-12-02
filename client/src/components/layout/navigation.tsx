@@ -93,14 +93,15 @@ export default function Navigation({ user }: NavigationProps) {
     logoutMutation.mutate();
   };
 
+  const TC = "T&C";
   const navItems = isAdminRole(user.role) 
     ? [
         { href: "/admin", label: t("admin.panel"), current: location === "/admin" },
       ]
     : [
         { href: "/", label: t("common.dashboard"), current: location === "/" },
-        { href: "/deals", label: t("common.termsAndConditions"), current: location === "/deals" },
         { href: "/rewards", label: t("common.rewards"), current: location === "/rewards" },
+        { href: "/deals", label: TC, current: location === "/deals" },
       ];
 
   const userInitials = `${user.firstName?.charAt(0) || 'U'}${user.lastName?.charAt(0) || 'U'}`.toUpperCase();
