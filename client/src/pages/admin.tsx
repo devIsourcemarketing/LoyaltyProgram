@@ -2108,11 +2108,11 @@ export default function Admin() {
                         <Card key={reward.id} className="border overflow-hidden" data-testid={`card-admin-reward-${reward.id}`}>
                           {/* Image Preview */}
                           {reward.imageUrl && (
-                            <div className="w-full h-48 bg-gray-100 relative overflow-hidden">
+                            <div className="w-full h-48 bg-white relative overflow-hidden flex items-center justify-center p-2">
                               <img
                                 src={reward.imageUrl}
                                 alt={reward.name}
-                                className="w-full h-full object-cover"
+                                className="w-full h-full object-contain"
                                 onError={(e) => {
                                   // Fallback if image fails to load
                                   e.currentTarget.style.display = 'none';

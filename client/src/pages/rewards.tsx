@@ -173,6 +173,14 @@ export default function Rewards() {
     return rewards.filter(reward => stats.availablePoints >= reward.pointsCost);
   };
 
+  // Check if user has a pending redemption for this reward
+  const hasPendingRedemption = (rewardId: string) => {
+    if (!userRewards) return false;
+    return userRewards.some(
+      (ur: any) => ur.rewardId === rewardId && ur.status === 'pending'
+    );
+  };
+
   return (
     <div className="min-h-screen bg-white padding-top-60">
       {/* Hero Banner */}
@@ -225,14 +233,8 @@ export default function Rewards() {
       )}
 
       <Tabs defaultValue="all" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 lg:grid-cols-7">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="all">{t("rewards.allRewards")}</TabsTrigger>
-          <TabsTrigger value="available">{t("rewards.availableRewards")}</TabsTrigger>
-          {categories.slice(0, 4).map((category) => (
-            <TabsTrigger key={category} value={category}>
-              {category}
-            </TabsTrigger>
-          ))}
           <TabsTrigger value="my-rewards">{t("rewards.myRewards")}</TabsTrigger>
         </TabsList>
 
@@ -256,15 +258,20 @@ export default function Rewards() {
             </div>
           ) : rewards && rewards.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {rewards.map((reward) => (
-                <Card key={reward.id} className="shadow-material overflow-hidden" data-testid={`card-reward-${reward.id}`}>
+              {rewards.map((reward) => {
+                const isPending = hasPendingRedemption(reward.id);
+                const canRedeem = stats && stats.availablePoints >= reward.pointsCost && !isPending;
+                
+                return (
+                <Card key={reward.id} className={`shadow-material overflow-hidden ${isPending ? 'opacity-60 bg-gray-50' : ''}`} data-testid={`card-reward-${reward.id}`}>
                   {/* Image Header */}
                   {reward.imageUrl && (
-                    <div className="w-full h-48 bg-gray-100 relative overflow-hidden">
+                    <div className="w-full h-52 bg-gray-50 relative">
                       <img 
                         src={reward.imageUrl} 
                         alt={reward.name}
-                        className="w-full h-full object-cover"
+                        className={`w-full h-full object-cover ${isPending ? 'grayscale' : ''}`}
+                        style={{ objectPosition: 'center' }}
                         onError={(e) => {
                           e.currentTarget.style.display = 'none';
                         }}
@@ -275,41 +282,50 @@ export default function Rewards() {
                   <CardContent className="p-6">
                     <div className="flex items-center space-x-4 mb-4 reward-info">
                       {!reward.imageUrl && (
-                        <div className="w-12 h-12 bg-gradient-to-br rounded-lg flex items-center justify-center green-background">
+                        <div className={`w-12 h-12 bg-gradient-to-br rounded-lg flex items-center justify-center ${isPending ? 'bg-gray-400' : 'green-background'}`}>
                           {getRewardIcon(reward.category)}
                         </div>
                       )}
                       <div className="flex-1">
-                        <h3 className="font-semibold text-gray-900">{reward.name}</h3>
+                        <h3 className={`font-semibold ${isPending ? 'text-gray-500' : 'text-gray-900'}`}>{reward.name}</h3>
                         <p className="text-sm text-gray-600 text-center">
-                          <span className="goal-number text-green-600">{reward.pointsCost.toLocaleString()}</span> Goals
+                          <span className={`goal-number ${isPending ? 'text-gray-500' : 'text-green-600'}`}>
+                            {stats ? stats.availablePoints : 0}/{reward.pointsCost.toLocaleString()}
+                          </span> Goles
                         </p>
                       </div>
                     </div>
                     
                     {reward.description && (
-                      <p className="text-sm text-gray-600 mb-4 text-center">{reward.description}</p>
+                      <p className={`text-sm mb-4 text-center ${isPending ? 'text-gray-500' : 'text-gray-600'}`}>{reward.description}</p>
                     )}
                     
-                    <Badge variant="outline" className="mb-4 reward-category">
+                    <Badge variant="outline" className={`mb-4 reward-category ${isPending ? 'text-gray-500 border-gray-300' : ''}`}>
                       {reward.category}
                     </Badge>
                     
-                    <Button
-                      className="w-full gradient-green"
-                      onClick={() => handleRedeem(reward)}
-                      disabled={!stats || stats.availablePoints < reward.pointsCost || redeemMutation.isPending}
-                      data-testid={`button-redeem-${reward.id}`}
-                    >
-                      {!stats || stats.availablePoints < reward.pointsCost
-                        ? t("rewards.insufficientPoints")
-                        : redeemMutation.isPending
-                        ? t("rewards.redeeming")
-                        : t("rewards.redeem")}
-                    </Button>
+                    {isPending ? (
+                      <div className="w-full text-center py-3 bg-gray-200 text-gray-700 rounded-md font-medium">
+                        {t("rewards.inExchange")}
+                      </div>
+                    ) : (
+                      <Button
+                        className="w-full gradient-green"
+                        onClick={() => handleRedeem(reward)}
+                        disabled={!canRedeem || redeemMutation.isPending}
+                        data-testid={`button-redeem-${reward.id}`}
+                      >
+                        {!stats || stats.availablePoints < reward.pointsCost
+                          ? t("rewards.insufficientPoints")
+                          : redeemMutation.isPending
+                          ? t("rewards.redeeming")
+                          : t("rewards.redeem")}
+                      </Button>
+                    )}
                   </CardContent>
                 </Card>
-              ))}
+                );
+              })}
             </div>
           ) : (
             <Card className="shadow-material">
@@ -349,11 +365,12 @@ export default function Rewards() {
               {availableRewards().map((reward) => (
                 <Card key={reward.id} className="shadow-material border-green-200 overflow-hidden" data-testid={`card-available-reward-${reward.id}`}>
                   {reward.imageUrl && (
-                    <div className="w-full h-48 bg-gray-100 relative overflow-hidden">
+                    <div className="w-full h-52 bg-gray-50 relative">
                       <img 
                         src={reward.imageUrl} 
                         alt={reward.name}
                         className="w-full h-full object-cover"
+                        style={{ objectPosition: 'center' }}
                         onError={(e) => {
                           e.currentTarget.parentElement!.style.display = 'none';
                         }}
@@ -416,11 +433,12 @@ export default function Rewards() {
               {filteredRewards(category).map((reward) => (
                 <Card key={reward.id} className="shadow-material overflow-hidden">
                   {reward.imageUrl && (
-                    <div className="w-full h-48 bg-gray-100 relative overflow-hidden">
+                    <div className="w-full h-52 bg-gray-50 relative">
                       <img 
                         src={reward.imageUrl} 
                         alt={reward.name}
                         className="w-full h-full object-cover"
+                        style={{ objectPosition: 'center' }}
                         onError={(e) => {
                           e.currentTarget.parentElement!.style.display = 'none';
                         }}
@@ -488,11 +506,11 @@ export default function Rewards() {
                   <div className="flex flex-col md:flex-row">
                     {/* Image Section */}
                     {userReward.imageUrl && (
-                      <div className="w-full md:w-48 h-48 bg-gray-100 relative overflow-hidden flex-shrink-0">
+                      <div className="w-full md:w-48 h-48 bg-white relative overflow-hidden flex-shrink-0 flex items-center justify-center p-2">
                         <img 
                           src={userReward.imageUrl} 
                           alt={userReward.rewardName || 'Reward'}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-contain"
                           onError={(e) => {
                             e.currentTarget.parentElement!.style.display = 'none';
                           }}

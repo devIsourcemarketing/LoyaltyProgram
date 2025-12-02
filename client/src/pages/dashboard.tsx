@@ -428,12 +428,12 @@ export default function Dashboard() {
                       data-testid={`card-featured-reward-${reward.id}`}
                     >
                       {/* Reward Image */}
-                      <div className="relative mb-4 h-32 rounded-lg overflow-hidden">
+                      <div className="relative mb-4 h-48 rounded-lg overflow-hidden bg-white flex items-center justify-center p-2">
                         {reward.imageUrl && !failedImages.has(reward.id) ? (
                           <img
                             src={reward.imageUrl}
                             alt={reward.name}
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-contain"
                             onError={() => handleImageError(reward.id)}
                           />
                         ) : (
