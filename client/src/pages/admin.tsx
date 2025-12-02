@@ -191,6 +191,12 @@ export default function Admin() {
     enabled: currentUser?.role === "admin" || currentUser?.role === "regional-admin" || currentUser?.role === "super-admin",
   });
 
+  // Rejected/unapproved users query
+  const { data: rejectedUsers, isLoading: rejectedUsersLoading } = useQuery<User[]>({
+    queryKey: ["/api/admin/users/rejected"],
+    enabled: currentUser?.role === "admin" || currentUser?.role === "regional-admin" || currentUser?.role === "super-admin",
+  });
+
   // Pending reward redemptions query
   const { data: pendingRedemptions, isLoading: pendingRedemptionsLoading } = useQuery<Array<any>>({
     queryKey: ["/api/admin/rewards/pending"],
@@ -485,6 +491,7 @@ export default function Admin() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/users/rejected"] });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/reports"] });
       toast({
         title: t("common.success"),
@@ -574,6 +581,7 @@ export default function Admin() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/users/pending"] });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/users/rejected"] });
       toast({
         title: t("common.success"),
         description: t("common.userRejectedSuccessfully"),
@@ -1181,7 +1189,7 @@ export default function Admin() {
             </CardHeader>
             <CardContent>
               <Tabs defaultValue="active" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 mb-6">
+                <TabsList className="grid w-full grid-cols-3 mb-6">
                   <TabsTrigger value="active" data-testid="subtab-active-users">
                     {t('admin.activeUsers')}
                   </TabsTrigger>
@@ -1189,6 +1197,12 @@ export default function Admin() {
                     {t('admin.pendingApprovals')}
                     {pendingUsers && pendingUsers.length > 0 && (
                       <Badge className="ml-2 bg-yellow-500">{pendingUsers.length}</Badge>
+                    )}
+                  </TabsTrigger>
+                  <TabsTrigger value="rejected" data-testid="subtab-rejected-users">
+                    {t('admin.unapprovedUsers')}
+                    {rejectedUsers && rejectedUsers.length > 0 && (
+                      <Badge className="ml-2 bg-red-500">{rejectedUsers.length}</Badge>
                     )}
                   </TabsTrigger>
                 </TabsList>
@@ -1863,6 +1877,110 @@ export default function Admin() {
                   ) : (
                     <p className="text-gray-500 text-center py-8" data-testid="text-no-pending-users">
                       No pending user approvals
+                    </p>
+                  )}
+                </TabsContent>
+
+                {/* Rejected/Unapproved Users Sub-Tab */}
+                <TabsContent value="rejected">
+                  <div className="text-sm text-gray-600 mb-4">
+                    {t('admin.unapprovedUsersDescription')}
+                  </div>
+
+                  {rejectedUsersLoading ? (
+                    <div className="space-y-4">
+                      {[...Array(3)].map((_, i) => (
+                        <Skeleton key={i} className="h-20 w-full" />
+                      ))}
+                    </div>
+                  ) : rejectedUsers && rejectedUsers.length > 0 ? (
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-[#F1F5F8]">
+                          <tr>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              {t('admin.user')}
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              {t('common.role')}
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              {t('common.country')}
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              {t('admin.registrationDate')}
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              {t('common.actions')}
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          {rejectedUsers.map((user: any) => (
+                            <tr key={user.id} data-testid={`row-rejected-user-${user.id}`}>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <div>
+                                  <div className="text-sm font-medium text-gray-900">
+                                    {user.firstName} {user.lastName}
+                                  </div>
+                                  <div className="text-sm text-gray-500">{user.email}</div>
+                                </div>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <Badge className="bg-gray-100 text-gray-800">
+                                  {user.role}
+                                </Badge>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                {user.country}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {formatDate(user.createdAt.toString())}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <AlertDialog>
+                                  <AlertDialogTrigger asChild>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-300"
+                                      data-testid={`button-delete-rejected-${user.id}`}
+                                    >
+                                      <Trash2 className="w-4 h-4 mr-1" />
+                                      {t('common.delete')}
+                                    </Button>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle>{t('admin.deleteRejectedUser')}</AlertDialogTitle>
+                                      <AlertDialogDescription>
+                                        {t('admin.deleteRejectedUserConfirmation')}
+                                      </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                      <AlertDialogCancel data-testid="button-cancel-delete-rejected">
+                                        {t('common.cancel')}
+                                      </AlertDialogCancel>
+                                      <AlertDialogAction
+                                        onClick={() => handleDeleteUser(user.id)}
+                                        disabled={deleteUserMutation.isPending}
+                                        className="bg-red-600 hover:bg-red-700"
+                                        data-testid="button-confirm-delete-rejected"
+                                      >
+                                        {deleteUserMutation.isPending ? t('common.deleting') : t('common.delete')}
+                                      </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
+                                </AlertDialog>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    <p className="text-gray-500 text-center py-8" data-testid="text-no-rejected-users">
+                      {t('admin.noRejectedUsers')}
                     </p>
                   )}
                 </TabsContent>

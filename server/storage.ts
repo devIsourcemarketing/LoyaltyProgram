@@ -173,6 +173,7 @@ export interface IStorage {
   getAllUsers(regionId?: string): Promise<User[]>;
   getAllDeals(page?: number, limit?: number, regionId?: string): Promise<{ deals: DealWithUser[]; total: number }>;
   getPendingUsers(regionId?: string): Promise<User[]>;
+  getRejectedUsers(regionId?: string): Promise<User[]>;
   approveUser(userId: string, approvedBy: string): Promise<User | undefined>;
   rejectUser(userId: string): Promise<User | undefined>;
   deleteUser(id: string): Promise<User | undefined>;
@@ -1200,6 +1201,28 @@ export class DatabaseStorage implements IStorage {
     if (regionName) {
       // Regional admin: solo ve usuarios pendientes de su REGIÓN
       conditions.push(eq(users.region, regionName as "NOLA" | "SOLA" | "BRASIL" | "MEXICO")); // Filtra directamente por región
+    }
+
+    return db
+      .select()
+      .from(users)
+      .where(and(...conditions))
+      .orderBy(desc(users.createdAt));
+  }
+
+  async getRejectedUsers(regionName?: string): Promise<User[]> {
+    // Show users who were rejected (isActive = false, isApproved = false)
+    // and completed registration (have username/password)
+    const conditions = [
+      eq(users.isActive, false), 
+      eq(users.isApproved, false),
+      isNotNull(users.username), // Only users who completed registration
+      ne(users.role, "super-admin") // Excluir super-admins
+    ];
+
+    if (regionName) {
+      // Regional admin: solo ve usuarios rechazados de su región
+      conditions.push(eq(users.region, regionName as "NOLA" | "SOLA" | "BRASIL" | "MEXICO"));
     }
 
     return db

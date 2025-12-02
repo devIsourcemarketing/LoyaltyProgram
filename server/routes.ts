@@ -2854,6 +2854,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get rejected/unapproved users
+  app.get("/api/admin/users/rejected", async (req, res) => {
+    const userRole = req.session?.userRole;
+    const userId = req.session?.userId;
+    
+    if (userRole !== "admin" && userRole !== "regional-admin" && userRole !== "super-admin") {
+      return res.status(403).json({ message: "Admin access required" });
+    }
+
+    if (!userId) {
+      return res.status(401).json({ message: "Authentication required" });
+    }
+
+    try {
+      const regionName = await getAdminRegion(userId);
+      const rejectedUsers = await storage.getRejectedUsers(regionName);
+      res.json(rejectedUsers);
+    } catch (error) {
+      console.error("Error fetching rejected users:", error);
+      res.status(500).json({ message: "Failed to fetch rejected users" });
+    }
+  });
+
     // Approve user registration
   app.put("/api/admin/users/:userId/approve", async (req, res) => {
     const userRole = req.session?.userRole;
