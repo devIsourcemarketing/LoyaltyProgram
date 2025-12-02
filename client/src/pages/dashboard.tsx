@@ -355,7 +355,7 @@ export default function Dashboard() {
                             )}
                           </div>
                           <p className={`text-sm ${isCurrentUser ? "text-blue-700 white-text" : "text-gray-600"}`}>
-                            @{leaderUser.username}
+                            {isCurrentUser ? leaderUser.email : `@${leaderUser.username}`}
                           </p>
                         </div>
 
