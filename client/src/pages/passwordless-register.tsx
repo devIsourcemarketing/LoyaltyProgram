@@ -27,11 +27,17 @@ const passwordlessRegisterSchema = z.object({
   email: z.string().email("Correo electrónico inválido"),
   firstName: z.string().min(1, "El nombre es requerido"),
   lastName: z.string().min(1, "El apellido es requerido"),
-  country: z.string().optional(),
-  city: z.string().optional(),
+  companyName: z.string().min(1, "El nombre de la empresa es requerido"),
+  partnerCategory: z.string().min(1, "La categoría del partner es requerida"),
+  marketSegment: z.string().min(1, "El segmento del mercado es requerido"),
   region: z.enum(["NOLA", "SOLA", "BRASIL", "MEXICO"], {
     required_error: "La región es requerida",
   }),
+  country: z.string().min(1, "El país es requerido"),
+  address: z.string().optional(),
+  city: z.string().optional(),
+  zipCode: z.string().optional(),
+  contactNumber: z.string().optional(),
   category: z.enum(["ENTERPRISE", "SMB", "MSSP"], {
     required_error: "La categoría es requerida",
   }),
@@ -48,9 +54,7 @@ export default function PasswordlessRegister() {
   const [selectedCountry, setSelectedCountry] = useState<string>("");
   const [selectedCity, setSelectedCity] = useState<string>("");
   const [selectedRegion, setSelectedRegion] = useState<string>("");
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
-  const [availableCountries, setAvailableCountries] = useState<string[]>([]);
-  const [availableCities, setAvailableCities] = useState<string[]>([]);
+  const [selectedMarketSegment, setSelectedMarketSegment] = useState<string>("");
   const [availableCategories, setAvailableCategories] = useState<string[]>([]);
   const [availableSubcategories, setAvailableSubcategories] = useState<string[]>([]);
 
@@ -70,9 +74,15 @@ export default function PasswordlessRegister() {
       email: "",
       firstName: "",
       lastName: "",
-      country: "",
-      city: "",
+      companyName: "",
+      partnerCategory: "",
+      marketSegment: "",
       region: undefined,
+      country: "",
+      address: "",
+      city: "",
+      zipCode: "",
+      contactNumber: "",
       category: undefined,
       subcategory: "",
     },
@@ -94,9 +104,9 @@ export default function PasswordlessRegister() {
       const categories = Object.keys(regionHierarchy[selectedRegion]?.categories || {});
       setAvailableCategories(categories);
       
-      // Reset category y subcategory
-      setSelectedCategory("");
-      form.setValue("category", "" as any);
+      // Reset market segment y subcategory
+      setSelectedMarketSegment("");
+      form.setValue("marketSegment", "");
       setAvailableSubcategories([]);
     } else {
       setAvailableCategories([]);
@@ -104,70 +114,18 @@ export default function PasswordlessRegister() {
     }
   }, [selectedRegion, regionHierarchy, form]);
 
-  // Actualizar subcategorías disponibles cuando se selecciona una categoría
+  // Actualizar subcategorías disponibles cuando se selecciona un segmento de mercado
   useEffect(() => {
-    if (selectedRegion && selectedCategory && regionHierarchy) {
-      const subcategories = regionHierarchy[selectedRegion]?.categories[selectedCategory] || [];
+    if (selectedRegion && selectedMarketSegment && regionHierarchy) {
+      const subcategories = regionHierarchy[selectedRegion]?.categories[selectedMarketSegment] || [];
       setAvailableSubcategories(subcategories);
     } else {
       setAvailableSubcategories([]);
     }
-  }, [selectedCategory, selectedRegion, regionHierarchy]);
-
-  // Actualizar países disponibles cuando se selecciona una región (usando REGION_HIERARCHY para países/ciudades)
-  useEffect(() => {
-    if (selectedRegion) {
-      const countries = Object.keys(REGION_HIERARCHY[selectedRegion] || {});
-      setAvailableCountries(countries);
-      
-      // Si solo hay un país (vacío o específico), seleccionarlo automáticamente
-      if (countries.length === 1) {
-        setSelectedCountry(countries[0]);
-        form.setValue("country", countries[0]);
-      } else {
-        setSelectedCountry("");
-        form.setValue("country", "");
-      }
-      
-      setSelectedCity("");
-      form.setValue("city", "");
-      setAvailableCities([]);
-    } else {
-      setAvailableCountries([]);
-      setSelectedCountry("");
-      setSelectedCity("");
-      setAvailableCities([]);
-    }
-  }, [selectedRegion, form]);
-
-  // Actualizar ciudades disponibles cuando se selecciona un país
-  useEffect(() => {
-    if (selectedRegion && selectedCountry !== undefined) {
-      const cities = REGION_HIERARCHY[selectedRegion]?.[selectedCountry] || [];
-      setAvailableCities(cities);
-      
-      // Reset ciudad seleccionada
-      setSelectedCity("");
-      form.setValue("city", "");
-    }
-  }, [selectedCountry, selectedRegion, form]);
+  }, [selectedMarketSegment, selectedRegion, regionHierarchy]);
 
   const registerMutation = useMutation({
     mutationFn: async (userData: PasswordlessRegisterForm) => {
-      // Construir el valor de country basado en la selección
-      let finalCountry = "";
-      if (userData.country && userData.country !== "") {
-        // Si hay país específico (NOLA: COLOMBIA, CENTRO AMERICA; SOLA: ARGENTINA, CHILE, PERU, OTROS)
-        if (userData.city) {
-          finalCountry = `${userData.country} - ${userData.city}`;
-        } else {
-          finalCountry = userData.country;
-        }
-      } else if (userData.city) {
-        // BRASIL o MÉXICO (sin país intermedio, solo ciudad)
-        finalCountry = userData.city;
-      }
-
       // Obtener idioma del localStorage
       const savedLanguage = localStorage.getItem('preferred-language') || 'es';
 
@@ -177,7 +135,6 @@ export default function PasswordlessRegister() {
         credentials: "include",
         body: JSON.stringify({
           ...userData,
-          country: finalCountry,
           language: savedLanguage,
         }),
       });
@@ -222,19 +179,6 @@ export default function PasswordlessRegister() {
   const onSubmit = (data: PasswordlessRegisterForm) => {
     registerMutation.mutate(data);
   };
-
-  const countries = [
-    { value: "US", label: "Estados Unidos" },
-    { value: "CA", label: "Canadá" },
-    { value: "MX", label: "México" },
-    { value: "BR", label: "Brasil" },
-    { value: "AR", label: "Argentina" },
-    { value: "CL", label: "Chile" },
-    { value: "CO", label: "Colombia" },
-    { value: "PE", label: "Perú" },
-    { value: "EC", label: "Ecuador" },
-    { value: "VE", label: "Venezuela" },
-  ];
 
   return (
     <div className="relative min-h-screen flex items-center justify-center p-4 overflow-hidden">
@@ -333,6 +277,85 @@ export default function PasswordlessRegister() {
                 />
               </div>
 
+              {/* Nombre de la Empresa */}
+              <FormField
+                control={form.control}
+                name="companyName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("auth.companyName")} *</FormLabel>
+                    <FormControl>
+                      <Input placeholder={t("auth.companyNamePlaceholder")} {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Categoría del Partner y Segmento del Mercado */}
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="partnerCategory"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("auth.partnerCategory")} *</FormLabel>
+                      <Select
+                        value={field.value}
+                        onValueChange={field.onChange}
+                        disabled={registerMutation.isPending}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder={t("auth.selectPartnerCategory")} />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="PLATINUM">PLATINUM</SelectItem>
+                          <SelectItem value="GOLD">GOLD</SelectItem>
+                          <SelectItem value="SILVER">SILVER</SelectItem>
+                          <SelectItem value="REGISTERED">REGISTERED</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="marketSegment"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("auth.marketSegment")} *</FormLabel>
+                      <Select
+                        value={field.value}
+                        onValueChange={(value) => {
+                          field.onChange(value);
+                          setSelectedMarketSegment(value);
+                          form.setValue("category", value as any, { shouldValidate: true });
+                          form.setValue("subcategory", "");
+                        }}
+                        disabled={registerMutation.isPending}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder={t("auth.selectMarketSegment")} />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="ENTERPRISE">ENTERPRISE</SelectItem>
+                          <SelectItem value="SMB">SMB</SelectItem>
+                          <SelectItem value="MSSP">MSSP</SelectItem>
+                          <SelectItem value="N/A">N/A</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
               {/* Region */}
               <FormField
                 control={form.control}
@@ -345,7 +368,8 @@ export default function PasswordlessRegister() {
                       onValueChange={(value) => {
                         setSelectedRegion(value);
                         form.setValue("region", value as any, { shouldValidate: true });
-                        setSelectedCategory(""); // Reset category when region changes
+                        setSelectedMarketSegment(""); // Reset market segment when region changes
+                        form.setValue("marketSegment", "");
                         form.setValue("category", "" as any, { shouldValidate: false });
                         form.setValue("subcategory", "", { shouldValidate: false });
                       }}
@@ -368,139 +392,34 @@ export default function PasswordlessRegister() {
                 )}
               />
 
-              {/* Mostrar selector de país solo si la región tiene países */}
-              {selectedRegion && availableCountries.length > 0 && availableCountries[0] !== "" && (
-                <FormField
-                  control={form.control}
-                  name="country"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        {selectedRegion === "NOLA" ? t("auth.subcategoryLabel") : t("auth.countryLabel")} *
-                      </FormLabel>
-                      <Select
-                        value={selectedCountry}
-                        onValueChange={(value) => {
-                          setSelectedCountry(value);
-                          form.setValue("country", value);
-                        }}
-                        disabled={registerMutation.isPending}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder={selectedRegion === "NOLA" ? t("auth.selectYourSubcategory") : t("auth.selectYourCountry")} />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {availableCountries.map((country) => (
-                            <SelectItem key={country} value={country}>
-                              {country}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
-
-              {/* Mostrar selector de ciudad si hay ciudades disponibles */}
-              {selectedRegion && availableCities.length > 0 && (
-                <FormField
-                  control={form.control}
-                  name="city"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("auth.cityLabel")} ({t("common.optional")})</FormLabel>
-                      <Select
-                        value={selectedCity}
-                        onValueChange={(value) => {
-                          setSelectedCity(value);
-                          form.setValue("city", value);
-                        }}
-                        disabled={registerMutation.isPending}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder={t("auth.selectYourCity")} />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {availableCities.map((city) => (
-                            <SelectItem key={city} value={city}>
-                              {city}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
-
-              {/* Category */}
-              {selectedRegion && availableCategories.length > 0 && (
-                <FormField
-                  control={form.control}
-                  name="category"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("auth.categoryLabel")} *</FormLabel>
-                      <Select
-                        value={selectedCategory}
-                        onValueChange={(value) => {
-                          setSelectedCategory(value);
-                          form.setValue("category", value as any, { shouldValidate: true });
-                          form.setValue("subcategory", "", { shouldValidate: false });
-                        }}
-                        disabled={registerMutation.isPending}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder={t("auth.selectYourCategory")} />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {availableCategories.map((category) => (
-                            <SelectItem key={category} value={category}>
-                              {category}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
-
-              {/* Subcategory - Mostrar solo si hay subcategorías disponibles */}
-              {selectedRegion && selectedCategory && availableSubcategories.length > 0 && (
+              {/* Subcategoría - Solo mostrar para región NOLA */}
+              {selectedRegion === "NOLA" && (
                 <FormField
                   control={form.control}
                   name="subcategory"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>
-                        {selectedRegion === "MEXICO" ? "Nivel de Partner *" : "Subcategoría *"}
-                      </FormLabel>
+                      <FormLabel>{t("auth.subcategoryLabel")} *</FormLabel>
                       <Select
+                        value={field.value}
                         onValueChange={(value) => form.setValue("subcategory", value)}
                         disabled={registerMutation.isPending}
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder={selectedRegion === "MEXICO" ? "Selecciona nivel" : "Selecciona subcategoría"} />
+                            <SelectValue placeholder={t("auth.selectYourSubcategory")} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {availableSubcategories.map((subcategory) => (
-                            <SelectItem key={subcategory} value={subcategory}>
-                              {subcategory}
-                            </SelectItem>
-                          ))}
+                          {availableSubcategories.length > 0 ? (
+                            availableSubcategories.map((subcategory) => (
+                              <SelectItem key={subcategory} value={subcategory}>
+                                {subcategory}
+                              </SelectItem>
+                            ))
+                          ) : (
+                            <SelectItem value="N/A" disabled>No hay subcategorías disponibles</SelectItem>
+                          )}
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -508,6 +427,107 @@ export default function PasswordlessRegister() {
                   )}
                 />
               )}
+
+              {/* País */}
+              <FormField
+                control={form.control}
+                name="country"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("auth.countryLabel")} *</FormLabel>
+                    <Select
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      disabled={registerMutation.isPending}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder={t("auth.selectYourCountry")} />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="ARGENTINA">ARGENTINA</SelectItem>
+                        <SelectItem value="BOLIVIA">BOLIVIA</SelectItem>
+                        <SelectItem value="BRASIL">BRASIL</SelectItem>
+                        <SelectItem value="CHILE">CHILE</SelectItem>
+                        <SelectItem value="COLOMBIA">COLOMBIA</SelectItem>
+                        <SelectItem value="COSTA RICA">COSTA RICA</SelectItem>
+                        <SelectItem value="ECUADOR">ECUADOR</SelectItem>
+                        <SelectItem value="EL SALVADOR">EL SALVADOR</SelectItem>
+                        <SelectItem value="GUATEMALA">GUATEMALA</SelectItem>
+                        <SelectItem value="HONDURAS">HONDURAS</SelectItem>
+                        <SelectItem value="MÉXICO">MÉXICO</SelectItem>
+                        <SelectItem value="NICARAGUA">NICARAGUA</SelectItem>
+                        <SelectItem value="PANAMÁ">PANAMÁ</SelectItem>
+                        <SelectItem value="PARAGUAY">PARAGUAY</SelectItem>
+                        <SelectItem value="PERÚ">PERÚ</SelectItem>
+                        <SelectItem value="URUGUAY">URUGUAY</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Dirección, Ciudad, Código Postal */}
+              <FormField
+                control={form.control}
+                name="address"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("auth.addressLabel")}</FormLabel>
+                    <FormControl>
+                      <Input placeholder={t("auth.addressPlaceholder")} {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="city"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("auth.cityLabel")}</FormLabel>
+                      <FormControl>
+                        <Input placeholder={t("auth.cityPlaceholder")} {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="zipCode"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("auth.zipCodeLabel")}</FormLabel>
+                      <FormControl>
+                        <Input placeholder={t("auth.zipCodePlaceholder")} {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Número de Contacto */}
+              <FormField
+                control={form.control}
+                name="contactNumber"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("auth.contactNumberLabel")}</FormLabel>
+                    <FormControl>
+                      <Input placeholder={t("auth.contactNumberPlaceholder")} {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               {/* Info Alert */}
               <Alert>
