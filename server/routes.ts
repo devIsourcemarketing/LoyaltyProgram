@@ -381,7 +381,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Request magic link for passwordless login
   app.post("/api/auth/request-magic-link", async (req, res) => {
     try {
-      const { email } = req.body;
+      const { email, language } = req.body;
       
       if (!email) {
         return res.status(400).json({ message: "Email is required" });
@@ -438,12 +438,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         loginTokenExpiry: expiryDate,
       });
 
+      // Usar idioma del cliente si viene, si no, detectar por IP
+      const userLanguage = language || await detectPreferredLanguage(req);
+      
+      console.log('🌍 [Magic Link Request] Language from client:', language);
+      console.log('🌍 [Magic Link Request] Final language:', userLanguage);
+
       // Enviar email con magic link usando el nuevo servicio con reintentos
       const emailResult = await sendMagicLinkEmail({
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
         loginToken,
+        language: userLanguage,
       });
 
       if (!emailResult) {
@@ -801,6 +808,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const updatedUser = await storage.getUser(deal.userId);
         const totalGoles = updatedUser?.points || 0;
         
+        // Detectar idioma preferido del usuario
+        const userLanguage = await detectPreferredLanguage(req);
+        
         await sendGolesRegistradosEmail({
           email: dealUser.email,
           firstName: dealUser.firstName,
@@ -808,7 +818,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           producto: deal.productName,
           valorDeal: parseInt(deal.dealValue) || 0,
           golesSumados: deal.pointsEarned,
-          totalGoles: totalGoles
+          totalGoles: totalGoles,
+          language: userLanguage,
         });
       }
       
@@ -1123,13 +1134,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const reward = await storage.getReward(req.params.id);
       
       if (user && reward) {
+        // Detectar idioma preferido del usuario
+        const userLanguage = await detectPreferredLanguage(req);
+        
         // Enviar email al usuario confirmando que su solicitud está pendiente
         await sendPendienteAprobacionEmail({
           email: user.email,
           firstName: user.firstName,
           lastName: user.lastName,
           nombrePremio: reward.name,
-          golesCanje: reward.pointsCost
+          golesCanje: reward.pointsCost,
+          language: userLanguage,
         });
         
         // Obtener email del primer admin para enviar notificación
@@ -2694,6 +2709,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
               const updatedUser = await storage.getUser(dealData.userId);
               const totalGoles = updatedUser?.points || 0;
               
+              // Detectar idioma preferido del usuario
+              const userLanguage = await detectPreferredLanguage(req);
+              
               await sendGolesRegistradosEmail({
                 email: dealUser.email,
                 firstName: dealUser.firstName,
@@ -2701,7 +2719,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 producto: dealData.productName,
                 valorDeal: parseInt(dealData.dealValue) || 0,
                 golesSumados: dealData.pointsEarned,
-                totalGoles: totalGoles
+                totalGoles: totalGoles,
+                language: userLanguage,
               });
             }
           }
@@ -3128,11 +3147,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
 
+      // Detectar idioma preferido del usuario
+      const userLanguage = await detectPreferredLanguage(req);
+
       // Send welcome email
       await sendBienvenidaEmail({
         email: approvedUser.email,
         firstName: approvedUser.firstName,
-        lastName: approvedUser.lastName
+        lastName: approvedUser.lastName,
+        language: userLanguage,
       });
 
       res.json({ 

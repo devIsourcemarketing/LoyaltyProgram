@@ -28,6 +28,351 @@ if (BREVO_API_KEY) {
 }
 
 /**
+ * Tipo para los idiomas soportados
+ */
+type EmailLanguage = 'es' | 'pt' | 'en';
+
+/**
+ * Base URL de Cloudinary para las imágenes de emails
+ */
+const CLOUDINARY_BASE = 'https://res.cloudinary.com/dk3ow5puw/image/upload';
+
+/**
+ * Helper para obtener las URLs de imágenes según el idioma
+ * Las imágenes están organizadas por idioma en Cloudinary:
+ * Public IDs: loyalty-program/emails/{tipo}/español/{imagen}
+ *             loyalty-program/emails/{tipo}/português/{imagen}
+ */
+function getEmailImageURLs(emailType: string, lang: EmailLanguage = 'es') {
+  // Map language codes to folder names in Cloudinary
+  const langFolder = lang === 'pt' ? 'português' : 'español';
+  const basePath = `${CLOUDINARY_BASE}/loyalty-program/emails/${emailType}/${langFolder}`;
+  
+  return {
+    basePath,
+    // Helper para construir URL de imagen
+    // NOTA: Cloudinary no requiere extensión en la URL, la detecta automáticamente
+    getImage: (filename: string, retina: boolean = false) => {
+      // Remover extensión si viene (Cloudinary la gestiona automáticamente)
+      let name = filename;
+      const lastDot = filename.lastIndexOf('.');
+      if (lastDot > 0) {
+        name = filename.substring(0, lastDot);
+      }
+      
+      // Codificar espacios como %20
+      const encodedName = name.replace(/ /g, '%20');
+      
+      // Retornar URL con carpeta de idioma incluida en el Public ID
+      return `${basePath}/${encodedName}`;
+    },
+    // Imágenes comunes (shared entre idiomas)
+    common: {
+      logoKaspersky: `${CLOUDINARY_BASE}/loyalty-program/emails/common/Kaspersky%20Logo.png`,
+      badge: `${CLOUDINARY_BASE}/loyalty-program/emails/common/Kaspersky%20Cup%20-%20badge%20250.png`,
+      socialIcons: {
+        facebook: `${CLOUDINARY_BASE}/loyalty-program/emails/common/social-icons/Group%2023.png`,
+        twitter: `${CLOUDINARY_BASE}/loyalty-program/emails/common/social-icons/Subtraction%201.png`,
+        linkedin: `${CLOUDINARY_BASE}/loyalty-program/emails/common/social-icons/Group%2025.png`,
+        instagram: `${CLOUDINARY_BASE}/loyalty-program/emails/common/social-icons/Group%2027.png`,
+        youtube: `${CLOUDINARY_BASE}/loyalty-program/emails/common/social-icons/Group%2028.png`,
+      }
+    }
+  };
+}
+
+/**
+ * Textos para emails en diferentes idiomas
+ */
+const emailTexts = {
+  common: {
+    greeting: {
+      es: 'HOLA',
+      pt: 'OLÁ',
+      en: 'HELLO'
+    },
+    followKaspersky: {
+      es: 'Siga a Kaspersky :',
+      pt: 'Siga a Kaspersky :',
+      en: 'Follow Kaspersky :'
+    },
+    kasperskyCup: {
+      es: 'Kaspersky Cup',
+      pt: 'Kaspersky Cup',
+      en: 'Kaspersky Cup'
+    }
+  },
+  magicLink: {
+    subject: {
+      es: 'Tu enlace único de acceso - Kaspersky Cup',
+      pt: 'Seu link único de acesso - Kaspersky Cup',
+      en: 'Your unique access link - Kaspersky Cup'
+    },
+    clickButton: {
+      es: 'Haga clic en el siguiente botón para iniciar sesión en el programa Kaspersky Cup:',
+      pt: 'Clique no botão abaixo para fazer login no programa Kaspersky Cup:',
+      en: 'Click the button below to log in to the Kaspersky Cup program:'
+    },
+    accessNow: {
+      es: 'Acceder ahora',
+      pt: 'Acessar agora',
+      en: 'Access now'
+    },
+    cannotAccess: {
+      es: 'Si no puede acceder desde el botón, copie y pegue este enlace',
+      pt: 'Se não conseguir acessar pelo botão, copie e cole este link',
+      en: 'If you cannot access from the button, copy and paste this link'
+    },
+    inBrowser: {
+      es: 'en su navegador:',
+      pt: 'no seu navegador:',
+      en: 'in your browser:'
+    },
+    important: {
+      es: 'IMPORTANTE:',
+      pt: 'IMPORTANTE:',
+      en: 'IMPORTANT:'
+    },
+    linkExpires: {
+      es: 'Este enlace expira en 15 minutos.',
+      pt: 'Este link expira em 15 minutos.',
+      en: 'This link expires in 15 minutes.'
+    },
+    useOnce: {
+      es: 'Solo puede usarse una vez.',
+      pt: 'Só pode ser usado uma vez.',
+      en: 'Can only be used once.'
+    },
+    didNotRequest: {
+      es: 'Si no solicitó este acceso, ignore este correo. Este es un mensaje automático, por favor, no responda a este mensaje.',
+      pt: 'Se você não solicitou este acesso, ignore este e-mail. Esta é uma mensagem automática, por favor, não responda a esta mensagem.',
+      en: 'If you did not request this access, ignore this email. This is an automated message, please do not reply to this message.'
+    }
+  },
+  bienvenida: {
+    subject: {
+      es: '¡Bienvenido a Kaspersky Cup! - Aquí comienza su ruta goleadora',
+      pt: 'Bem-vindo à Kaspersky Cup! - Aqui começa sua rota de gols',
+      en: 'Welcome to Kaspersky Cup! - Your scoring route begins here'
+    },
+    welcome: {
+      es: 'Bienvenido(a) a <span class="highlight-text">Kaspersky Cup</span>, una campaña de incentivos con muchos premios pensada para nuestros socios.',
+      pt: 'Bem-vindo(a) à <span class="highlight-text">Kaspersky Cup</span>, uma campanha de incentivos com muitos prêmios pensada para nossos parceiros.',
+      en: 'Welcome to <span class="highlight-text">Kaspersky Cup</span>, an incentive campaign with many prizes designed for our partners.'
+    },
+    salesTransform: {
+      es: 'Cada venta de productos Kaspersky se transforma en goles que pueden valer premios increíbles. Cuanto más venda, más gana, con recompensas exclusivas que se actualizan cada mes.',
+      pt: 'Cada venda de produtos Kaspersky se transforma em gols que podem valer prêmios incríveis. Quanto mais você vende, mais ganha, com recompensas exclusivas que são atualizadas a cada mês.',
+      en: 'Each sale of Kaspersky products turns into goals that can be worth incredible prizes. The more you sell, the more you earn, with exclusive rewards that are updated every month.'
+    },
+    worldCupExperience: {
+      es: 'Conviértase en el goleador de <span class="highlight-text">Kaspersky Cup</span> y participe por una experiencia completa para asistir a un partido de la Copa Mundial con todos los gastos pagos.',
+      pt: 'Torne-se o artilheiro da <span class="highlight-text">Kaspersky Cup</span> e participe de uma experiência completa para assistir a uma partida da Copa do Mundo com todas as despesas pagas.',
+      en: 'Become the top scorer of <span class="highlight-text">Kaspersky Cup</span> and participate for a complete experience to attend a World Cup match with all expenses paid.'
+    },
+    accessAccount: {
+      es: 'Ingrese a <span class="highlight-text">kasperskycup.com</span>, conozca los términos y condiciones del programa y consulte su puntaje.',
+      pt: 'Acesse <span class="highlight-text">kasperskycup.com</span>, conheça os termos e condições do programa e consulte sua pontuação.',
+      en: 'Visit <span class="highlight-text">kasperskycup.com</span>, learn about the program terms and conditions and check your score.'
+    },
+    accessButton: {
+      es: 'Acceder a mi cuenta',
+      pt: 'Acessar minha conta',
+      en: 'Access my account'
+    }
+  },
+  golesRegistrados: {
+    subject: {
+      es: '¡Golazo! Su marcador sigue creciendo - Kaspersky Cup',
+      pt: 'Golaço! Seu placar continua crescendo - Kaspersky Cup',
+      en: 'Goal! Your score keeps growing - Kaspersky Cup'
+    },
+    greatNews: {
+      es: '¡Excelentes noticias!',
+      pt: 'Excelentes notícias!',
+      en: 'Excellent news!'
+    },
+    salesRegistered: {
+      es: 'Nuevas ventas fueron registradas a su nombre y ha acumulado más goles en <span class="highlight-text">Kaspersky Cup</span>.',
+      pt: 'Novas vendas foram registradas em seu nome e você acumulou mais gols na <span class="highlight-text">Kaspersky Cup</span>.',
+      en: 'New sales have been registered in your name and you have accumulated more goals in <span class="highlight-text">Kaspersky Cup</span>.'
+    },
+    product: {
+      es: 'Producto',
+      pt: 'Produto',
+      en: 'Product'
+    },
+    dealValue: {
+      es: 'Valor del Deal',
+      pt: 'Valor do Negócio',
+      en: 'Deal Value'
+    },
+    goalsAdded: {
+      es: 'Goles sumados',
+      pt: 'Gols adicionados',
+      en: 'Goals added'
+    },
+    redeemReward: {
+      es: 'Sus goles ya están disponibles en su cuenta y puede usarlos para <span class="highlight-text">canjear el premio imperdible del mes</span>.',
+      pt: 'Seus gols já estão disponíveis em sua conta e você pode usá-los para <span class="highlight-text">resgatar o prêmio imperdível do mês</span>.',
+      en: 'Your goals are now available in your account and you can use them to <span class="highlight-text">redeem this month\'s unmissable prize</span>.'
+    },
+    viewScore: {
+      es: 'Ver mi marcador',
+      pt: 'Ver meu placar',
+      en: 'View my score'
+    },
+    keepGoing: {
+      es: '¡Sigue así!',
+      pt: 'Continue assim!',
+      en: 'Keep it up!'
+    },
+    worldCup2026: {
+      es: 'Cada nuevo gol te acerca a vivir en vivo la <span class="highlight-text">Copa Mundial de Fútbol 2026</span>.',
+      pt: 'Cada novo gol te aproxima de viver ao vivo a <span class="highlight-text">Copa do Mundo de Futebol 2026</span>.',
+      en: 'Each new goal brings you closer to experiencing the <span class="highlight-text">2026 FIFA World Cup</span> live.'
+    }
+  },
+  pendienteAprobacion: {
+    subject: {
+      es: 'Kaspersky Cup - Solicitud de Canje en Proceso',
+      pt: 'Kaspersky Cup - Solicitação de Resgate em Processo',
+      en: 'Kaspersky Cup - Redemption Request in Process'
+    },
+    redeemMessage: {
+      es: 'Sus goles le permitieron <span class="highlight-text">redimir su premio</span> en <span class="highlight-text">Kaspersky Cup.</span>',
+      pt: 'Seus gols permitiram <span class="highlight-text">resgatar seu prêmio</span> na <span class="highlight-text">Kaspersky Cup.</span>',
+      en: 'Your goals allowed you to <span class="highlight-text">redeem your prize</span> at <span class="highlight-text">Kaspersky Cup.</span>'
+    },
+    processing: {
+      es: 'Nuestro equipo organizador está procesando su solicitud. Muy pronto recibirá la confirmación del envío por correo electrónico o a través de la plataforma.',
+      pt: 'Nossa equipe organizadora está processando sua solicitação. Em breve você receberá a confirmação do envio por e-mail ou através da plataforma.',
+      en: 'Our organizing team is processing your request. You will soon receive shipping confirmation by email or through the platform.'
+    },
+    checkStatus: {
+      es: 'Revisar el estado de mi premio',
+      pt: 'Verificar o status do meu prêmio',
+      en: 'Check my prize status'
+    },
+    soonInTouch: {
+      es: 'Pronto estaremos en contacto con usted.',
+      pt: 'Em breve estaremos em contato com você.',
+      en: 'We will be in touch with you soon.'
+    },
+    seeYouNextMatch: {
+      es: '¡Nos vemos en el próximo partido!',
+      pt: 'Vejo você na próxima partida!',
+      en: 'See you at the next match!'
+    }
+  },
+  aprobacionPremio: {
+    subject: {
+      es: 'Kaspersky Cup - ¡Premio Aprobado!',
+      pt: 'Kaspersky Cup - Prêmio Aprovado!',
+      en: 'Kaspersky Cup - Prize Approved!'
+    },
+    approved: {
+      es: '¡Su premio ha sido aprobado!',
+      pt: 'Seu prêmio foi aprovado!',
+      en: 'Your prize has been approved!'
+    },
+    congratulations: {
+      es: '¡Felicidades!',
+      pt: 'Parabéns!',
+      en: 'Congratulations!'
+    },
+    deliveryMessage: {
+      es: 'Su premio será enviado en los próximos días.',
+      pt: 'Seu prêmio será enviado nos próximos dias.',
+      en: 'Your prize will be shipped in the next few days.'
+    }
+  },
+  expectativa: {
+    subject: {
+      es: '⚽ Prepárate para Kaspersky Cup - ¡Grandes premios te esperan!',
+      pt: '⚽ Prepare-se para a Kaspersky Cup - Grandes prêmios te esperam!',
+      en: '⚽ Get ready for Kaspersky Cup - Great prizes await you!'
+    },
+    comingSoon: {
+      es: 'Muy pronto comenzará',
+      pt: 'Em breve começará',
+      en: 'Coming soon'
+    },
+    stayTuned: {
+      es: 'Mantente atento a tu correo.',
+      pt: 'Fique atento ao seu e-mail.',
+      en: 'Stay tuned to your email.'
+    }
+  },
+  registroExitoso: {
+    subject: {
+      es: '⚽ ¡Registro exitoso! - Completa tu perfil en Kaspersky Cup',
+      pt: '⚽ Registro bem-sucedido! - Complete seu perfil na Kaspersky Cup',
+      en: '⚽ Registration successful! - Complete your profile at Kaspersky Cup'
+    },
+    almostReady: {
+      es: '¡Casi listo!',
+      pt: 'Quase pronto!',
+      en: 'Almost ready!'
+    },
+    completeProfile: {
+      es: 'Completa tu perfil para empezar a jugar',
+      pt: 'Complete seu perfil para começar a jogar',
+      en: 'Complete your profile to start playing'
+    },
+    completeButton: {
+      es: 'Completar mi registro',
+      pt: 'Completar meu registro',
+      en: 'Complete my registration'
+    }
+  },
+  registroPasswordless: {
+    subject: {
+      es: '⚽ ¡Registro exitoso! ¡Fue convocado a jugar en Kaspersky Cup! 🏆',
+      pt: '⚽ Registro bem-sucedido! Você foi convocado para jogar na Kaspersky Cup! 🏆',
+      en: '⚽ Registration successful! You\'ve been called up to play in Kaspersky Cup! 🏆'
+    },
+    welcome: {
+      es: '¡Bienvenido al equipo!',
+      pt: 'Bem-vindo à equipe!',
+      en: 'Welcome to the team!'
+    },
+    convened: {
+      es: 'Fuiste convocado a jugar',
+      pt: 'Você foi convocado para jogar',
+      en: 'You have been called up to play'
+    },
+    accessButton: {
+      es: 'Acceder ahora',
+      pt: 'Acessar agora',
+      en: 'Access now'
+    }
+  },
+  ganadorPremioMayor: {
+    subject: {
+      es: '🏆 ¡FELICIDADES! Ganaste el Gran Premio - Kaspersky Cup',
+      pt: '🏆 PARABÉNS! Você ganhou o Grande Prêmio - Kaspersky Cup',
+      en: '🏆 CONGRATULATIONS! You won the Grand Prize - Kaspersky Cup'
+    },
+    youWon: {
+      es: '¡GANASTE!',
+      pt: 'VOCÊ GANHOU!',
+      en: 'YOU WON!'
+    },
+    worldCupTrip: {
+      es: 'Viaje a la Copa Mundial',
+      pt: 'Viagem para a Copa do Mundo',
+      en: 'World Cup Trip'
+    },
+    tripDetails: {
+      es: 'Detalles de tu viaje',
+      pt: 'Detalhes da sua viagem',
+      en: 'Your trip details'
+    }
+  }
+};
+
+/**
  * Convierte una imagen a Base64 para embeber en emails
  */
 function imageToBase64(imagePath: string): string {
@@ -1786,12 +2131,14 @@ export interface MagicLinkEmailData {
   firstName: string;
   lastName: string;
   loginToken: string;
+  language?: EmailLanguage;
 }
 
 export interface ExpectationEmailData {
   email: string;
   firstName?: string;
   lastName?: string;
+  language?: EmailLanguage;
 }
 
 /**
@@ -1799,6 +2146,7 @@ export interface ExpectationEmailData {
  * Este email se envía antes del lanzamiento o como campaña promocional
  */
 export async function sendExpectationEmail(data: ExpectationEmailData): Promise<boolean> {
+  const lang = data.language || 'es';
   try {
     if (!BREVO_API_KEY) {
       console.warn('⚠️  BREVO_API_KEY no configurada. Email no enviado.');
@@ -1809,11 +2157,13 @@ export async function sendExpectationEmail(data: ExpectationEmailData): Promise<
     console.log('📤 Intentando enviar email de expectativa...');
     console.log('   Destinatario:', data.email);
     console.log('   Remitente:', FROM_EMAIL);
+    console.log('   Idioma:', lang);
     
-    // Imágenes alojadas en Cloudinary (Europa)
-    const heroImageUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764337224/loyalty-program/emails/expectativa/hero.png';
-    const heroImage2xUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764337226/loyalty-program/emails/expectativa/hero-2x.png';
-    const footerImageUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764337229/loyalty-program/emails/expectativa/footer.png';
+    // Imágenes dinámicas según idioma
+    const images = getEmailImageURLs('expectativa', lang);
+    const heroImageUrl = images.getImage('hero.png');
+    const heroImage2xUrl = images.getImage('hero.png', true);
+    const footerImageUrl = images.common.badge;
     
     const sendSmtpEmail = new brevo.SendSmtpEmail();
     sendSmtpEmail.to = [{ 
@@ -1821,7 +2171,7 @@ export async function sendExpectationEmail(data: ExpectationEmailData): Promise<
       name: data.firstName && data.lastName ? `${data.firstName} ${data.lastName}` : undefined 
     }];
     sendSmtpEmail.sender = { email: FROM_EMAIL, name: 'Kaspersky Cup' };
-    sendSmtpEmail.subject = '⚽ Ventas que se celebran como goles - Kaspersky Cup 2025';
+    sendSmtpEmail.subject = emailTexts.expectativa.subject[lang];
     sendSmtpEmail.htmlContent = `
       <!DOCTYPE html>
       <html>
@@ -2041,22 +2391,22 @@ export async function sendExpectationEmail(data: ExpectationEmailData): Promise<
             
             <!-- Redes Sociales -->
             <div class="social-section">
-              <div class="social-title">Siga a Kaspersky :</div>
+              <div class="social-title">${emailTexts.common.followKaspersky[lang]}</div>
               <div class="social-links">
                 <a href="https://www.facebook.com/Kaspersky" style="display: inline-block; margin: 0 6px; text-decoration: none;" title="Facebook">
-                  <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338210/loyalty-program/emails/common/social-icons/Group%2023.png" alt="Facebook" style="width: 16px; height: 16px;" />
+                  <img src="${images.common.socialIcons.facebook}" alt="Facebook" style="width: 16px; height: 16px;" />
                 </a>
                 <a href="https://twitter.com/kaspersky" style="display: inline-block; margin: 0 6px; text-decoration: none;" title="Twitter">
-                  <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338220/loyalty-program/emails/common/social-icons/Subtraction%201.png" alt="Twitter" style="width: 16px; height: 16px;" />
+                  <img src="${images.common.socialIcons.twitter}" alt="Twitter" style="width: 16px; height: 16px;" />
                 </a>
                 <a href="https://www.linkedin.com/company/kaspersky-lab" style="display: inline-block; margin: 0 6px; text-decoration: none;" title="LinkedIn">
-                  <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338212/loyalty-program/emails/common/social-icons/Group%2025.png" alt="LinkedIn" style="width: 16px; height: 16px;" />
+                  <img src="${images.common.socialIcons.linkedin}" alt="LinkedIn" style="width: 16px; height: 16px;" />
                 </a>
                 <a href="https://www.instagram.com/kasperskylab/" style="display: inline-block; margin: 0 6px; text-decoration: none;" title="Instagram">
-                  <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338213/loyalty-program/emails/common/social-icons/Group%2027.png" alt="Instagram" style="width: 16px; height: 16px;" />
+                  <img src="${images.common.socialIcons.instagram}" alt="Instagram" style="width: 16px; height: 16px;" />
                 </a>
                 <a href="https://www.youtube.com/user/Kaspersky" style="display: inline-block; margin: 0 6px; text-decoration: none;" title="YouTube">
-                  <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338215/loyalty-program/emails/common/social-icons/Group%2028.png" alt="YouTube" style="width: 16px; height: 16px;" />
+                  <img src="${images.common.socialIcons.youtube}" alt="YouTube" style="width: 16px; height: 16px;" />
                 </a>
               </div>
             </div>
@@ -2112,6 +2462,7 @@ export interface RegistroExitosoEmailData {
   lastName?: string;
   inviteToken?: string; // Para invitaciones (completar registro)
   loginToken?: string; // Para passwordless (acceso directo con magic link)
+  language?: EmailLanguage;
 }
 
 /**
@@ -2119,6 +2470,7 @@ export interface RegistroExitosoEmailData {
  * Este email se envía cuando un admin invita a un nuevo usuario al programa
  */
 export async function sendRegistroExitosoEmail(data: RegistroExitosoEmailData): Promise<boolean> {
+  const lang = data.language || 'es';
   try {
     if (!BREVO_API_KEY) {
       console.warn('⚠️  BREVO_API_KEY no configurada. Email no enviado.');
@@ -2130,11 +2482,13 @@ export async function sendRegistroExitosoEmail(data: RegistroExitosoEmailData): 
     console.log('📤 Intentando enviar email de registro exitoso...');
     console.log('   Destinatario:', data.email);
     console.log('   Remitente:', FROM_EMAIL);
+    console.log('   Idioma:', lang);
     
-    // Imágenes alojadas en Cloudinary (Europa)
-    const heroImageUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764342186/loyalty-program/emails/registro-exitoso/Group%2065.png';
-    const heroImage2xUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764342187/loyalty-program/emails/registro-exitoso/Group%2065%402x.png';
-    const footerImageUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764337229/loyalty-program/emails/expectativa/footer.png';
+    // Imágenes dinámicas según idioma
+    const images = getEmailImageURLs('registro-exitoso', lang);
+    const heroImageUrl = images.getImage('Group 65.png');
+    const heroImage2xUrl = images.getImage('Group 65.png', true);
+    const footerImageUrl = images.common.badge;
     const userName = data.firstName || 'Usuario';
     
     // Determinar el link correcto según el tipo de token
@@ -2150,7 +2504,7 @@ export async function sendRegistroExitosoEmail(data: RegistroExitosoEmailData): 
       name: data.firstName && data.lastName ? `${data.firstName} ${data.lastName}` : undefined 
     }];
     sendSmtpEmail.sender = { email: FROM_EMAIL, name: 'Kaspersky Cup' };
-    sendSmtpEmail.subject = '⚽ ¡Bienvenido a Kaspersky Cup! - Complete su registro';
+    sendSmtpEmail.subject = emailTexts.registroExitoso.subject[lang];
     sendSmtpEmail.htmlContent = `
       <!DOCTYPE html>
       <html>
@@ -2367,22 +2721,22 @@ export async function sendRegistroExitosoEmail(data: RegistroExitosoEmailData): 
             
             <!-- Redes Sociales -->
             <div class="social-section">
-              <div class="social-title">Siga a Kaspersky :</div>
+              <div class="social-title">${emailTexts.common.followKaspersky[lang]}</div>
               <div class="social-links">
                 <a href="https://www.facebook.com/Kaspersky" style="display: inline-block; margin: 0 6px; text-decoration: none;" title="Facebook">
-                  <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338210/loyalty-program/emails/common/social-icons/Group%2023.png" alt="Facebook" style="width: 16px; height: 16px;" />
+                  <img src="${images.common.socialIcons.facebook}" alt="Facebook" style="width: 16px; height: 16px;" />
                 </a>
                 <a href="https://twitter.com/kaspersky" style="display: inline-block; margin: 0 6px; text-decoration: none;" title="Twitter">
-                  <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338220/loyalty-program/emails/common/social-icons/Subtraction%201.png" alt="Twitter" style="width: 16px; height: 16px;" />
+                  <img src="${images.common.socialIcons.twitter}" alt="Twitter" style="width: 16px; height: 16px;" />
                 </a>
                 <a href="https://www.linkedin.com/company/kaspersky-lab" style="display: inline-block; margin: 0 6px; text-decoration: none;" title="LinkedIn">
-                  <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338212/loyalty-program/emails/common/social-icons/Group%2025.png" alt="LinkedIn" style="width: 16px; height: 16px;" />
+                  <img src="${images.common.socialIcons.linkedin}" alt="LinkedIn" style="width: 16px; height: 16px;" />
                 </a>
                 <a href="https://www.instagram.com/kasperskylab/" style="display: inline-block; margin: 0 6px; text-decoration: none;" title="Instagram">
-                  <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338213/loyalty-program/emails/common/social-icons/Group%2027.png" alt="Instagram" style="width: 16px; height: 16px;" />
+                  <img src="${images.common.socialIcons.instagram}" alt="Instagram" style="width: 16px; height: 16px;" />
                 </a>
                 <a href="https://www.youtube.com/user/Kaspersky" style="display: inline-block; margin: 0 6px; text-decoration: none;" title="YouTube">
-                  <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338215/loyalty-program/emails/common/social-icons/Group%2028.png" alt="YouTube" style="width: 16px; height: 16px;" />
+                  <img src="${images.common.socialIcons.youtube}" alt="YouTube" style="width: 16px; height: 16px;" />
                 </a>
               </div>
             </div>
@@ -2446,6 +2800,7 @@ export interface RegistroPasswordlessEmailData {
   firstName?: string;
   lastName?: string;
   loginToken: string; // Magic link token
+  language?: EmailLanguage;
 }
 
 /**
@@ -2453,6 +2808,7 @@ export interface RegistroPasswordlessEmailData {
  * Asunto: !Registro exitoso! ¡Fue convocado a jugar en Kasperksy Cup! 🏆
  */
 export async function sendRegistroPasswordlessEmail(data: RegistroPasswordlessEmailData): Promise<boolean> {
+  const lang = data.language || 'es';
   try {
     if (!BREVO_API_KEY) {
       console.warn('⚠️  BREVO_API_KEY no configurada. Email no enviado.');
@@ -2464,13 +2820,15 @@ export async function sendRegistroPasswordlessEmail(data: RegistroPasswordlessEm
     console.log('📤 Intentando enviar email de registro passwordless...');
     console.log('   Destinatario:', data.email);
     console.log('   Remitente:', FROM_EMAIL);
+    console.log('   Idioma:', lang);
     
-    // Imágenes alojadas en Cloudinary (Europa)
-    const leftImageUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764594519/loyalty-program/emails/registro-passwordless/Group%2065.png';
-    const leftImage2xUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764594521/loyalty-program/emails/registro-passwordless/Group%2065%402x.png';
-    const logoUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764594525/loyalty-program/emails/registro-passwordless/Logo%20-%20Kaspersky%20Cup.png';
-    const logo2xUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764594526/loyalty-program/emails/registro-passwordless/Logo%20-%20Kaspersky%20Cup%402x.png';
-    const footerImageUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764337229/loyalty-program/emails/expectativa/footer.png';
+    // Imágenes dinámicas según idioma
+    const images = getEmailImageURLs('registro-passwordless', lang);
+    const leftImageUrl = images.getImage('Group 65.png');
+    const leftImage2xUrl = images.getImage('Group 65.png', true);
+    const logoUrl = images.getImage('Logo - Kaspersky Cup.png');
+    const logo2xUrl = images.getImage('Logo - Kaspersky Cup.png', true);
+    const footerImageUrl = images.common.badge;
     const userName = data.firstName || 'Usuario';
     const magicLink = `${APP_URL}/auth/verify-magic-link/${data.loginToken}`;
     
@@ -2480,7 +2838,7 @@ export async function sendRegistroPasswordlessEmail(data: RegistroPasswordlessEm
       name: data.firstName && data.lastName ? `${data.firstName} ${data.lastName}` : undefined 
     }];
     sendSmtpEmail.sender = { email: FROM_EMAIL, name: 'Kaspersky Cup' };
-    sendSmtpEmail.subject = '!Registro exitoso! ¡Fue convocado a jugar en Kasperksy Cup! 🏆';
+    sendSmtpEmail.subject = emailTexts.registroPasswordless.subject[lang];
     sendSmtpEmail.htmlContent = `
       <!DOCTYPE html>
       <html>
@@ -2746,6 +3104,7 @@ export interface BienvenidaEmailData {
   firstName?: string;
   lastName?: string;
   loginToken?: string; // Optional magic link token for first access
+  language?: EmailLanguage; // Language for email content
 }
 
 /**
@@ -2753,6 +3112,7 @@ export interface BienvenidaEmailData {
  * Este email se envía cuando un usuario completa su registro exitosamente
  */
 export async function sendBienvenidaEmail(data: BienvenidaEmailData): Promise<boolean> {
+  const lang = data.language || 'es';
   try {
     if (!BREVO_API_KEY) {
       console.warn('⚠️  BREVO_API_KEY no configurada. Email no enviado.');
@@ -2763,16 +3123,18 @@ export async function sendBienvenidaEmail(data: BienvenidaEmailData): Promise<bo
     console.log('📤 Intentando enviar email de bienvenida...');
     console.log('   Destinatario:', data.email);
     console.log('   Remitente:', FROM_EMAIL);
+    console.log('   Idioma:', lang);
     
-    // Imágenes alojadas en Cloudinary (Europa)
-    const heroImageUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764344180/loyalty-program/emails/bienvenida/Group%2059.png';
-    const heroImage2xUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764344182/loyalty-program/emails/bienvenida/Group%2059%402x.png';
-    const img2Url = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764344188/loyalty-program/emails/bienvenida/u8721598234_A_photorealistic_image_of_a_male_soccer_player_hold_51c9badc-b990-4ca5-a9ff-bb764d1a6e4c.png';
-    const img2Url2x = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764344205/loyalty-program/emails/bienvenida/u8721598234_A_photorealistic_image_of_a_male_soccer_player_hold_51c9badc-b990-4ca5-a9ff-bb764d1a6e4c%402x.png';
-    const img3Url = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764344185/loyalty-program/emails/bienvenida/Group%2060.png';
-    const img3Url2x = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764344186/loyalty-program/emails/bienvenida/Group%2060%402x.png';
-    const footerImageUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764337229/loyalty-program/emails/expectativa/footer.png';
-    const userName = data.firstName || 'Usuario';
+    // Imágenes dinámicas según idioma
+    const images = getEmailImageURLs('bienvenida', lang);
+    const heroImageUrl = images.getImage('Group 59.png');
+    const heroImage2xUrl = images.getImage('Group 59.png', true);
+    const img2Url = images.getImage('u8721598234_A_photorealistic_image_of_a_male_soccer_player_hold_51c9badc-b990-4ca5-a9ff-bb764d1a6e4c.png');
+    const img2Url2x = images.getImage('u8721598234_A_photorealistic_image_of_a_male_soccer_player_hold_51c9badc-b990-4ca5-a9ff-bb764d1a6e4c.png', true);
+    const img3Url = images.getImage('Group 60.png');
+    const img3Url2x = images.getImage('Group 60.png', true);
+    const footerImageUrl = images.common.badge;
+    const userName = data.firstName || emailTexts.common.greeting[lang];
     
     // Construir URL de acceso si se proporciona loginToken
     const loginUrl = data.loginToken 
@@ -2785,7 +3147,7 @@ export async function sendBienvenidaEmail(data: BienvenidaEmailData): Promise<bo
       name: data.firstName && data.lastName ? `${data.firstName} ${data.lastName}` : undefined 
     }];
     sendSmtpEmail.sender = { email: FROM_EMAIL, name: 'Kaspersky Cup' };
-    sendSmtpEmail.subject = '⚽ ¡Bienvenido a Kaspersky Cup! - Aquí comienza su ruta goleadora';
+    sendSmtpEmail.subject = `⚽ ${emailTexts.bienvenida.subject[lang]}`;  
     sendSmtpEmail.htmlContent = `
       <!DOCTYPE html>
       <html>
@@ -2977,16 +3339,16 @@ export async function sendBienvenidaEmail(data: BienvenidaEmailData): Promise<bo
           
           <!-- Contenido -->
           <div class="content-section">
-            <div class="greeting">HOLA</div>
+            <div class="greeting">${emailTexts.common.greeting[lang]}</div>
             <div class="name">(${userName})</div>
             
             <p class="message">
-              Bienvenido(a) a <span class="highlight-text">Kaspersky Cup</span>, una campaña de incentivos con muchos premios pensada para nuestros socios.
+              ${emailTexts.bienvenida.welcome[lang]}
             </p>
             
             <div class="info-box">
               <div class="info-text">
-                Cada venta de productos Kaspersky se transforma en goles que pueden valer premios increíbles. Cuanto más venda, más gana, con recompensas exclusivas que se actualizan cada mes.
+                ${emailTexts.bienvenida.salesTransform[lang]}
               </div>
             </div>
             
@@ -2997,18 +3359,18 @@ export async function sendBienvenidaEmail(data: BienvenidaEmailData): Promise<bo
                  class="section-image" />
             
             <p class="message">
-              Conviértase en el goleador de <span class="highlight-text">Kaspersky Cup</span> y participe por una experiencia completa para asistir a un partido de la Copa Mundial con todos los gastos pagos.
+              ${emailTexts.bienvenida.worldCupExperience?.[lang] || emailTexts.bienvenida.welcome[lang]}
             </p>
             
             <p class="message">
-              Ingrese a <span class="highlight-text">kasperskycup.com</span>, conozca los términos y condiciones del programa y consulte su puntaje.
+              ${emailTexts.bienvenida.accessAccount[lang]}
             </p>
             
             ${loginUrl ? `
             <!-- Botón de Acceso -->
             <div class="access-button-container">
               <a href="${loginUrl}" class="access-button" style="display: inline-block; background-color: #29CCB1; color: #FFFFFF; text-decoration: none; padding: 16px 48px; border-radius: 4px; font-size: 18px; font-weight: 600;">
-                Acceder a mi cuenta
+                ${emailTexts.bienvenida.accessAccount[lang]}
               </a>
               <p class="access-note" style="font-size: 13px; color: #666666; margin-top: 16px; font-style: italic;">
                 Este enlace de acceso expira en 7 días. Después de su primera visita, podrá solicitar nuevos enlaces de acceso desde la pantalla de inicio de sesión.
@@ -3035,7 +3397,7 @@ export async function sendBienvenidaEmail(data: BienvenidaEmailData): Promise<bo
             
             <!-- Redes Sociales -->
             <div class="social-section">
-              <div class="social-title">Siga a Kaspersky :</div>
+              <div class="social-title">${emailTexts.common.followKaspersky[lang]}</div>
               <div class="social-links">
                 <a href="https://www.facebook.com/Kaspersky" style="display: inline-block; margin: 0 6px; text-decoration: none;" title="Facebook">
                   <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338210/loyalty-program/emails/common/social-icons/Group%2023.png" alt="Facebook" style="width: 16px; height: 16px;" />
@@ -3110,6 +3472,7 @@ Kaspersky Cup
  * Envía un email con magic link para acceso sin contraseña
  */
 export async function sendMagicLinkEmail(data: MagicLinkEmailData): Promise<boolean> {
+  const lang = data.language || 'es';
   try {
     if (!BREVO_API_KEY) {
       console.warn('⚠️  BREVO_API_KEY no configurada. Email no enviado.');
@@ -3121,19 +3484,26 @@ export async function sendMagicLinkEmail(data: MagicLinkEmailData): Promise<bool
     console.log('📤 Intentando enviar email de magic link...');
     console.log('   Destinatario:', data.email);
     console.log('   Remitente:', FROM_EMAIL);
+    console.log('   Idioma detectado:', lang);
 
     const magicLink = `${APP_URL}/login/magic?token=${data.loginToken}`;
     
-    // Imágenes alojadas en Cloudinary (Europa)
-    const heroImageUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764344794/loyalty-program/emails/magic-link/Group%2061.png';
-    const heroImage2xUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764344796/loyalty-program/emails/magic-link/Group%2061%402x.png';
-    const footerImageUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764337229/loyalty-program/emails/expectativa/footer.png';
-    const userName = data.firstName || 'Usuario';
+    // Imágenes dinámicas según idioma
+    const images = getEmailImageURLs('magic-link', lang);
+    const heroImageUrl = images.getImage('Group 61.png');
+    const heroImage2xUrl = images.getImage('Group 61.png', true);
+    const footerImageUrl = images.common.badge;
+    
+    console.log('   🖼️  Hero Image URL:', heroImageUrl);
+    console.log('   🖼️  Hero Image 2x URL:', heroImage2xUrl);
+    console.log('   🖼️  Footer Image URL:', footerImageUrl);
+    
+    const userName = data.firstName || emailTexts.common.greeting[lang];
     
     const sendSmtpEmail = new brevo.SendSmtpEmail();
     sendSmtpEmail.to = [{ email: data.email, name: `${data.firstName} ${data.lastName}` }];
     sendSmtpEmail.sender = { email: FROM_EMAIL, name: 'Kaspersky Cup' };
-    sendSmtpEmail.subject = '⚽ Tu enlace único de acceso - Kaspersky Cup';
+    sendSmtpEmail.subject = `⚽ ${emailTexts.magicLink.subject[lang]}`;  
     sendSmtpEmail.htmlContent = `
       <!DOCTYPE html>
       <html>
@@ -3320,28 +3690,26 @@ export async function sendMagicLinkEmail(data: MagicLinkEmailData): Promise<bool
           
           <!-- Contenido -->
           <div class="content-section">
-            <div class="greeting">HOLA</div>
+            <div class="greeting">${emailTexts.common.greeting[lang]}</div>
             <div class="name">(${userName})</div>
             
             <p class="message">
-              Haga clic en el siguiente botón para iniciar sesión<br>
-              en el programa <span class="highlight-text">Kaspersky Cup</span>:
+              ${emailTexts.magicLink.clickButton[lang]}
             </p>
             
-            <a href="${magicLink}" class="cta-button">Acceder ahora</a>
+            <a href="${magicLink}" class="cta-button">${emailTexts.magicLink.accessNow[lang]}</a>
             
             <p class="link-text">
-              Si no puede acceder desde el botón, copie y pegue este enlace<br>
-              en su navegador:<br>
+              ${emailTexts.magicLink.cannotAccess[lang]}<br>
+              ${emailTexts.magicLink.inBrowser[lang]}<br>
               <a href="${magicLink}" class="link-url">${magicLink}</a>
             </p>
             
             <div class="warning-box">
-              <div class="warning-title">IMPORTANTE:</div>
-              <div class="warning-text">Este enlace expira en <span class="highlight-text">15 minutos</span>.</div>
-              <div class="warning-text">Solo puede usarse <span class="highlight-text">una vez</span>.</div>
-              <div class="warning-text">Si no solicitó este acceso, <span class="highlight-text">ignore este correo</span>.</div>
-              <div class="warning-text">Este es un mensaje automático, por favor,<br><span class="highlight-text">no responda a este mensaje</span>.</div>
+              <div class="warning-title">${emailTexts.magicLink.important[lang]}</div>
+              <div class="warning-text">${emailTexts.magicLink.linkExpires[lang]}</div>
+              <div class="warning-text">${emailTexts.magicLink.useOnce[lang]}</div>
+              <div class="warning-text">${emailTexts.magicLink.didNotRequest[lang]}</div>
             </div>
           </div>
           
@@ -3357,7 +3725,7 @@ export async function sendMagicLinkEmail(data: MagicLinkEmailData): Promise<bool
             
             <!-- Redes Sociales -->
             <div class="social-section">
-              <div class="social-title">Siga a Kaspersky :</div>
+              <div class="social-title">${emailTexts.common.followKaspersky[lang]}</div>
               <div class="social-links">
                 <a href="https://www.facebook.com/Kaspersky" style="display: inline-block; margin: 0 6px; text-decoration: none;" title="Facebook">
                   <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338210/loyalty-program/emails/common/social-icons/Group%2023.png" alt="Facebook" style="width: 16px; height: 16px;" />
@@ -3424,12 +3792,14 @@ export interface GolesRegistradosEmailData {
   valorDeal: number;
   golesSumados: number;
   totalGoles: number;
+  language?: EmailLanguage;
 }
 
 /**
  * Envía un email cuando el KL registra goles a nombre del usuario
  */
 export async function sendGolesRegistradosEmail(data: GolesRegistradosEmailData): Promise<boolean> {
+  const lang = data.language || 'es';
   try {
     if (!BREVO_API_KEY) {
       console.warn('⚠️  BREVO_API_KEY no configurada. Email no enviado.');
@@ -3442,17 +3812,19 @@ export async function sendGolesRegistradosEmail(data: GolesRegistradosEmailData)
     console.log('📤 Intentando enviar email de goles registrados...');
     console.log('   Destinatario:', data.email);
     console.log('   Remitente:', FROM_EMAIL);
+    console.log('   Idioma:', lang);
 
-    // Imágenes alojadas en Cloudinary (Europa)
-    const heroImageUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764345851/loyalty-program/emails/goles-registrados/Group%2062.png';
-    const heroImage2xUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764345853/loyalty-program/emails/goles-registrados/Group%2062%402x.png';
-    const footerImageUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764337229/loyalty-program/emails/expectativa/footer.png';
-    const userName = data.firstName || 'Usuario';
+    // Imágenes dinámicas según idioma
+    const images = getEmailImageURLs('goles-registrados', lang);
+    const heroImageUrl = images.getImage('Group 62.png');
+    const heroImage2xUrl = images.getImage('Group 62.png', true);
+    const footerImageUrl = images.common.badge;
+    const userName = data.firstName || emailTexts.common.greeting[lang];
     
     const sendSmtpEmail = new brevo.SendSmtpEmail();
     sendSmtpEmail.to = [{ email: data.email, name: `${data.firstName} ${data.lastName}` }];
     sendSmtpEmail.sender = { email: FROM_EMAIL, name: 'Kaspersky Cup' };
-    sendSmtpEmail.subject = '⚽ ¡Golazo! Su marcador sigue creciendo - Kaspersky Cup';
+    sendSmtpEmail.subject = `⚽ ${emailTexts.golesRegistrados.subject[lang]}`;  
     sendSmtpEmail.htmlContent = `
       <!DOCTYPE html>
       <html>
@@ -3671,42 +4043,39 @@ export async function sendGolesRegistradosEmail(data: GolesRegistradosEmailData)
           
           <!-- Contenido -->
           <div class="content-section">
-            <div class="greeting">HOLA</div>
+            <div class="greeting">${emailTexts.common.greeting[lang]}</div>
             <div class="name">(${userName})</div>
             
             <p class="message">
-              <strong>¡Excelentes noticias!</strong><br>
-              Nuevas ventas fueron registradas a su nombre y ha<br>
-              acumulado más goles en <span class="highlight-text">Kaspersky Cup</span>.
+              <strong>${emailTexts.golesRegistrados.greatNews[lang]}</strong><br>
+              ${emailTexts.golesRegistrados.salesRegistered[lang]}
             </p>
             
             <table class="stats-table">
               <tr>
-                <td class="stats-header">Producto</td>
+                <td class="stats-header">${emailTexts.golesRegistrados.product[lang]}</td>
                 <td class="stats-value">${data.producto}</td>
               </tr>
               <tr>
-                <td class="stats-header">Valor del Deal</td>
+                <td class="stats-header">${emailTexts.golesRegistrados.dealValue[lang]}</td>
                 <td class="stats-value">${data.valorDeal} Goles</td>
               </tr>
               <tr>
-                <td class="stats-header">Goles sumados</td>
+                <td class="stats-header">${emailTexts.golesRegistrados.goalsAdded[lang]}</td>
                 <td class="stats-value">${data.golesSumados} Goles</td>
               </tr>
             </table>
             
             <p class="message">
-              Sus goles ya están disponibles en su cuenta y puede<br>
-              usarlos para <span class="highlight-text">canjear el premio imperdible del mes</span>.
+              ${emailTexts.golesRegistrados.redeemReward?.[lang] || emailTexts.golesRegistrados.salesRegistered[lang]}
             </p>
             
-            <a href="${APP_URL}" class="cta-button">Ver mi marcador</a>
+            <a href="${APP_URL}" class="cta-button">${emailTexts.golesRegistrados.viewScore[lang]}</a>
             
             <div class="info-box">
               <p class="info-text">
-                <strong>¡Sigue así!</strong><br>
-                Cada nuevo gol te acerca a vivir en vivo la<br>
-                <span class="highlight-text">Copa Mundial de Fútbol 2026</span>.
+                <strong>${emailTexts.golesRegistrados.keepGoing[lang]}</strong><br>
+                ${emailTexts.golesRegistrados.worldCup2026[lang]}
               </p>
             </div>
           </div>
@@ -3714,7 +4083,7 @@ export async function sendGolesRegistradosEmail(data: GolesRegistradosEmailData)
           <!-- Footer Section -->
           <div class="footer-section">
             <!-- Texto Siga a Kaspersky -->
-            <div class="social-title">Siga a Kaspersky :</div>
+            <div class="social-title">${emailTexts.common.followKaspersky[lang]}</div>
             
             <!-- Redes Sociales -->
             <div class="social-links">
@@ -3794,6 +4163,7 @@ export interface GanadorPremioMayorEmailData {
   fechaPartido: string;
   hora: string;
   lugar: string;
+  language?: EmailLanguage;
 }
 
 /**
@@ -3805,6 +4175,7 @@ export interface PendienteAprobacionEmailData {
   lastName: string;
   nombrePremio: string;
   golesCanje: number;
+  language?: EmailLanguage;
 }
 
 /**
@@ -3813,20 +4184,22 @@ export interface PendienteAprobacionEmailData {
  * y queda pendiente de aprobación por el administrador
  */
 export async function sendPendienteAprobacionEmail(data: PendienteAprobacionEmailData): Promise<boolean> {
+  const lang = data.language || 'es';
   try {
     const sendSmtpEmail = new brevo.SendSmtpEmail();
     sendSmtpEmail.sender = { name: 'Kaspersky Cup', email: FROM_EMAIL };
     sendSmtpEmail.to = [{ email: data.email, name: `${data.firstName} ${data.lastName}` }];
-    sendSmtpEmail.subject = 'Kaspersky Cup - Solicitud de Canje en Proceso';
+    sendSmtpEmail.subject = `${emailTexts.pendienteAprobacion.subject[lang]}`;
 
     const userName = data.firstName.toUpperCase();
 
-    // URLs de las imágenes en Cloudinary
-    const heroImageUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764347282/loyalty-program/emails/pendiente-aprobacion/Group%2063.png';
-    const heroImage2xUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764347284/loyalty-program/emails/pendiente-aprobacion/Group%2063%402x.png';
-    const ballImageUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764347280/loyalty-program/emails/pendiente-aprobacion/ball.jpg';
-    const badgeImageUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764336799/loyalty-program/emails/common/Kaspersky%20Cup%20-%20badge%20250.png';
-    const logoKasperskyUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764336795/loyalty-program/emails/common/Kaspersky%20Logo.png';
+    // Imágenes dinámicas según idioma
+    const images = getEmailImageURLs('pendiente-aprobacion', lang);
+    const heroImageUrl = images.getImage('Group 63.png');
+    const heroImage2xUrl = images.getImage('Group 63.png', true);
+    const ballImageUrl = images.getImage('ball.jpg');
+    const badgeImageUrl = images.common.badge;
+    const logoKasperskyUrl = images.common.logoKaspersky;
 
     sendSmtpEmail.htmlContent = `
       <!DOCTYPE html>
@@ -4056,12 +4429,11 @@ export async function sendPendienteAprobacionEmail(data: PendienteAprobacionEmai
           
           <!-- Content Section -->
           <div class="content-section">
-            <div class="greeting">HOLA</div>
+            <div class="greeting">${emailTexts.common.greeting[lang]}</div>
             <div class="user-name">(${userName})</div>
             
             <p class="message-text">
-              Sus goles le permitieron <span class="highlight-text">redimir su premio</span> en<br>
-              <span class="highlight-text">Kaspersky Cup.</span>
+              ${emailTexts.pendienteAprobacion.redeemMessage[lang]}
             </p>
             
             <!-- Balón -->
@@ -4075,26 +4447,24 @@ export async function sendPendienteAprobacionEmail(data: PendienteAprobacionEmai
             <!-- Status Box -->
             <div class="status-box">
               <p>
-                Nuestro equipo organizador está procesando su solicitud. Muy 
-                pronto recibirá la confirmación del envío por correo electrónico 
-                o a través de la plataforma.
+                ${emailTexts.pendienteAprobacion.processing[lang]}
               </p>
             </div>
             
             <!-- CTA Button -->
-            <a href="${APP_URL}/rewards" class="cta-button">Revisar el estado de mi premio</a>
+            <a href="${APP_URL}/rewards" class="cta-button">${emailTexts.pendienteAprobacion.checkStatus[lang]}</a>
             
             <!-- Footer Text -->
             <p class="footer-text">
-              Pronto estaremos en contacto con usted.<br>
-              <span class="footer-highlight">¡Nos vemos en el próximo partido!</span>
+              ${emailTexts.pendienteAprobacion.soonInTouch[lang]}<br>
+              <span class="footer-highlight">${emailTexts.pendienteAprobacion.seeYouNextMatch[lang]}</span>
             </p>
           </div>
           
           <!-- Footer Section -->
           <div class="footer-section">
             <!-- Texto Siga a Kaspersky -->
-            <div class="social-title">Siga a Kaspersky :</div>
+            <div class="social-title">${emailTexts.common.followKaspersky[lang]}</div>
             
             <!-- Redes Sociales -->
             <div class="social-links">
@@ -4160,6 +4530,7 @@ Kaspersky Cup
 }
 
 export async function sendGanadorPremioMayorEmail(data: GanadorPremioMayorEmailData): Promise<boolean> {
+  const lang = data.language || 'es';
   try {
     if (!BREVO_API_KEY) {
       console.warn('⚠️  BREVO_API_KEY no configurada. Email no enviado.');
@@ -4171,22 +4542,24 @@ export async function sendGanadorPremioMayorEmail(data: GanadorPremioMayorEmailD
     console.log('📤 Intentando enviar email de ganador premio mayor...');
     console.log('   Destinatario:', data.email);
     console.log('   Remitente:', FROM_EMAIL);
+    console.log('   Idioma:', lang);
 
-    // Imágenes alojadas en Cloudinary (Europa)
-    const heroImageUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764346361/loyalty-program/emails/ganador-premio-mayor/Group%2066.jpg';
-    const heroImage2xUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764346362/loyalty-program/emails/ganador-premio-mayor/Group%2066%402x.jpg';
-    const maletasImageUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764346432/loyalty-program/emails/ganador-premio-mayor/Mail%2007%20-%2002.png';
-    const maletasImage2xUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764346434/loyalty-program/emails/ganador-premio-mayor/Mail%2007%20-%2002%402x.png';
-    const estadioImageUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764346365/loyalty-program/emails/ganador-premio-mayor/Group%2067.jpg';
-    const estadioImage2xUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764346369/loyalty-program/emails/ganador-premio-mayor/Group%2067%402x.jpg';
-    const logoKasperskyUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764346371/loyalty-program/emails/ganador-premio-mayor/Logo%20-%20Kaspersky%20Cup.png';
+    // Imágenes dinámicas según idioma
+    const images = getEmailImageURLs('ganador-premio-mayor', lang);
+    const heroImageUrl = images.getImage('Group 66.jpg');
+    const heroImage2xUrl = images.getImage('Group 66.jpg', true);
+    const maletasImageUrl = images.getImage('Mail 07 - 02.png');
+    const maletasImage2xUrl = images.getImage('Mail 07 - 02.png', true);
+    const estadioImageUrl = images.getImage('Group 67.jpg');
+    const estadioImage2xUrl = images.getImage('Group 67.jpg', true);
+    const logoKasperskyUrl = images.common.logoKaspersky;
     
     const userName = data.firstName || 'Usuario';
     
     const sendSmtpEmail = new brevo.SendSmtpEmail();
     sendSmtpEmail.to = [{ email: data.email, name: `${data.firstName} ${data.lastName}` }];
     sendSmtpEmail.sender = { email: FROM_EMAIL, name: 'Kaspersky Cup' };
-    sendSmtpEmail.subject = '🏆 ¡Usted fue el máximo goleador de Kaspersky Cup!';
+    sendSmtpEmail.subject = emailTexts.ganadorPremioMayor.subject[lang];
     sendSmtpEmail.htmlContent = `
       <!DOCTYPE html>
       <html>

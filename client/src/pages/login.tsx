@@ -118,11 +118,17 @@ export default function Login() {
 
   const magicLinkMutation = useMutation({
     mutationFn: async (email: string) => {
+      // Obtener el idioma seleccionado del localStorage
+      const savedLanguage = localStorage.getItem('preferred-language') || 'es';
+      
       const response = await fetch("/api/auth/request-magic-link", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ 
+          email,
+          language: savedLanguage // Enviar idioma seleccionado
+        }),
       });
       
       const data = await response.json();
