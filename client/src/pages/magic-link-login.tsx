@@ -113,7 +113,7 @@ export default function MagicLinkLogin() {
         <Card className="w-full max-w-md">
           <CardContent className="pt-6 flex flex-col items-center">
             <Loader2 className="h-8 w-8 animate-spin text-primary-600 mb-4" />
-            <p className="text-gray-600">Verificando tu enlace de acceso...</p>
+            <p className="text-gray-600">Verificando su enlace de acceso...</p>
           </CardContent>
         </Card>
       </div>

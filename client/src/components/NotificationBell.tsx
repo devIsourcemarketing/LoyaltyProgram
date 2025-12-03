@@ -140,7 +140,7 @@ export function NotificationBell({ userId }: { userId: string }) {
         <ScrollArea className="h-[400px]">
           {notifications.length === 0 ? (
             <div className="p-4 text-center text-muted-foreground">
-              No tienes notificaciones
+              No tiene notificaciones
             </div>
           ) : (
             <div className="divide-y">
