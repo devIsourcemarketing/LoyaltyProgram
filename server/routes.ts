@@ -270,7 +270,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         address,
         city,
         zipCode,
-        contactNumber
+        contactNumber,
+        language
       } = req.body;
       
       if (!email || !firstName || !lastName || !country || !region || !category) {
@@ -289,6 +290,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Crear usuario sin contraseña (se genera una temporal)
       const tempPassword = await bcrypt.hash(nanoid(32), 10);
+      
+      // Detectar idioma: primero del cliente, luego por IP
+      const userLanguage = language || await detectPreferredLanguage(req);
       
       const user = await storage.createUser({
         username: `user_${nanoid(8)}`, // Username temporal
@@ -311,6 +315,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         isActive: true,
         isApproved: false, // REQUIERE APROBACIÓN de administrador
         isPasswordless: true, // Usuario passwordless
+        preferredLanguage: userLanguage, // Guardar idioma preferido
       });
 
       // Generar magic link para primer acceso
@@ -329,6 +334,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         firstName: user.firstName,
         lastName: user.lastName,
         loginToken, // Magic link para acceso
+        language: userLanguage, // Idioma del usuario
       });
 
       // Enviar notificaciones a los admins correspondientes
@@ -1213,6 +1219,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const reward = await storage.getReward(updatedRedemption.rewardId);
       
       if (user && reward) {
+        const userLanguage = await detectPreferredLanguage(req, user);
         await sendRedemptionApprovedEmail(
           user.email,
           user.firstName,
@@ -1221,7 +1228,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             rewardName: reward.name,
             pointsCost: reward.pointsCost,
             status: updatedRedemption.status,
-            estimatedDeliveryDays: reward.estimatedDeliveryDays || undefined
+            estimatedDeliveryDays: reward.estimatedDeliveryDays || undefined,
+            language: userLanguage
           }
         );
       }
@@ -1569,12 +1577,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
         invitedFromRegion: adminUser?.region || null, // Track from which region the invitation was sent
       });
 
+      // Detectar idioma basado en el país del usuario invitado
+      let userLanguage: 'es' | 'pt' | 'en' = 'es';
+      if (country) {
+        const countryLower = country.toLowerCase();
+        if (countryLower.includes('brasil') || countryLower.includes('brazil')) {
+          userLanguage = 'pt';
+        } else if (countryLower.includes('estados unidos') || countryLower.includes('united states') || countryLower.includes('canada')) {
+          userLanguage = 'en';
+        }
+      }
+      
+      // Guardar idioma preferido en el usuario
+      await storage.updateUser(newUser.id, {
+        preferredLanguage: userLanguage
+      });
+      
       // Send Registro Exitoso email (Kaspersky Cup welcome/invite email)
       const emailSent = await sendRegistroExitosoEmail({
         email,
         firstName,
         lastName,
-        inviteToken
+        inviteToken,
+        language: userLanguage
       });
 
       if (!emailSent) {
@@ -1705,12 +1730,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
             invitedFromRegion: adminUser?.region || null, // Track from which region the invitation was sent
           });
 
+          // Detectar idioma basado en el país del usuario invitado
+          let userLanguage: 'es' | 'pt' | 'en' = 'es';
+          if (country) {
+            const countryLower = country.toLowerCase();
+            if (countryLower.includes('brasil') || countryLower.includes('brazil')) {
+              userLanguage = 'pt';
+            } else if (countryLower.includes('estados unidos') || countryLower.includes('united states') || countryLower.includes('canada')) {
+              userLanguage = 'en';
+            }
+          }
+          
+          // Guardar idioma preferido en el usuario
+          await storage.updateUser(newUser.id, {
+            preferredLanguage: userLanguage
+          });
+          
           // Send Registro Exitoso email (Kaspersky Cup welcome/invite email)
           const emailSent = await sendRegistroExitosoEmail({
             email,
             firstName,
             lastName,
-            inviteToken
+            inviteToken,
+            language: userLanguage
           });
 
           results.success.push({
@@ -2911,12 +2953,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
               invitedFromRegion: adminUser?.region || null,
             });
 
+            const userLanguage = await detectPreferredLanguage(req);
             // Send invitation email
             const emailSent = await sendRegistroExitosoEmail({
               email,
               firstName,
               lastName,
-              inviteToken
+              inviteToken,
+              language: userLanguage
             });
 
             results.success.push({
@@ -3141,21 +3185,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     try {
       const { userId } = req.params;
+      const { language } = req.body; // Get language from admin panel selector
       const approvedUser = await storage.approveUser(userId, adminUserId!);
       
       if (!approvedUser) {
         return res.status(404).json({ message: "User not found" });
       }
 
-      // Detectar idioma preferido del usuario
-      const userLanguage = await detectPreferredLanguage(req);
+      // Use language from admin panel selector, or default to Spanish
+      const emailLanguage: 'es' | 'pt' | 'en' = 
+        (language === 'es' || language === 'pt' || language === 'en') ? language : 'es';
 
-      // Send welcome email
+      // Send welcome email with admin-selected language
       await sendBienvenidaEmail({
         email: approvedUser.email,
         firstName: approvedUser.firstName,
         lastName: approvedUser.lastName,
-        language: userLanguage,
+        language: emailLanguage,
       });
 
       res.json({ 
@@ -4230,6 +4276,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Enviar email al ganador
+      const userLanguage = await detectPreferredLanguage(req, winner);
       await sendGanadorPremioMayorEmail({
         email: winner.email,
         firstName: winner.firstName,
@@ -4237,7 +4284,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         periodo: periodo || 'Competencia Kaspersky Cup',
         fechaPartido: fechaPartido || 'Por confirmar',
         hora: hora || 'Por confirmar',
-        lugar: lugar || 'Por confirmar'
+        lugar: lugar || 'Por confirmar',
+        language: userLanguage
       });
 
       res.json({ 
@@ -4634,10 +4682,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid email format" });
       }
 
+      const userLanguage = await detectPreferredLanguage(req);
       const emailSent = await sendExpectationEmail({
         email,
         firstName,
-        lastName
+        lastName,
+        language: userLanguage
       });
 
       if (emailSent) {
@@ -4694,10 +4744,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
             continue;
           }
 
+          const userLanguage = await detectPreferredLanguage(req);
           const emailSent = await sendExpectationEmail({
             email: recipient.email,
             firstName: recipient.firstName,
-            lastName: recipient.lastName
+            lastName: recipient.lastName,
+            language: userLanguage
           });
 
           if (emailSent) {
@@ -4753,10 +4805,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid email format" });
       }
 
+      const userLanguage = await detectPreferredLanguage(req);
       const emailSent = await sendRegistroExitosoEmail({
         email,
         firstName,
-        lastName
+        lastName,
+        language: userLanguage
       });
 
       if (emailSent) {
@@ -4813,10 +4867,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
             continue;
           }
 
+          const userLanguage = await detectPreferredLanguage(req);
           const emailSent = await sendRegistroExitosoEmail({
             email: recipient.email,
             firstName: recipient.firstName,
-            lastName: recipient.lastName
+            lastName: recipient.lastName,
+            language: userLanguage
           });
 
           if (emailSent) {

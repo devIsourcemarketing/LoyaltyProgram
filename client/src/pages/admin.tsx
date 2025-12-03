@@ -554,7 +554,11 @@ export default function Admin() {
   // Approve user mutation
   const approveUserMutation = useMutation({
     mutationFn: async (userId: string) => {
-      return apiRequest("PUT", `/api/admin/users/${userId}/approve`);
+      // Get current language from localStorage to send to server
+      const adminLanguage = localStorage.getItem('preferred-language') || 'es';
+      return apiRequest("PUT", `/api/admin/users/${userId}/approve`, {
+        language: adminLanguage
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/users/pending"] });

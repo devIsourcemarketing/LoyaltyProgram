@@ -114,7 +114,12 @@ export async function detectLanguageFromIP(req: Request): Promise<Language> {
  * Detecta el idioma preferido del usuario
  * Primero intenta por IP, luego por Accept-Language del navegador
  */
-export async function detectPreferredLanguage(req: Request): Promise<Language> {
+export async function detectPreferredLanguage(req: Request, user?: { preferredLanguage?: string }): Promise<Language> {
+  // Si el usuario tiene un idioma preferido guardado, usarlo
+  if (user?.preferredLanguage && (user.preferredLanguage === 'es' || user.preferredLanguage === 'pt' || user.preferredLanguage === 'en')) {
+    return user.preferredLanguage as Language;
+  }
+  
   // Intentar detección por IP
   const ipLanguage = await detectLanguageFromIP(req);
   

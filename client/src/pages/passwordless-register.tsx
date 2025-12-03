@@ -168,6 +168,9 @@ export default function PasswordlessRegister() {
         finalCountry = userData.city;
       }
 
+      // Obtener idioma del localStorage
+      const savedLanguage = localStorage.getItem('preferred-language') || 'es';
+
       const response = await fetch("/api/auth/register-passwordless", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -175,6 +178,7 @@ export default function PasswordlessRegister() {
         body: JSON.stringify({
           ...userData,
           country: finalCountry,
+          language: savedLanguage,
         }),
       });
 

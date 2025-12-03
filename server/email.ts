@@ -333,9 +333,24 @@ const emailTexts = {
       en: '⚽ Registration successful! You\'ve been called up to play in Kaspersky Cup! 🏆'
     },
     welcome: {
-      es: '¡Bienvenido al equipo!',
-      pt: 'Bem-vindo à equipe!',
-      en: 'Welcome to the team!'
+      es: '¡Le damos la bienvenida a',
+      pt: 'Damos as boas-vindas a',
+      en: 'We welcome you to'
+    },
+    programDescription: {
+      es: 'El programa donde sus ventas se transforman en goles y le permiten ganar premios mes a mes.',
+      pt: 'O programa onde suas vendas se transformam em gols e permitem ganhar prêmios mês a mês.',
+      en: 'The program where your sales turn into goals and allow you to win prizes month by month.'
+    },
+    platformAccess: {
+      es: 'Para ingresar a la plataforma, visite',
+      pt: 'Para acessar a plataforma, visite',
+      en: 'To access the platform, visit'
+    },
+    emailInstruction: {
+      es: 'ingrese el correo electrónico con el que se registró y recibirá un enlace de acceso para consultar su marcador y los goles que vaya acumulando.',
+      pt: 'insira o e-mail com o qual se registrou e receberá um link de acesso para consultar seu placar e os gols que vai acumulando.',
+      en: 'enter the email you registered with and you will receive an access link to check your score and the goals you are accumulating.'
     },
     convened: {
       es: 'Fuiste convocado a jugar',
@@ -766,7 +781,7 @@ export async function sendInviteEmail(data: InviteEmailData): Promise<boolean> {
             
             <!-- Footer -->
             <div class="footer-section">
-              <div class="footer-logo">kaspersky</div>
+              <img src="${images.common.logoKaspersky}" alt="Kaspersky" style="max-width: 120px; height: auto; margin-bottom: 15px;" />
               <p class="footer-text">
                 La emoción del fútbol, la pasión por las ventas.<br>
                 <span class="footer-highlight">Solo en Kaspersky Cup.</span>
@@ -1035,7 +1050,7 @@ export async function sendWelcomeEmail(email: string, firstName: string, lastNam
             </div>
             
             <div class="footer-section">
-              <div class="footer-logo">kaspersky</div>
+              <img src="${images.common.logoKaspersky}" alt="Kaspersky" style="max-width: 120px; height: auto; margin-bottom: 15px;" />
               <p class="footer-text">
                 La emoción del fútbol, la pasión por las ventas.<br>
                 <strong>Solo en Kaspersky Cup.</strong>
@@ -1342,7 +1357,7 @@ export async function sendApprovalEmail(email: string, firstName: string, lastNa
             </div>
             
             <div class="footer-section">
-              <div class="footer-logo">kaspersky</div>
+              <img src="${images.common.logoKaspersky}" alt="Kaspersky" style="max-width: 120px; height: auto; margin-bottom: 15px;" />
               <p class="footer-text">
                 La emoción del fútbol, la pasión por las ventas.<br>
                 <strong>Solo en Kaspersky Cup.</strong>
@@ -1500,8 +1515,10 @@ export async function sendRedemptionApprovedEmail(
     pointsCost: number;
     status: string;
     estimatedDeliveryDays?: number;
+    language?: EmailLanguage;
   }
 ): Promise<boolean> {
+  const lang = redemptionDetails.language || 'es';
   try {
     if (!BREVO_API_KEY) {
       console.warn('BREVO_API_KEY no configurada. Email no enviado.');
@@ -1516,10 +1533,11 @@ export async function sendRedemptionApprovedEmail(
 
     const userName = firstName.toUpperCase();
 
-    // URLs de las imágenes en Cloudinary
-    const heroImageUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764347920/loyalty-program/emails/aprobacion-premio/Group%2064.png';
-    const heroImage2xUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764347922/loyalty-program/emails/aprobacion-premio/Group%2064%402x.png';
-    const logoKasperskyUrl = 'https://res.cloudinary.com/dk3ow5puw/image/upload/v1764336795/loyalty-program/emails/common/Kaspersky%20Logo.png';
+    // Imágenes dinámicas según idioma
+    const images = getEmailImageURLs('aprobacion-premio', lang);
+    const heroImageUrl = images.getImage('Group 64.png');
+    const heroImage2xUrl = images.getImage('Group 64.png', true);
+    const logoKasperskyUrl = images.common.logoKaspersky;
 
     sendSmtpEmail.htmlContent = `
       <!DOCTYPE html>
@@ -2824,11 +2842,10 @@ export async function sendRegistroPasswordlessEmail(data: RegistroPasswordlessEm
     
     // Imágenes dinámicas según idioma
     const images = getEmailImageURLs('registro-passwordless', lang);
-    const leftImageUrl = images.getImage('Group 65.png');
-    const leftImage2xUrl = images.getImage('Group 65.png', true);
+    const heroImageUrl = images.getImage('Group 65.png');
+    const heroImage2xUrl = images.getImage('Group 65.png', true);
     const logoUrl = images.getImage('Logo - Kaspersky Cup.png');
     const logo2xUrl = images.getImage('Logo - Kaspersky Cup.png', true);
-    const footerImageUrl = images.common.badge;
     const userName = data.firstName || 'Usuario';
     const magicLink = `${APP_URL}/auth/verify-magic-link/${data.loginToken}`;
     
@@ -2853,12 +2870,10 @@ export async function sendRegistroPasswordlessEmail(data: RegistroPasswordlessEm
           }
           
           body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            line-height: 1.6;
+            font-family: Arial, sans-serif;
             background-color: #FFFFFF;
             margin: 0;
             padding: 0;
-            -webkit-font-smoothing: antialiased;
           }
           
           .email-container {
@@ -2867,215 +2882,219 @@ export async function sendRegistroPasswordlessEmail(data: RegistroPasswordlessEm
             background-color: #FFFFFF;
           }
           
-          .hero-image-section {
-            position: relative;
-            text-align: center;
-            background-color: #FFFFFF;
+          .hero-section {
+            width: 100%;
             padding: 0;
             margin: 0;
-            overflow: hidden;
           }
           
           .hero-image {
-            width: 536px;
-            height: 850px;
-            max-width: 100%;
-            display: block;
-            margin: 0 auto;
-            background: transparent no-repeat padding-box;
-            opacity: 1;
-          }
-          
-          .content-section {
-            background-color: #FFFFFF;
-            padding: 40px 68px;
-            text-align: center;
-          }
-          
-          .greeting {
-            font: normal normal 900 45px/50px Arial;
-            letter-spacing: 0.36px;
-            text-transform: uppercase;
-            color: #1D1D1B;
-            opacity: 1;
-            margin-bottom: 20px;
-          }
-          
-          .greeting-name {
-            color: #29CCB1;
-            font-weight: 900;
-          }
-          
-          .welcome-message {
-            font: normal normal bold 18px/24px Arial;
-            letter-spacing: 0.14px;
-            color: #1D1D1B;
-            text-align: center;
-            opacity: 1;
-            margin-bottom: 20px;
-          }
-          
-          .description {
-            font: normal normal bold 18px/24px Arial;
-            letter-spacing: 0.14px;
-            color: #1D1D1B;
-            text-align: center;
-            opacity: 1;
-            margin-bottom: 20px;
-          }
-          
-          .instructions {
-            font: normal normal normal 18px/24px Arial;
-            letter-spacing: 0.14px;
-            color: #1D1D1B;
-            text-align: center;
-            opacity: 1;
-            margin-bottom: 20px;
-          }
-          
-          .instructions a {
-            color: #29CCB1;
-            text-decoration: none;
-            font-weight: bold;
-          }
-          
-          .cta-button {
-            display: inline-block;
-            padding: 16px 40px;
-            background-color: #29CCB1;
-            color: #FFFFFF !important;
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 18px;
-            margin: 20px 0;
-            text-align: center;
-            opacity: 1;
-          }
-          
-          .cta-button:hover {
-            background-color: #25B89F;
-          }
-          
-          .logo-kaspersky {
-            width: 232px;
-            height: 333px;
-            max-width: 100%;
-            display: block;
-            margin: 30px auto;
-            background: transparent no-repeat padding-box;
-            opacity: 1;
-          }
-          
-          .footer-section {
-            background-color: #FFFFFF;
-            padding: 0;
-            text-align: center;
-          }
-          
-          .footer-image {
             width: 100%;
             max-width: 600px;
             height: auto;
             display: block;
-            margin: 0 auto;
+          }
+          
+          .content-section {
+            background-color: #FFFFFF;
+            padding: 40px;
+            text-align: center;
+          }
+          
+          .greeting {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+          }
+          
+          .greeting-name {
+            color: #29CCB1;
+          }
+          
+          .welcome-text {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #1D1D1B;
+            margin: 20px 0;
+          }
+          
+          .logo-section {
+            margin: 30px 0;
+          }
+          
+          .logo-image {
+            max-width: 200px;
+            height: auto;
+          }
+          
+          .info-text {
+            font-size: 14px;
+            line-height: 1.8;
+            color: #1D1D1B;
+            margin: 24px 0;
+          }
+          
+          .link {
+            color: #29CCB1;
+            text-decoration: none;
+            font-weight: 600;
+          }
+          
+          .reminder-box {
+            background-color: #1D1D1B;
+            border-radius: 4px;
+            padding: 32px;
+            margin: 32px 0;
+            color: #FFFFFF;
+          }
+          
+          .reminder-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            letter-spacing: 0.5px;
+          }
+          
+          .reminder-text {
+            font-size: 14px;
+            line-height: 1.8;
+            margin-bottom: 16px;
+          }
+          
+          .highlight {
+            color: #29CCB1;
+            font-weight: 600;
+          }
+          
+          .reminder-message {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 24px 0 0 0;
+            line-height: 1.6;
+          }
+          
+          .footer-section {
+            background-color: #1D1D1B;
+            color: #FFFFFF;
+            padding: 32px 40px;
+            text-align: center;
+          }
+          
+          .social-title {
+            font-size: 13px;
+            margin-bottom: 16px;
+          }
+          
+          .social-icons {
+            margin-bottom: 20px;
+          }
+          
+          .social-icon {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            margin: 0 8px;
+          }
+          
+          .footer-logo {
+            font-size: 16px;
+            font-weight: 700;
+            color: #FFFFFF;
           }
           
           @media only screen and (max-width: 600px) {
-            .content-section {
-              padding: 20px;
+            .content-section,
+            .footer-section {
+              padding: 24px 20px;
             }
             
-            .greeting, .welcome-message {
-              font-size: 16px;
-            }
-            
-            .description, .instructions, .important-text {
-              font-size: 14px;
-            }
-            
-            .cta-button {
-              padding: 14px 30px;
-              font-size: 14px;
+            .reminder-box {
+              padding: 24px;
             }
           }
         </style>
       </head>
       <body>
         <div class="email-container">
-          <!-- Hero Image Section -->
-          <div class="hero-image-section">
-            <img 
-              src="${leftImageUrl}" 
-              srcset="${leftImageUrl} 1x, ${leftImage2xUrl} 2x"
-              alt="Kaspersky Cup - Aplique su mejor táctica" 
-              class="hero-image"
-              style="width: 536px; height: 850px; max-width: 100%; display: block; margin: 0 auto;"
-            />
+          <!-- Hero Image -->
+          <div class="hero-section">
+            <img src="${heroImageUrl}" 
+                 srcset="${heroImageUrl} 1x, ${heroImage2xUrl} 2x"
+                 alt="Kaspersky Cup" 
+                 class="hero-image" />
           </div>
           
-          <!-- Content Section -->
-          <div class="content-section" style="text-align: center; padding: 40px 68px;">
-            <h1 class="greeting" style="font: normal normal 900 45px/50px Arial; letter-spacing: 0.36px; text-transform: uppercase; color: #1D1D1B; margin-bottom: 20px;">
-              HOLA <span style="color: #29CCB1;">${userName.toUpperCase()}</span>
-            </h1>
-            
-            <p class="welcome-message" style="font: normal normal bold 18px/24px Arial; letter-spacing: 0.14px; color: #1D1D1B; margin-bottom: 20px;">
-              ¡Le damos la bienvenida a
-            </p>
-            
-            <!-- Logo Kaspersky Cup -->
-            <div style="margin: 30px 0;">
-              <img 
-                src="${logoUrl}" 
-                srcset="${logoUrl} 1x, ${logo2xUrl} 2x"
-                alt="Logo Kaspersky Cup" 
-                style="width: 232px; height: 333px; max-width: 100%; display: block; margin: 0 auto;"
-              />
+          <!-- Content -->
+          <div class="content-section">
+            <div class="greeting">
+              HOLA<br>
+              <span class="greeting-name">(${userName.toUpperCase()})</span>
             </div>
             
-            <p class="description" style="font: normal normal bold 18px/24px Arial; letter-spacing: 0.14px; color: #1D1D1B; margin-bottom: 20px;">
-              El programa donde sus ventas se transforman en goles y le permiten ganar premios mes a mes.
+            <p class="welcome-text">
+              ${emailTexts.registroPasswordless.convened[lang]}
             </p>
             
-            <p class="instructions" style="font: normal normal normal 18px/24px Arial; letter-spacing: 0.14px; color: #1D1D1B; margin-bottom: 30px;">
-              Para ingresar a la plataforma, visite <a href="${magicLink}" style="color: #29CCB1; text-decoration: none; font-weight: bold;">kasperskycup.com</a>, ingrese el correo electrónico con el que se registró y recibirá un enlace de acceso para consultar su marcador y los goles que vaya acumulando.
-            </p>
+            <!-- Logo -->
+            <div class="logo-section">
+              <img src="${logoUrl}" 
+                   srcset="${logoUrl} 1x, ${logo2xUrl} 2x"
+                   alt="Kaspersky Cup Logo" 
+                   class="logo-image" />
+            </div>
             
-            <!-- Magic Link Button -->
-            <div style="margin: 30px 0;">
-              <a href="${magicLink}" class="cta-button" style="display: inline-block; padding: 16px 40px; background-color: #29CCB1; color: #FFFFFF !important; text-decoration: none; border-radius: 8px; font-weight: 700; font-size: 18px;">
-                Ingresar a Kaspersky Cup
-              </a>
+            <!-- Reminder Box -->
+            <div class="reminder-box">
+              <div class="reminder-title">RECUERDE:</div>
+              
+              <p class="reminder-text">
+                Para que sus ventas sumen goles dentro de <span class="highlight">Kaspersky Cup</span>, 
+                deben estar registradas previamente en KUDOS. <strong>Solo las ventas correctamente validadas 
+                se convertirán en goles dentro del programa.</strong>
+              </p>
+              
+              <p class="reminder-message">
+                ¡Esperamos que usted sea el jugador estrella en<br>
+                <span class="highlight">Kaspersky Cup!</span>
+              </p>
             </div>
           </div>
           
-          <!-- Footer Section -->
+          <!-- Footer -->
           <div class="footer-section">
-            <img 
-              src="${footerImageUrl}" 
-              alt="Kaspersky Cup Footer" 
-              class="footer-image"
-            />
+            <div class="social-title">${emailTexts.common.followKaspersky[lang]}</div>
+            <div class="social-icons">
+              <a href="#"><img src="${images.common.socialIcons.facebook}" class="social-icon" alt="Facebook" /></a>
+              <a href="#"><img src="${images.common.socialIcons.twitter}" class="social-icon" alt="Twitter" /></a>
+              <a href="#"><img src="${images.common.socialIcons.linkedin}" class="social-icon" alt="LinkedIn" /></a>
+              <a href="#"><img src="${images.common.socialIcons.instagram}" class="social-icon" alt="Instagram" /></a>
+              <a href="#"><img src="${images.common.socialIcons.youtube}" class="social-icon" alt="YouTube" /></a>
+            </div>
+            <div class="footer-logo">
+              <img src="${images.common.logoKaspersky}" alt="Kaspersky" style="max-width: 120px; height: auto;" />
+            </div>
           </div>
         </div>
       </body>
       </html>
-    `.trim();
+    `;
 
     sendSmtpEmail.textContent = `
-HOLA ${userName.toUpperCase()}
+${emailTexts.registroPasswordless.welcome[lang]} ${userName}
 
-¡Le damos la bienvenida a KASPERSKY CUP!
+${emailTexts.registroPasswordless.convened[lang]}
 
-El programa donde sus ventas se transforman en goles y le permiten ganar premios mes a mes.
+Para acceder, haz clic en el siguiente enlace:
+${magicLink}
 
-Para ingresar a la plataforma, visite kasperskycup.com, ingrese el correo electrónico con el que se registró y recibirá un enlace de acceso para consultar su marcador y los goles que vaya acumulando.
+RECUERDE:
+Para que sus ventas sumen goles dentro de Kaspersky Cup, deben estar registradas previamente en KUDOS. 
+Solo las ventas correctamente validadas se convertirán en goles dentro del programa.
 
-Ingrese aquí: ${magicLink}
+¡Esperamos que usted sea el jugador estrella en Kaspersky Cup!
 
-Saludos,
-Kaspersky Cup
+Siga a Kaspersky
+${emailTexts.common.kasperskyCup[lang]}
     `.trim();
 
     await apiInstance.sendTransacEmail(sendSmtpEmail);
@@ -3083,18 +3102,7 @@ Kaspersky Cup
     return true;
   } catch (error: any) {
     console.error('❌ Error sending registro passwordless email:', error);
-    
-    if (error.response) {
-      console.error('   Response status:', error.response.status);
-      console.error('   Response data:', JSON.stringify(error.response.data, null, 2));
-    }
-    
-    if (error.body) {
-      console.error('   Error body:', JSON.stringify(error.body, null, 2));
-    }
-    
     console.error('   Error message:', error.message);
-    
     return false;
   }
 }
@@ -3518,12 +3526,10 @@ export async function sendMagicLinkEmail(data: MagicLinkEmailData): Promise<bool
           }
           
           body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            line-height: 1.6;
+            font-family: Arial, sans-serif;
             background-color: #FFFFFF;
             margin: 0;
             padding: 0;
-            -webkit-font-smoothing: antialiased;
           }
           
           .email-container {
@@ -3533,12 +3539,9 @@ export async function sendMagicLinkEmail(data: MagicLinkEmailData): Promise<bool
           }
           
           .hero-image-section {
-            position: relative;
             text-align: center;
-            background-color: #FFFFFF;
             padding: 0;
             margin: 0;
-            overflow: hidden;
           }
           
           .hero-image {
@@ -3546,34 +3549,32 @@ export async function sendMagicLinkEmail(data: MagicLinkEmailData): Promise<bool
             max-width: 600px;
             height: auto;
             display: block;
-            margin: 0 auto;
           }
           
           .content-section {
             background-color: #FFFFFF;
-            padding: 40px;
-            text-align: center;
+            padding: 32px 40px;
           }
           
           .greeting {
-            font-size: 32px;
+            font-size: 24px;
             font-weight: 700;
             color: #1D1D1B;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
           }
           
           .name {
-            font-size: 32px;
+            font-size: 24px;
             font-weight: 700;
             color: #29CCB1;
-            margin-bottom: 32px;
+            margin-bottom: 20px;
           }
           
           .message {
-            font-size: 16px;
+            font-size: 14px;
             color: #1D1D1B;
             line-height: 1.6;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
           }
           
           .highlight-text {
@@ -3581,98 +3582,103 @@ export async function sendMagicLinkEmail(data: MagicLinkEmailData): Promise<bool
             font-weight: 600;
           }
           
+          .cta-container {
+            text-align: center;
+            margin: 24px 0;
+          }
+          
           .cta-button {
             display: inline-block;
             background-color: #29CCB1;
             color: #FFFFFF;
             text-decoration: none;
-            padding: 14px 40px;
+            padding: 12px 36px;
             border-radius: 4px;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 600;
-            margin: 24px 0;
           }
           
-          .link-text {
-            font-size: 14px;
+          .link-section {
+            font-size: 13px;
             color: #6B7280;
-            margin-top: 16px;
+            margin: 20px 0;
+            line-height: 1.6;
           }
           
           .link-url {
             color: #29CCB1;
             word-break: break-all;
+            display: block;
+            margin-top: 8px;
           }
           
           .warning-box {
             background-color: #1D1D1B;
             border-radius: 4px;
             padding: 24px;
-            margin: 32px 0;
-            text-align: left;
+            margin: 24px 0;
             color: #FFFFFF;
           }
           
           .warning-title {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 700;
-            color: #FFFFFF;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
           }
           
-          .warning-text {
-            font-size: 14px;
-            color: #FFFFFF;
+          .warning-item {
+            font-size: 13px;
             line-height: 1.6;
             margin-bottom: 8px;
+          }
+          
+          .warning-highlight {
+            color: #29CCB1;
+          }
+          
+          .footer-note {
+            font-size: 13px;
+            color: #6B7280;
+            line-height: 1.6;
+            margin-top: 20px;
           }
           
           .footer-section {
             background-color: #1D1D1B;
             color: #FFFFFF;
-            padding: 48px 40px;
+            padding: 32px 40px;
             text-align: center;
-          }
-          
-          .footer-cup-badge {
-            margin: 0 auto 28px;
-            text-align: center;
-          }
-          
-          .footer-cup-image {
-            width: 250px;
-            height: auto;
-            display: inline-block;
-          }
-          
-          .social-section {
-            margin-top: 32px;
-            padding-top: 24px;
-            border-top: 1px solid rgba(255, 255, 255, 0.15);
           }
           
           .social-title {
-            font-size: 14px;
-            color: #FFFFFF;
+            font-size: 13px;
             margin-bottom: 16px;
-            font-weight: 400;
+          }
+          
+          .social-icons {
+            margin-bottom: 20px;
+          }
+          
+          .social-icon {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            margin: 0 6px;
+          }
+          
+          .footer-logo {
+            font-size: 16px;
+            font-weight: 700;
+            color: #29CCB1;
           }
           
           @media only screen and (max-width: 600px) {
             .content-section {
-              padding: 24px;
-            }
-            
-            .greeting, .name {
-              font-size: 24px;
-            }
-            
-            .message {
-              font-size: 14px;
+              padding: 24px 20px;
             }
             
             .footer-section {
-              padding: 36px 24px;
+              padding: 24px 20px;
             }
           }
         </style>
@@ -3683,96 +3689,81 @@ export async function sendMagicLinkEmail(data: MagicLinkEmailData): Promise<bool
           <div class="hero-image-section">
             <img src="${heroImageUrl}" 
                  srcset="${heroImageUrl} 1x, ${heroImage2xUrl} 2x"
-                 alt="La emoción del fútbol, también se vive en las ventas" 
-                 class="hero-image" 
-                 style="width: 100%; max-width: 600px; height: auto; display: block;" />
+                 alt="Kaspersky Cup" 
+                 class="hero-image" />
           </div>
           
           <!-- Contenido -->
           <div class="content-section">
             <div class="greeting">${emailTexts.common.greeting[lang]}</div>
-            <div class="name">(${userName})</div>
+            <div class="name">(${userName.toUpperCase()})</div>
             
             <p class="message">
               ${emailTexts.magicLink.clickButton[lang]}
             </p>
             
-            <a href="${magicLink}" class="cta-button">${emailTexts.magicLink.accessNow[lang]}</a>
+            <div class="cta-container">
+              <a href="${magicLink}" class="cta-button">${emailTexts.magicLink.accessNow[lang]}</a>
+            </div>
             
-            <p class="link-text">
-              ${emailTexts.magicLink.cannotAccess[lang]}<br>
-              ${emailTexts.magicLink.inBrowser[lang]}<br>
+            <div class="link-section">
+              ${emailTexts.magicLink.cannotAccess[lang]} ${emailTexts.magicLink.inBrowser[lang]}
               <a href="${magicLink}" class="link-url">${magicLink}</a>
-            </p>
+            </div>
             
+            <!-- Warning Box -->
             <div class="warning-box">
               <div class="warning-title">${emailTexts.magicLink.important[lang]}</div>
-              <div class="warning-text">${emailTexts.magicLink.linkExpires[lang]}</div>
-              <div class="warning-text">${emailTexts.magicLink.useOnce[lang]}</div>
-              <div class="warning-text">${emailTexts.magicLink.didNotRequest[lang]}</div>
-            </div>
-          </div>
-          
-          <!-- Footer Section -->
-          <div class="footer-section">
-            <!-- Badge Kaspersky Cup -->
-            <div class="footer-cup-badge">
-              <img src="${footerImageUrl}" 
-                   alt="Kaspersky Cup" 
-                   class="footer-cup-image" 
-                   style="width: 250px; height: auto; display: inline-block;" />
+              <div class="warning-item">
+                ${emailTexts.magicLink.linkExpires[lang]} <span class="warning-highlight">${emailTexts.magicLink.linkExpires[lang].split('.')[0]}.</span>
+              </div>
+              <div class="warning-item">
+                ${emailTexts.magicLink.useOnce[lang]}
+              </div>
             </div>
             
-            <!-- Redes Sociales -->
-            <div class="social-section">
-              <div class="social-title">${emailTexts.common.followKaspersky[lang]}</div>
-              <div class="social-links">
-                <a href="https://www.facebook.com/Kaspersky" style="display: inline-block; margin: 0 6px; text-decoration: none;" title="Facebook">
-                  <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338210/loyalty-program/emails/common/social-icons/Group%2023.png" alt="Facebook" style="width: 16px; height: 16px;" />
-                </a>
-                <a href="https://twitter.com/kaspersky" style="display: inline-block; margin: 0 6px; text-decoration: none;" title="Twitter">
-                  <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338220/loyalty-program/emails/common/social-icons/Subtraction%201.png" alt="Twitter" style="width: 16px; height: 16px;" />
-                </a>
-                <a href="https://www.linkedin.com/company/kaspersky-lab" style="display: inline-block; margin: 0 6px; text-decoration: none;" title="LinkedIn">
-                  <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338212/loyalty-program/emails/common/social-icons/Group%2025.png" alt="LinkedIn" style="width: 16px; height: 16px;" />
-                </a>
-                <a href="https://www.instagram.com/kasperskylab/" style="display: inline-block; margin: 0 6px; text-decoration: none;" title="Instagram">
-                  <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338213/loyalty-program/emails/common/social-icons/Group%2027.png" alt="Instagram" style="width: 16px; height: 16px;" />
-                </a>
-                <a href="https://www.youtube.com/user/Kaspersky" style="display: inline-block; margin: 0 6px; text-decoration: none;" title="YouTube">
-                  <img src="https://res.cloudinary.com/dk3ow5puw/image/upload/v1764338215/loyalty-program/emails/common/social-icons/Group%2028.png" alt="YouTube" style="width: 16px; height: 16px;" />
-                </a>
-              </div>
+            <p class="footer-note">
+              ${emailTexts.magicLink.didNotRequest[lang]}
+            </p>
+          </div>
+          
+          <!-- Footer -->
+          <div class="footer-section">
+            <div class="social-title">${emailTexts.common.followKaspersky[lang]}</div>
+            <div class="social-icons">
+              <a href="#"><img src="${images.common.socialIcons.facebook}" class="social-icon" alt="Facebook" /></a>
+              <a href="#"><img src="${images.common.socialIcons.twitter}" class="social-icon" alt="Twitter" /></a>
+              <a href="#"><img src="${images.common.socialIcons.linkedin}" class="social-icon" alt="LinkedIn" /></a>
+              <a href="#"><img src="${images.common.socialIcons.instagram}" class="social-icon" alt="Instagram" /></a>
+              <a href="#"><img src="${images.common.socialIcons.youtube}" class="social-icon" alt="YouTube" /></a>
+            </div>
+            <div class="footer-logo">
+              <img src="${images.common.logoKaspersky}" alt="Kaspersky" style="max-width: 120px; height: auto;" />
             </div>
           </div>
         </div>
       </body>
       </html>
     `;
+
     sendSmtpEmail.textContent = `
-Kaspersky Cup - Tu enlace único de acceso
+${emailTexts.common.greeting[lang]} ${userName.toUpperCase()},
 
-HOLA ${userName}
+${emailTexts.magicLink.clickButton[lang]}
 
-Haga clic en el siguiente enlace para iniciar sesión en el programa Kaspersky Cup:
+${emailTexts.magicLink.accessNow[lang]}: ${magicLink}
 
+${emailTexts.magicLink.cannotAccess[lang]} ${emailTexts.magicLink.inBrowser[lang]}
 ${magicLink}
 
-IMPORTANTE:
-- Este enlace expira en 15 minutos.
-- Solo puede usarse una vez.
-- Si no solicitó este acceso, ignore este correo.
-- Este es un mensaje automático, por favor, no responda a este mensaje.
+${emailTexts.magicLink.important[lang]}
+- ${emailTexts.magicLink.linkExpires[lang]}
+- ${emailTexts.magicLink.useOnce[lang]}
 
-Siga a Kaspersky en nuestras redes sociales:
-- Facebook: https://www.facebook.com/Kaspersky
-- Twitter: https://twitter.com/kaspersky
-- LinkedIn: https://www.linkedin.com/company/kaspersky-lab
-- Instagram: https://www.instagram.com/kasperskylab/
-- YouTube: https://www.youtube.com/user/Kaspersky
+${emailTexts.magicLink.didNotRequest[lang]}
 
-Saludos,
-Kaspersky Cup
+${emailTexts.common.followKaspersky[lang]}
+${emailTexts.common.kasperskyCup[lang]}
     `.trim();
 
     await apiInstance.sendTransacEmail(sendSmtpEmail);
