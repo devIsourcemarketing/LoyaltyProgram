@@ -77,7 +77,7 @@ export default function Navigation({ user }: NavigationProps) {
       queryClient.clear();
       toast({
         title: t("common.success"),
-        description: "Logged out successfully",
+        description: t("common.loggedOutSuccessfully"),
       });
       // Immediate redirect to login page - remove timeout
       setLocation("/login");
