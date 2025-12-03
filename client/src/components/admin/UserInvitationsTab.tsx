@@ -14,6 +14,8 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Textarea } from "@/components/ui/textarea";
 import * as XLSX from "xlsx";
 import { useTranslation } from "@/hooks/useTranslation";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { PARTNER_CATEGORIES, MARKET_SEGMENTS } from "@/../../shared/constants";
 
 interface InviteFormData {
   email: string;
@@ -381,21 +383,39 @@ export default function UserInvitationsTab() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="partnerCategory">Categoría del Partner</Label>
-                    <Input
-                      id="partnerCategory"
-                      placeholder="Ej: Enterprise, SMB"
+                    <Select
                       value={inviteForm.partnerCategory || ""}
-                      onChange={(e) => setInviteForm({ ...inviteForm, partnerCategory: e.target.value })}
-                    />
+                      onValueChange={(value) => setInviteForm({ ...inviteForm, partnerCategory: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecciona categoría" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {PARTNER_CATEGORIES.map((category) => (
+                          <SelectItem key={category} value={category}>
+                            {category}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div>
                     <Label htmlFor="marketSegment">Segmento del Mercado</Label>
-                    <Input
-                      id="marketSegment"
-                      placeholder="Segmento del mercado"
+                    <Select
                       value={inviteForm.marketSegment || ""}
-                      onChange={(e) => setInviteForm({ ...inviteForm, marketSegment: e.target.value })}
-                    />
+                      onValueChange={(value) => setInviteForm({ ...inviteForm, marketSegment: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecciona segmento" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {MARKET_SEGMENTS.map((segment) => (
+                          <SelectItem key={segment} value={segment}>
+                            {segment}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">

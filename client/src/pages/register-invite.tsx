@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation, useRoute } from "wouter";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "@/hooks/useTranslation";
 import { CheckCircle, AlertCircle, Loader2 } from "lucide-react";
-import { REGION_HIERARCHY } from "@/../../shared/constants";
+import { REGION_HIERARCHY, PARTNER_CATEGORIES, MARKET_SEGMENTS } from "@/../../shared/constants";
 import { useQuery } from "@tanstack/react-query";
 import { LanguageSelector } from "@/components/LanguageSelector";
 
@@ -94,6 +94,7 @@ export default function RegisterWithInvite() {
     formState: { errors },
     setValue,
     watch,
+    control,
   } = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema),
   });
@@ -408,12 +409,27 @@ export default function RegisterWithInvite() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="partnerCategory">Categoría del Partner</Label>
-                <Input
-                  id="partnerCategory"
-                  type="text"
-                  placeholder="Ej: Enterprise, SMB"
-                  {...register("partnerCategory")}
-                  disabled={isSubmitting}
+                <Controller
+                  name="partnerCategory"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      value={field.value || ""}
+                      onValueChange={field.onChange}
+                      disabled={isSubmitting}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecciona categoría" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {PARTNER_CATEGORIES.map((category) => (
+                          <SelectItem key={category} value={category}>
+                            {category}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
                 />
                 {errors.partnerCategory && (
                   <p className="text-sm text-red-500 mt-1">{errors.partnerCategory.message}</p>
@@ -422,12 +438,27 @@ export default function RegisterWithInvite() {
 
               <div>
                 <Label htmlFor="marketSegment">Segmento del Mercado</Label>
-                <Input
-                  id="marketSegment"
-                  type="text"
-                  placeholder="Segmento del mercado"
-                  {...register("marketSegment")}
-                  disabled={isSubmitting}
+                <Controller
+                  name="marketSegment"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      value={field.value || ""}
+                      onValueChange={field.onChange}
+                      disabled={isSubmitting}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecciona segmento" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {MARKET_SEGMENTS.map((segment) => (
+                          <SelectItem key={segment} value={segment}>
+                            {segment}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
                 />
                 {errors.marketSegment && (
                   <p className="text-sm text-red-500 mt-1">{errors.marketSegment.message}</p>

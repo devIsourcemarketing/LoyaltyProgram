@@ -39,3 +39,11 @@ export type Region = typeof REGIONS[number];
 // Lista de categorías disponibles
 export const CATEGORIES = ["ENTERPRISE", "SMB", "MSSP"] as const;
 export type Category = typeof CATEGORIES[number];
+
+// Partner Categories (niveles de certificación del partner)
+export const PARTNER_CATEGORIES = ["REGISTERED", "CERTIFIED", "GOLD", "PLATINUM"] as const;
+export type PartnerCategory = typeof PARTNER_CATEGORIES[number];
+
+// Market Segments (segmentos de mercado)
+export const MARKET_SEGMENTS = ["SMB", "Enterprise", "MSSP"] as const;
+export type MarketSegment = typeof MARKET_SEGMENTS[number];

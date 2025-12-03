@@ -15,7 +15,7 @@ import { useLocation } from "wouter";
 import { AlertCircle, Loader2 } from "lucide-react";
 import backgroundImage from "@assets/login.jpg";
 import kasperskyLogo from "@/assets/logo-kaspersky-cup.png";
-import { REGION_HIERARCHY } from "@/../../shared/constants";
+import { REGION_HIERARCHY, PARTNER_CATEGORIES, MARKET_SEGMENTS } from "@/../../shared/constants";
 import { LanguageSelector } from "@/components/LanguageSelector";
 
 // Tipo para la jerarquía de regiones desde la API
@@ -364,9 +364,24 @@ export default function PasswordlessRegister() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Categoría del Partner</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Ej: Enterprise, SMB" {...field} />
-                      </FormControl>
+                      <Select
+                        value={field.value || ""}
+                        onValueChange={(value) => form.setValue("partnerCategory", value)}
+                        disabled={registerMutation.isPending}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecciona categoría" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {PARTNER_CATEGORIES.map((category) => (
+                            <SelectItem key={category} value={category}>
+                              {category}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -378,9 +393,24 @@ export default function PasswordlessRegister() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Segmento del Mercado</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Segmento del mercado" {...field} />
-                      </FormControl>
+                      <Select
+                        value={field.value || ""}
+                        onValueChange={(value) => form.setValue("marketSegment", value)}
+                        disabled={registerMutation.isPending}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecciona segmento" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {MARKET_SEGMENTS.map((segment) => (
+                            <SelectItem key={segment} value={segment}>
+                              {segment}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -393,13 +423,15 @@ export default function PasswordlessRegister() {
                 name="region"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("auth.regionLabel")} *</FormLabel>
+                    <FormLabel>Región *</FormLabel>
                     <Select
                       value={selectedRegion}
                       onValueChange={(value) => {
                         setSelectedRegion(value);
                         form.setValue("region", value as any, { shouldValidate: true });
-                        setSelectedCategory(""); // Reset category when region changes
+                        form.setValue("country", "");
+                        form.setValue("city", "");
+                        setSelectedCategory("");
                         form.setValue("category", "" as any, { shouldValidate: false });
                         form.setValue("subcategory", "", { shouldValidate: false });
                       }}
@@ -407,14 +439,14 @@ export default function PasswordlessRegister() {
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder={t("auth.selectYourRegion")} />
+                          <SelectValue placeholder="Selecciona región" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
                         <SelectItem value="NOLA">NOLA (Norte de América Latina)</SelectItem>
                         <SelectItem value="SOLA">SOLA (Sur de América Latina)</SelectItem>
-                        <SelectItem value="BRASIL">Brasil</SelectItem>
-                        <SelectItem value="MEXICO">México</SelectItem>
+                        <SelectItem value="BRASIL">BRASIL</SelectItem>
+                        <SelectItem value="MEXICO">MÉXICO</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -422,27 +454,25 @@ export default function PasswordlessRegister() {
                 )}
               />
 
-              {/* Mostrar selector de país solo si la región tiene países */}
-              {selectedRegion && availableCountries.length > 0 && availableCountries[0] !== "" && (
-                <FormField
-                  control={form.control}
-                  name="country"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        {selectedRegion === "NOLA" ? t("auth.subcategoryLabel") : t("auth.countryLabel")} *
-                      </FormLabel>
+              {/* País */}
+              <FormField
+                control={form.control}
+                name="country"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>País</FormLabel>
+                    {availableCountries.length > 0 && availableCountries[0] !== "" ? (
                       <Select
-                        value={selectedCountry}
+                        value={field.value || ""}
                         onValueChange={(value) => {
-                          setSelectedCountry(value);
                           form.setValue("country", value);
+                          setSelectedCountry(value);
                         }}
-                        disabled={registerMutation.isPending}
+                        disabled={!selectedRegion || registerMutation.isPending}
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder={selectedRegion === "NOLA" ? t("auth.selectYourSubcategory") : t("auth.selectYourCountry")} />
+                            <SelectValue placeholder="Selecciona país" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -453,117 +483,21 @@ export default function PasswordlessRegister() {
                           ))}
                         </SelectContent>
                       </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
-
-              {/* Mostrar selector de ciudad si hay ciudades disponibles */}
-              {selectedRegion && availableCities.length > 0 && (
-                <FormField
-                  control={form.control}
-                  name="city"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("auth.cityLabel")} ({t("common.optional")})</FormLabel>
-                      <Select
-                        value={selectedCity}
-                        onValueChange={(value) => {
-                          setSelectedCity(value);
-                          form.setValue("city", value);
-                        }}
-                        disabled={registerMutation.isPending}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder={t("auth.selectYourCity")} />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {availableCities.map((city) => (
-                            <SelectItem key={city} value={city}>
-                              {city}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
-
-              {/* Category */}
-              {selectedRegion && availableCategories.length > 0 && (
-                <FormField
-                  control={form.control}
-                  name="category"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("auth.categoryLabel")} *</FormLabel>
-                      <Select
-                        value={selectedCategory}
-                        onValueChange={(value) => {
-                          setSelectedCategory(value);
-                          form.setValue("category", value as any, { shouldValidate: true });
-                          form.setValue("subcategory", "", { shouldValidate: false });
-                        }}
-                        disabled={registerMutation.isPending}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder={t("auth.selectYourCategory")} />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {availableCategories.map((category) => (
-                            <SelectItem key={category} value={category}>
-                              {category}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
-
-              {/* Subcategory - Mostrar solo si hay subcategorías disponibles */}
-              {selectedRegion && selectedCategory && availableSubcategories.length > 0 && (
-                <FormField
-                  control={form.control}
-                  name="subcategory"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        {selectedRegion === "MEXICO" ? "Nivel de Partner *" : "Subcategoría *"}
-                      </FormLabel>
-                      <Select
-                        onValueChange={(value) => form.setValue("subcategory", value)}
-                        disabled={registerMutation.isPending}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder={selectedRegion === "MEXICO" ? "Selecciona nivel" : "Selecciona subcategoría"} />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {availableSubcategories.map((subcategory) => (
-                            <SelectItem key={subcategory} value={subcategory}>
-                              {subcategory}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
-
-              {/* Address */}
+                    ) : (
+                      <FormControl>
+                        <Input 
+                          placeholder="Colombia, México, etc." 
+                          {...field}
+                          disabled={registerMutation.isPending}
+                        />
+                      </FormControl>
+                    )}
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              {/* Dirección */}
               <FormField
                 control={form.control}
                 name="address"
@@ -578,8 +512,43 @@ export default function PasswordlessRegister() {
                 )}
               />
 
-              {/* Zip Code & Contact Number */}
+              {/* Ciudad / Código Postal */}
               <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="city"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Ciudad</FormLabel>
+                      {availableCities.length > 0 ? (
+                        <Select
+                          value={field.value || ""}
+                          onValueChange={(value) => form.setValue("city", value)}
+                          disabled={registerMutation.isPending}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecciona ciudad" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {availableCities.map((city) => (
+                              <SelectItem key={city} value={city}>
+                                {city}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      ) : (
+                        <FormControl>
+                          <Input placeholder="Ciudad" {...field} />
+                        </FormControl>
+                      )}
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
                 <FormField
                   control={form.control}
                   name="zipCode"
@@ -593,21 +562,87 @@ export default function PasswordlessRegister() {
                     </FormItem>
                   )}
                 />
+              </div>
 
+              {/* Número de Contacto */}
+              <FormField
+                control={form.control}
+                name="contactNumber"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Número de Contacto</FormLabel>
+                    <FormControl>
+                      <Input placeholder="+57 300 123 4567" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Categoría (ENTERPRISE/SMB/MSSP) */}
+              <FormField
+                control={form.control}
+                name="category"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Categoría *</FormLabel>
+                    <Select
+                      value={selectedCategory}
+                      onValueChange={(value) => {
+                        setSelectedCategory(value);
+                        form.setValue("category", value as any, { shouldValidate: true });
+                      }}
+                      disabled={!selectedRegion || availableCategories.length === 0 || registerMutation.isPending}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecciona tu categoría" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {availableCategories.map((cat) => (
+                          <SelectItem key={cat} value={cat}>
+                            {cat}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Subcategoría */}
+              {availableSubcategories.length > 0 && (
                 <FormField
                   control={form.control}
-                  name="contactNumber"
+                  name="subcategory"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Número de Contacto</FormLabel>
-                      <FormControl>
-                        <Input type="tel" placeholder="+57 123 456 7890" {...field} />
-                      </FormControl>
+                      <FormLabel>Subcategoría</FormLabel>
+                      <Select
+                        value={field.value || ""}
+                        onValueChange={(value) => form.setValue("subcategory", value)}
+                        disabled={registerMutation.isPending}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecciona subcategoría (opcional)" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {availableSubcategories.map((subcat) => (
+                            <SelectItem key={subcat} value={subcat}>
+                              {subcat}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-              </div>
+              )}
 
               {/* Info Alert */}
               <Alert>

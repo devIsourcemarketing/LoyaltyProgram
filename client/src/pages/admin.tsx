@@ -15,7 +15,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { REGION_HIERARCHY } from "@/../../shared/constants";
+import { REGION_HIERARCHY, PARTNER_CATEGORIES, MARKET_SEGMENTS } from "@/../../shared/constants";
 import { 
   Users, 
   ClipboardCheck, 
@@ -1359,9 +1359,23 @@ export default function Admin() {
                             render={({ field }) => (
                               <FormItem>
                                 <FormLabel>Categoría del Partner</FormLabel>
-                                <FormControl>
-                                  <Input placeholder="Ej: Enterprise, SMB" {...field} />
-                                </FormControl>
+                                <Select
+                                  value={field.value || ""}
+                                  onValueChange={(value) => createUserForm.setValue("partnerCategory", value)}
+                                >
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Selecciona categoría" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    {PARTNER_CATEGORIES.map((category) => (
+                                      <SelectItem key={category} value={category}>
+                                        {category}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
                                 <FormMessage />
                               </FormItem>
                             )}
@@ -1373,9 +1387,23 @@ export default function Admin() {
                             render={({ field }) => (
                               <FormItem>
                                 <FormLabel>Segmento del Mercado</FormLabel>
-                                <FormControl>
-                                  <Input placeholder="Segmento" {...field} />
-                                </FormControl>
+                                <Select
+                                  value={field.value || ""}
+                                  onValueChange={(value) => createUserForm.setValue("marketSegment", value)}
+                                >
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Selecciona segmento" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    {MARKET_SEGMENTS.map((segment) => (
+                                      <SelectItem key={segment} value={segment}>
+                                        {segment}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
                                 <FormMessage />
                               </FormItem>
                             )}
@@ -1751,9 +1779,23 @@ export default function Admin() {
                             render={({ field }) => (
                               <FormItem>
                                 <FormLabel>Categoría del Partner</FormLabel>
-                                <FormControl>
-                                  <Input placeholder="Enterprise, SMB" {...field} value={field.value || ""} />
-                                </FormControl>
+                                <Select
+                                  value={field.value || ""}
+                                  onValueChange={(value) => editUserForm.setValue("partnerCategory", value)}
+                                >
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Selecciona categoría" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    {PARTNER_CATEGORIES.map((category) => (
+                                      <SelectItem key={category} value={category}>
+                                        {category}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
                                 <FormMessage />
                               </FormItem>
                             )}
@@ -1765,9 +1807,23 @@ export default function Admin() {
                             render={({ field }) => (
                               <FormItem>
                                 <FormLabel>Segmento del Mercado</FormLabel>
-                                <FormControl>
-                                  <Input placeholder="Segmento" {...field} value={field.value || ""} />
-                                </FormControl>
+                                <Select
+                                  value={field.value || ""}
+                                  onValueChange={(value) => editUserForm.setValue("marketSegment", value)}
+                                >
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Selecciona segmento" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    {MARKET_SEGMENTS.map((segment) => (
+                                      <SelectItem key={segment} value={segment}>
+                                        {segment}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
                                 <FormMessage />
                               </FormItem>
                             )}
