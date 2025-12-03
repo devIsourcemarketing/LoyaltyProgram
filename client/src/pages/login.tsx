@@ -156,7 +156,7 @@ export default function Login() {
         setLocation(`/passwordless-register?email=${encodeURIComponent(data.email)}`);
         toast({
           title: "Registro requerido",
-          description: "No existe una cuenta con este email. Por favor, completa tu registro.",
+          description: "No existe una cuenta con este email. Por favor, complete su registro.",
           variant: "default",
         });
         return;
@@ -168,7 +168,7 @@ export default function Login() {
         loginForm.setValue("username", data.email);
         toast({
           title: "Cuenta de administrador",
-          description: "Por favor, ingresa tu contraseña para continuar.",
+          description: "Por favor, ingrese su contraseña para continuar.",
           variant: "default",
         });
         return;
@@ -180,7 +180,7 @@ export default function Login() {
         loginForm.setValue("username", data.email);
         toast({
           title: "Contraseña requerida",
-          description: "Por favor, ingresa tu contraseña para continuar.",
+          description: "Por favor, ingrese su contraseña para continuar.",
           variant: "default",
         });
         return;
@@ -245,7 +245,7 @@ export default function Login() {
     if (!emailForLogin || !emailForLogin.includes('@')) {
       toast({
         title: t("common.error"),
-        description: "Por favor ingresa un email válido",
+        description: "Por favor ingrese un email válido",
         variant: "destructive",
       });
       return;
@@ -268,7 +268,7 @@ export default function Login() {
         loginForm.setValue("username", emailForLogin);
         toast({
           title: "Contraseña requerida",
-          description: "Por favor, ingresa tu contraseña para continuar.",
+          description: "Por favor, ingrese su contraseña para continuar.",
           variant: "default",
         });
         return; // No enviar magic link

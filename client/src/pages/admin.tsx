@@ -15,7 +15,6 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { REGION_HIERARCHY, PARTNER_CATEGORIES, MARKET_SEGMENTS } from "@/../../shared/constants";
 import { 
   Users, 
   ClipboardCheck, 
@@ -64,20 +63,12 @@ interface ReportsData {
 
 // User creation form schema
 const createUserSchema = z.object({
-  email: z.string().email("Invalid email address"),
-  companyName: z.string().optional(),
-  partnerCategory: z.string().optional(),
-  marketSegment: z.string().optional(),
-  region: z.string().min(1, "Region is required"),
-  country: z.string().optional(),
-  address: z.string().optional(),
-  city: z.string().optional(),
-  zipCode: z.string().optional(),
-  contactNumber: z.string().optional(),
   username: z.string().min(3, "Username must be at least 3 characters"),
-  password: z.string().optional(), // Opcional para usuarios con magic link
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
+  country: z.string().min(1, "Country is required"),
   role: z.enum(["user", "admin", "regional-admin", "super-admin"]).default("user"),
   isActive: z.boolean().default(true),
   adminRegionId: z.string().optional().nullable(),
@@ -89,14 +80,7 @@ const editUserSchema = z.object({
   email: z.string().email("Invalid email address"),
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
-  companyName: z.string().optional(),
-  partnerCategory: z.string().optional(),
-  marketSegment: z.string().optional(),
   country: z.string().optional().nullable(),
-  address: z.string().optional(),
-  city: z.string().optional(),
-  zipCode: z.string().optional(),
-  contactNumber: z.string().optional(),
   role: z.enum(["user", "admin", "regional-admin", "super-admin"]),
   isActive: z.boolean(),
   adminRegionId: z.string().optional().nullable(),
@@ -146,85 +130,20 @@ export default function Admin() {
     endDate: "",
   });
   const [topScorersRegion, setTopScorersRegion] = useState("all");
-  
-  // States for create user form - region, country and city selection
-  const [createUserSelectedRegion, setCreateUserSelectedRegion] = useState<string>("");
-  const [createUserAvailableCountries, setCreateUserAvailableCountries] = useState<string[]>([]);
-  const [createUserAvailableCities, setCreateUserAvailableCities] = useState<string[]>([]);
-  const [createUserSelectedCountry, setCreateUserSelectedCountry] = useState<string>("");
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
-
-  // Obtener jerarquía de regiones desde la API (mantenemos para otros usos)
-  const { data: regionHierarchy } = useQuery<any>({
-    queryKey: ["/api/region-hierarchy"],
-    queryFn: async () => {
-      const response = await fetch("/api/region-hierarchy");
-      if (!response.ok) throw new Error("Failed to load region hierarchy");
-      return response.json();
-    },
-  });
-
-  // Efecto 1: Actualizar países y ciudades cuando se selecciona una región
-  useEffect(() => {
-    if (createUserSelectedRegion && REGION_HIERARCHY[createUserSelectedRegion]) {
-      const countries = Object.keys(REGION_HIERARCHY[createUserSelectedRegion]);
-      setCreateUserAvailableCountries(countries);
-      
-      // Para BRASIL y MEXICO que tienen ciudades directas (key vacía "")
-      if (countries.length === 1 && countries[0] === "") {
-        setCreateUserAvailableCities(REGION_HIERARCHY[createUserSelectedRegion][""]
-);
-        setCreateUserSelectedCountry("");
-        // Reset country en el form también
-        createUserForm.setValue('country', "");
-      } else {
-        // Reset para regiones con países (NOLA, SOLA)
-        setCreateUserSelectedCountry("");
-        setCreateUserAvailableCities([]);
-        createUserForm.setValue('country', "");
-      }
-    } else {
-      setCreateUserAvailableCountries([]);
-      setCreateUserAvailableCities([]);
-      setCreateUserSelectedCountry("");
-    }
-  }, [createUserSelectedRegion]);
-
-  // Efecto 2: Actualizar ciudades cuando se selecciona un país
-  useEffect(() => {
-    if (createUserSelectedRegion && createUserSelectedCountry && 
-        REGION_HIERARCHY[createUserSelectedRegion]?.[createUserSelectedCountry]) {
-      setCreateUserAvailableCities(REGION_HIERARCHY[createUserSelectedRegion][createUserSelectedCountry]);
-    } else if (!createUserSelectedCountry && createUserAvailableCountries.length === 1 && 
-               createUserAvailableCountries[0] === "") {
-      // Mantener las ciudades para BRASIL/MEXICO
-      return;
-    } else if (createUserSelectedCountry) {
-      // Si hay país seleccionado pero no ciudades en hierarchy, limpiar
-      setCreateUserAvailableCities([]);
-    }
-  }, [createUserSelectedCountry, createUserSelectedRegion]);
 
   // User creation form
   const createUserForm = useForm<CreateUserForm>({
     resolver: zodResolver(createUserSchema),
     defaultValues: {
-      email: "",
-      companyName: "",
-      partnerCategory: "",
-      marketSegment: "",
-      region: "",
-      country: "",
-      address: "",
-      city: "",
-      zipCode: "",
-      contactNumber: "",
       username: "",
+      email: "",
       password: "",
       firstName: "",
       lastName: "",
+      country: "",
       role: "user",
       isActive: true,
     },
@@ -600,15 +519,9 @@ export default function Admin() {
     },
     onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
-      
-      const successCount = data.inserted || data.results?.success?.length || 0;
-      const errorCount = data.errorCount || data.results?.failed?.length || 0;
-      const errors = data.errors || data.results?.failed?.map((f: any) => `${f.email}: ${f.reason}`) || [];
-      
       toast({
-        title: errorCount > 0 ? t("common.warning") : t("common.success"),
-        description: `${data.message || 'CSV processed'}. Successful: ${successCount}, Failed: ${errorCount}${errors.length > 0 ? `\n\nErrors:\n${errors.slice(0, 3).join('\n')}${errors.length > 3 ? `\n...and ${errors.length - 3} more` : ''}` : ''}`,
-        variant: errorCount > 0 ? "destructive" : "default",
+        title: t("common.success"),
+        description: `${data.message}${data.errors && data.errors.length > 0 ? `. ${data.errorCount} errors occurred.` : ''}`,
       });
     },
     onError: (error: any) => {
@@ -1320,354 +1233,170 @@ export default function Admin() {
                       </DialogDescription>
                     </DialogHeader>
                     <Form {...createUserForm}>
-                      <form onSubmit={createUserForm.handleSubmit(handleCreateUser)} className="space-y-4 max-h-[70vh] overflow-y-auto px-1">
-                        {/* Correo */}
+                      <form onSubmit={createUserForm.handleSubmit(handleCreateUser)} className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                          <FormField
+                            control={createUserForm.control}
+                            name="firstName"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>{t('auth.firstName')}</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="John" {...field} data-testid="input-first-name" />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={createUserForm.control}
+                            name="lastName"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>{t('auth.lastName')}</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="Doe" {...field} data-testid="input-last-name" />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                        
                         <FormField
                           control={createUserForm.control}
-                          name="email"
+                          name="username"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Correo *</FormLabel>
+                              <FormLabel>{t('common.username')}</FormLabel>
                               <FormControl>
-                                <Input type="email" placeholder="usuario@ejemplo.com" {...field} data-testid="input-email" />
+                                <Input placeholder="johndoe" {...field} data-testid="input-username" />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
                           )}
                         />
                         
-                        {/* Nombre de la Empresa */}
                         <FormField
                           control={createUserForm.control}
-                          name="companyName"
+                          name="email"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Nombre de la Empresa</FormLabel>
+                              <FormLabel>{t('common.email')}</FormLabel>
                               <FormControl>
-                                <Input placeholder="Nombre de la empresa" {...field} />
+                                <Input type="email" placeholder="john@example.com" {...field} data-testid="input-email" />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
                           )}
                         />
-
-                        {/* Categoría del Partner / Segmento del Mercado */}
-                        <div className="grid grid-cols-2 gap-4">
-                          <FormField
-                            control={createUserForm.control}
-                            name="partnerCategory"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Categoría del Partner</FormLabel>
-                                <Select
-                                  value={field.value || ""}
-                                  onValueChange={(value) => createUserForm.setValue("partnerCategory", value)}
-                                >
-                                  <FormControl>
-                                    <SelectTrigger>
-                                      <SelectValue placeholder="Selecciona categoría" />
-                                    </SelectTrigger>
-                                  </FormControl>
-                                  <SelectContent>
-                                    {PARTNER_CATEGORIES.map((category) => (
-                                      <SelectItem key={category} value={category}>
-                                        {category}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          
-                          <FormField
-                            control={createUserForm.control}
-                            name="marketSegment"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Segmento del Mercado</FormLabel>
-                                <Select
-                                  value={field.value || ""}
-                                  onValueChange={(value) => createUserForm.setValue("marketSegment", value)}
-                                >
-                                  <FormControl>
-                                    <SelectTrigger>
-                                      <SelectValue placeholder="Selecciona segmento" />
-                                    </SelectTrigger>
-                                  </FormControl>
-                                  <SelectContent>
-                                    {MARKET_SEGMENTS.map((segment) => (
-                                      <SelectItem key={segment} value={segment}>
-                                        {segment}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
-
-                        {/* Región */}
+                        
                         <FormField
                           control={createUserForm.control}
-                          name="region"
+                          name="password"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Región *</FormLabel>
-                              <Select
-                                value={createUserSelectedRegion}
-                                onValueChange={(value) => {
-                                  setCreateUserSelectedRegion(value);
-                                  createUserForm.setValue("region", value, { shouldValidate: true });
-                                  createUserForm.setValue("country", "");
-                                }}
-                              >
-                                <FormControl>
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Selecciona región" />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  <SelectItem value="NOLA">NOLA (North of Latin America)</SelectItem>
-                                  <SelectItem value="SOLA">SOLA (South of Latin America)</SelectItem>
-                                  <SelectItem value="BRASIL">BRASIL</SelectItem>
-                                  <SelectItem value="MEXICO">MÉXICO</SelectItem>
-                                </SelectContent>
-                              </Select>
+                              <FormLabel>{t('common.password')}</FormLabel>
+                              <FormControl>
+                                <Input type="password" placeholder="••••••••" {...field} data-testid="input-password" />
+                              </FormControl>
                               <FormMessage />
                             </FormItem>
                           )}
                         />
-
-                        {/* País */}
+                        
                         <FormField
                           control={createUserForm.control}
                           name="country"
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>{t('common.country')}</FormLabel>
-                              {createUserSelectedRegion && createUserAvailableCountries.length > 0 && createUserAvailableCountries[0] !== "" ? (
-                                <Select
-                                  value={field.value || ""}
-                                  onValueChange={(value) => {
-                                    setCreateUserSelectedCountry(value);
-                                    createUserForm.setValue("country", value);
-                                  }}
-                                >
-                                  <FormControl>
-                                    <SelectTrigger>
-                                      <SelectValue placeholder={t('admin.selectCountry')} />
-                                    </SelectTrigger>
-                                  </FormControl>
-                                  <SelectContent>
-                                    {createUserAvailableCountries.map((country) => (
-                                      <SelectItem key={country} value={country}>
-                                        {country}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              ) : (
-                                <FormControl>
-                                  <Input placeholder={t('admin.countryPlaceholder')} {...field} />
-                                </FormControl>
-                              )}
+                              <FormControl>
+                                <Input placeholder="United States" {...field} data-testid="input-country" />
+                              </FormControl>
                               <FormMessage />
                             </FormItem>
                           )}
                         />
                         
-                        {/* Dirección */}
-                        <FormField
-                          control={createUserForm.control}
-                          name="address"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Dirección</FormLabel>
-                              <FormControl>
-                                <Input placeholder="Dirección completa" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        {/* Ciudad / Código Postal */}
                         <div className="grid grid-cols-2 gap-4">
-                          <FormField
-                            control={createUserForm.control}
-                            name="city"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Ciudad</FormLabel>
-                                {createUserAvailableCities.length > 0 ? (
-                                  <Select
-                                    value={field.value || ""}
-                                    onValueChange={(value) => createUserForm.setValue("city", value)}
-                                  >
-                                    <FormControl>
-                                      <SelectTrigger>
-                                        <SelectValue placeholder="Selecciona ciudad" />
-                                      </SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                      {createUserAvailableCities.map((city) => (
-                                        <SelectItem key={city} value={city}>
-                                          {city}
-                                        </SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
-                                ) : (
-                                  <FormControl>
-                                    <Input placeholder="Ciudad" {...field} />
-                                  </FormControl>
-                                )}
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          
-                          <FormField
-                            control={createUserForm.control}
-                            name="zipCode"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Código Postal</FormLabel>
-                                <FormControl>
-                                  <Input placeholder="Código postal" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
-
-                        {/* Número de Contacto */}
-                        <FormField
-                          control={createUserForm.control}
-                          name="contactNumber"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Número de Contacto</FormLabel>
-                              <FormControl>
-                                <Input type="tel" placeholder="+57 123 456 7890" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <div className="border-t pt-4 mt-4">
-                          <p className="text-sm text-gray-600 mb-4">Información de acceso</p>
-                          
-                          <div className="grid grid-cols-2 gap-4">
-                            <FormField
-                              control={createUserForm.control}
-                              name="firstName"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>Nombre *</FormLabel>
-                                  <FormControl>
-                                    <Input placeholder="Nombre" {...field} data-testid="input-first-name" />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-                            <FormField
-                              control={createUserForm.control}
-                              name="lastName"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>Apellido *</FormLabel>
-                                  <FormControl>
-                                    <Input placeholder="Apellido" {...field} data-testid="input-last-name" />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-                          </div>
-                          
-                          <FormField
-                            control={createUserForm.control}
-                            name="username"
-                            render={({ field }) => (
-                              <FormItem className="mt-4">
-                                <FormLabel>Usuario *</FormLabel>
-                                <FormControl>
-                                  <Input placeholder="nombre_usuario" {...field} data-testid="input-username" />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          
-                          <FormField
-                            control={createUserForm.control}
-                            name="password"
-                            render={({ field }) => (
-                              <FormItem className="mt-4">
-                                <FormLabel>{t('common.password')} ({t('common.optional')})</FormLabel>
-                                <FormControl>
-                                  <Input type="password" placeholder="••••••••" {...field} data-testid="input-password" />
-                                </FormControl>
-                                <FormMessage />
-                                <p className="text-xs text-gray-500">{t('admin.passwordOptionalHint')}</p>
-                              </FormItem>
-                            )}
-                          />
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4 border-t pt-4">
                           <FormField
                             control={createUserForm.control}
                             name="role"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Rol</FormLabel>
+                                <FormLabel>{t('common.role')}</FormLabel>
                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                   <FormControl>
                                     <SelectTrigger data-testid="select-role">
-                                      <SelectValue />
+                                      <SelectValue placeholder="Select a role" />
                                     </SelectTrigger>
                                   </FormControl>
                                   <SelectContent>
-                                    <SelectItem value="user">User</SelectItem>
-                                    <SelectItem value="admin">Admin</SelectItem>
-                                    <SelectItem value="regional-admin">Regional Admin</SelectItem>
-                                    <SelectItem value="super-admin">Super Admin</SelectItem>
+                                    <SelectItem value="user">{t('admin.roleUser')}</SelectItem>
+                                    <SelectItem value="admin">{t('admin.roleAdmin')}</SelectItem>
+                                    {(currentUser?.role === "super-admin" || currentUser?.role === "regional-admin") && (
+                                      <SelectItem value="regional-admin">{t('admin.roleRegionalAdmin')}</SelectItem>
+                                    )}
+                                    {currentUser?.role === "super-admin" && (
+                                      <SelectItem value="super-admin">{t('admin.roleSuperAdmin')}</SelectItem>
+                                    )}
                                   </SelectContent>
                                 </Select>
                                 <FormMessage />
                               </FormItem>
                             )}
                           />
-                          
-                          <FormField
-                            control={createUserForm.control}
-                            name="isActive"
-                            render={({ field }) => (
-                              <FormItem className="flex items-center space-x-2 pt-7">
-                                <FormControl>
-                                  <input
-                                    type="checkbox"
-                                    checked={field.value}
-                                    onChange={field.onChange}
-                                    className="w-4 h-4"
-                                  />
-                                </FormControl>
-                                <FormLabel className="!mt-0">Activo</FormLabel>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
 
+                          {/* Region selector - solo para super-admin cuando crea regional-admin */}
+                          {currentUser?.role === "super-admin" && createUserForm.watch("role") === "regional-admin" && (
+                            <FormField
+                              control={createUserForm.control}
+                              name="adminRegionId"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>{t("auth.assignedRegion")}</FormLabel>
+                                  <Select onValueChange={field.onChange} value={field.value || undefined}>
+                                    <FormControl>
+                                      <SelectTrigger data-testid="select-admin-region">
+                                        <SelectValue placeholder={t("admin.selectRegionPlaceholder")} />
+                                      </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                      {regionConfigs?.map((region) => (
+                                        <SelectItem key={region.id} value={region.id}>
+                                          {region.region} - {region.category}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                  <FormDescription>
+                                    Este admin solo verá datos de esta región
+                                  </FormDescription>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          )}
+
+                          {/* Indicador para regional-admin: se asignará automáticamente su región */}
+                          {currentUser?.role === "regional-admin" && createUserForm.watch("role") === "regional-admin" && (
+                            <FormItem>
+                              <FormLabel>{t("auth.assignedRegion")}</FormLabel>
+                              <div className="flex items-center gap-2 p-2 border rounded-md" style={{ backgroundColor: '#E6F7FF', borderColor: '#33BBFF' }}>
+                                <MapPin className="h-4 w-4 text-blue-600" />
+                                <div className="text-sm text-blue-900">
+                                  <div className="font-medium">{currentUser.regionInfo?.region}</div>
+                                  <div className="text-xs text-blue-700">{currentUser.regionInfo?.category}</div>
+                                </div>
+                              </div>
+                              <FormDescription>
+                                Se asignará automáticamente su región
+                              </FormDescription>
+                            </FormItem>
+                          )}
+                        </div>
+                        
                         <div className="flex justify-end space-x-2 pt-4">
                           <Button 
                             type="button" 
@@ -1760,147 +1489,17 @@ export default function Admin() {
                         
                         <FormField
                           control={editUserForm.control}
-                          name="companyName"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Nombre de la Empresa</FormLabel>
-                              <FormControl>
-                                <Input placeholder="Acme Corp" {...field} value={field.value || ""} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <div className="grid grid-cols-2 gap-4">
-                          <FormField
-                            control={editUserForm.control}
-                            name="partnerCategory"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Categoría del Partner</FormLabel>
-                                <Select
-                                  value={field.value || ""}
-                                  onValueChange={(value) => editUserForm.setValue("partnerCategory", value)}
-                                >
-                                  <FormControl>
-                                    <SelectTrigger>
-                                      <SelectValue placeholder="Selecciona categoría" />
-                                    </SelectTrigger>
-                                  </FormControl>
-                                  <SelectContent>
-                                    {PARTNER_CATEGORIES.map((category) => (
-                                      <SelectItem key={category} value={category}>
-                                        {category}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          
-                          <FormField
-                            control={editUserForm.control}
-                            name="marketSegment"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Segmento del Mercado</FormLabel>
-                                <Select
-                                  value={field.value || ""}
-                                  onValueChange={(value) => editUserForm.setValue("marketSegment", value)}
-                                >
-                                  <FormControl>
-                                    <SelectTrigger>
-                                      <SelectValue placeholder="Selecciona segmento" />
-                                    </SelectTrigger>
-                                  </FormControl>
-                                  <SelectContent>
-                                    {MARKET_SEGMENTS.map((segment) => (
-                                      <SelectItem key={segment} value={segment}>
-                                        {segment}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
-                        
-                        <FormField
-                          control={editUserForm.control}
                           name="country"
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>{t('common.country')}</FormLabel>
                               <FormControl>
                                 <Input 
-                                  placeholder="Colombia, México" 
+                                  placeholder="United States" 
                                   {...field} 
                                   value={field.value || ""} 
                                   data-testid="input-edit-country" 
                                 />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <div className="grid grid-cols-2 gap-4">
-                          <FormField
-                            control={editUserForm.control}
-                            name="city"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Ciudad</FormLabel>
-                                <FormControl>
-                                  <Input placeholder="Bogotá" {...field} value={field.value || ""} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          
-                          <FormField
-                            control={editUserForm.control}
-                            name="zipCode"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Código Postal</FormLabel>
-                                <FormControl>
-                                  <Input placeholder="110111" {...field} value={field.value || ""} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
-
-                        <FormField
-                          control={editUserForm.control}
-                          name="address"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Dirección</FormLabel>
-                              <FormControl>
-                                <Input placeholder="Calle 123 #45-67" {...field} value={field.value || ""} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={editUserForm.control}
-                          name="contactNumber"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Número de Contacto</FormLabel>
-                              <FormControl>
-                                <Input type="tel" placeholder="+57 123 456 7890" {...field} value={field.value || ""} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
