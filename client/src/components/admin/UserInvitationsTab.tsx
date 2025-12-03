@@ -19,14 +19,6 @@ interface InviteFormData {
   email: string;
   firstName: string;
   lastName: string;
-  companyName?: string;
-  partnerCategory?: string;
-  marketSegment?: string;
-  country?: string;
-  address?: string;
-  city?: string;
-  zipCode?: string;
-  contactNumber?: string;
 }
 
 export default function UserInvitationsTab() {
@@ -37,14 +29,6 @@ export default function UserInvitationsTab() {
     email: "",
     firstName: "",
     lastName: "",
-    companyName: "",
-    partnerCategory: "",
-    marketSegment: "",
-    country: "",
-    address: "",
-    city: "",
-    zipCode: "",
-    contactNumber: "",
   });
   const [csvFile, setCsvFile] = useState<File | null>(null);
   const [bulkUsers, setBulkUsers] = useState<InviteFormData[]>([]);
@@ -102,19 +86,7 @@ export default function UserInvitationsTab() {
         description: t("admin.invitationSentSuccessfully"),
       });
       setIsInviteDialogOpen(false);
-      setInviteForm({ 
-        email: "", 
-        firstName: "", 
-        lastName: "",
-        companyName: "",
-        partnerCategory: "",
-        marketSegment: "",
-        country: "",
-        address: "",
-        city: "",
-        zipCode: "",
-        contactNumber: "",
-      });
+      setInviteForm({ email: "", firstName: "", lastName: "" });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/users/pending"] });
     },
     onError: (error: any) => {
@@ -211,36 +183,12 @@ export default function UserInvitationsTab() {
         const worksheet = workbook.Sheets[sheetName];
         const jsonData = XLSX.utils.sheet_to_json(worksheet) as any[];
 
-        // Process CSV data - mapear todos los campos
-        const users = jsonData.map((row) => {
-          const email = row.email || row.Email || row.EMAIL || row["USER ID"] || "";
-          
-          // Si no hay firstName/lastName, intentar generarlos del email
-          let firstName = row.firstName || row.FirstName || row.first_name || row["First Name"] || "";
-          let lastName = row.lastName || row.LastName || row.last_name || row["Last Name"] || "";
-          
-          if (!firstName && !lastName && email) {
-            // Extraer nombre del email (antes del @)
-            const emailName = email.split('@')[0];
-            // Capitalizar primera letra
-            firstName = emailName.charAt(0).toUpperCase() + emailName.slice(1);
-            lastName = "User"; // Apellido por defecto
-          }
-          
-          return {
-            email,
-            firstName,
-            lastName,
-            companyName: row.companyName || row.CompanyName || row.company_name || row["Company Name"] || row["COMPANY NAME"] || "",
-            partnerCategory: row.partnerCategory || row.PartnerCategory || row.partner_category || row["Partner Category"] || row["PARTNER CATEGORY"] || "",
-            marketSegment: row.marketSegment || row.MarketSegment || row.market_segment || row["Market Segment"] || row["MARKET SEGMENT"] || "",
-            country: row.country || row.Country || row.COUNTRY || row["KL REGION"] || "",
-            address: row.address || row.Address || row.ADDRESS || "",
-            city: row.city || row.City || row.CITY || "",
-            zipCode: row.zipCode || row.ZipCode || row.zip_code || row["Zip Code"] || row["ZIP CODE"] || "",
-            contactNumber: row.contactNumber || row.ContactNumber || row.contact_number || row["Contact Number"] || row["CONTACT NUMBER"] || "",
-          };
-        }).filter(user => user.email);
+        // Process CSV data
+        const users = jsonData.map((row) => ({
+          email: row.email || row.Email || row.EMAIL || "",
+          firstName: row.firstName || row.FirstName || row.first_name || row["First Name"] || "",
+          lastName: row.lastName || row.LastName || row.last_name || row["Last Name"] || "",
+        })).filter(user => user.email && user.firstName && user.lastName);
 
         setBulkUsers(users);
         setCsvPreview(`${users.length} usuarios válidos encontrados en el archivo.`);
@@ -279,32 +227,8 @@ export default function UserInvitationsTab() {
 
   const downloadCsvTemplate = () => {
     const template = [
-      { 
-        email: "user@example.com", 
-        firstName: t("admin.firstNameField"), 
-        lastName: t("admin.lastNameField"),
-        companyName: "Company Name",
-        partnerCategory: "Partner Category",
-        marketSegment: "Market Segment",
-        country: "Country",
-        address: "Address",
-        city: "City",
-        zipCode: "12345",
-        contactNumber: "+1234567890"
-      },
-      { 
-        email: "other@example.com", 
-        firstName: "John", 
-        lastName: "Doe",
-        companyName: "Acme Corp",
-        partnerCategory: "Enterprise",
-        marketSegment: "SMB",
-        country: "Colombia",
-        address: "123 Main St",
-        city: "Bogotá",
-        zipCode: "110111",
-        contactNumber: "+57123456789"
-      },
+      { email: "user@example.com", firstName: t("admin.firstNameField"), lastName: t("admin.lastNameField") },
+      { email: "other@example.com", firstName: "John", lastName: "Doe" },
     ];
 
     const worksheet = XLSX.utils.json_to_sheet(template);
@@ -338,7 +262,7 @@ export default function UserInvitationsTab() {
                   {t('admin.userWillReceiveEmail')}
                 </DialogDescription>
               </DialogHeader>
-              <div className="space-y-4 max-h-[60vh] overflow-y-auto">
+              <div className="space-y-4">
                 <div>
                   <Label htmlFor="email">Email *</Label>
                   <Input
@@ -366,85 +290,6 @@ export default function UserInvitationsTab() {
                       placeholder={t("admin.lastNameField")}
                       value={inviteForm.lastName}
                       onChange={(e) => setInviteForm({ ...inviteForm, lastName: e.target.value })}
-                    />
-                  </div>
-                </div>
-                <div>
-                  <Label htmlFor="companyName">Nombre de la Empresa</Label>
-                  <Input
-                    id="companyName"
-                    placeholder="Nombre de la empresa"
-                    value={inviteForm.companyName || ""}
-                    onChange={(e) => setInviteForm({ ...inviteForm, companyName: e.target.value })}
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="partnerCategory">Categoría del Partner</Label>
-                    <Input
-                      id="partnerCategory"
-                      placeholder="Ej: Enterprise, SMB"
-                      value={inviteForm.partnerCategory || ""}
-                      onChange={(e) => setInviteForm({ ...inviteForm, partnerCategory: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="marketSegment">Segmento del Mercado</Label>
-                    <Input
-                      id="marketSegment"
-                      placeholder="Segmento del mercado"
-                      value={inviteForm.marketSegment || ""}
-                      onChange={(e) => setInviteForm({ ...inviteForm, marketSegment: e.target.value })}
-                    />
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="country">País</Label>
-                    <Input
-                      id="country"
-                      placeholder="País"
-                      value={inviteForm.country || ""}
-                      onChange={(e) => setInviteForm({ ...inviteForm, country: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="city">Ciudad</Label>
-                    <Input
-                      id="city"
-                      placeholder="Ciudad"
-                      value={inviteForm.city || ""}
-                      onChange={(e) => setInviteForm({ ...inviteForm, city: e.target.value })}
-                    />
-                  </div>
-                </div>
-                <div>
-                  <Label htmlFor="address">Dirección</Label>
-                  <Input
-                    id="address"
-                    placeholder="Dirección completa"
-                    value={inviteForm.address || ""}
-                    onChange={(e) => setInviteForm({ ...inviteForm, address: e.target.value })}
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="zipCode">Código Postal</Label>
-                    <Input
-                      id="zipCode"
-                      placeholder="Código postal"
-                      value={inviteForm.zipCode || ""}
-                      onChange={(e) => setInviteForm({ ...inviteForm, zipCode: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="contactNumber">Número de Contacto</Label>
-                    <Input
-                      id="contactNumber"
-                      type="tel"
-                      placeholder="+57 123 456 7890"
-                      value={inviteForm.contactNumber || ""}
-                      onChange={(e) => setInviteForm({ ...inviteForm, contactNumber: e.target.value })}
                     />
                   </div>
                 </div>

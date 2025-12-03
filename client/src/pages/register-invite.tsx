@@ -23,35 +23,14 @@ type RegionHierarchy = Record<string, {
 
 const registerSchema = z.object({
   username: z.string().min(3, "Username must be at least 3 characters"),
-  password: z.string().optional(),
-  confirmPassword: z.string().optional(),
-  companyName: z.string().optional(),
-  partnerCategory: z.string().optional(),
-  marketSegment: z.string().optional(),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  confirmPassword: z.string(),
   country: z.string().optional(),
   city: z.string().optional(),
-  address: z.string().optional(),
-  zipCode: z.string().optional(),
-  contactNumber: z.string().optional(),
   region: z.string().min(1, "validation.regionRequired"),
   category: z.string().min(1, "validation.categoryRequired"),
   subcategory: z.string().optional(),
-}).refine((data) => {
-  // Si se proporciona password, debe tener mínimo 6 caracteres
-  if (data.password && data.password.trim() !== "") {
-    return data.password.length >= 6;
-  }
-  return true;
-}, {
-  message: "Password must be at least 6 characters",
-  path: ["password"],
-}).refine((data) => {
-  // Si hay password, confirmPassword debe coincidir
-  if (data.password && data.password.trim() !== "") {
-    return data.password === data.confirmPassword;
-  }
-  return true;
-}, {
+}).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
 });
@@ -285,7 +264,7 @@ export default function RegisterWithInvite() {
       toast({
         title: t("auth.registrationCompleted"),
         description: result.regionAutoAssigned 
-          ? `Tu cuenta está lista. Se te asignó automáticamente la región ${result.assignedRegion} desde donde fuiste invitado. Ya puedes iniciar sesión.`
+          ? `Su cuenta está lista. Se le asignó automáticamente la región ${result.assignedRegion} desde donde fue invitado. Ya puede iniciar sesión.`
           : result.message || t("auth.accountReady"),
       });
 
@@ -392,51 +371,7 @@ export default function RegisterWithInvite() {
             </div>
 
             <div>
-              <Label htmlFor="companyName">Nombre de la Empresa</Label>
-              <Input
-                id="companyName"
-                type="text"
-                placeholder="Nombre de la empresa"
-                {...register("companyName")}
-                disabled={isSubmitting}
-              />
-              {errors.companyName && (
-                <p className="text-sm text-red-500 mt-1">{errors.companyName.message}</p>
-              )}
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="partnerCategory">Categoría del Partner</Label>
-                <Input
-                  id="partnerCategory"
-                  type="text"
-                  placeholder="Ej: Enterprise, SMB"
-                  {...register("partnerCategory")}
-                  disabled={isSubmitting}
-                />
-                {errors.partnerCategory && (
-                  <p className="text-sm text-red-500 mt-1">{errors.partnerCategory.message}</p>
-                )}
-              </div>
-
-              <div>
-                <Label htmlFor="marketSegment">Segmento del Mercado</Label>
-                <Input
-                  id="marketSegment"
-                  type="text"
-                  placeholder="Segmento del mercado"
-                  {...register("marketSegment")}
-                  disabled={isSubmitting}
-                />
-                {errors.marketSegment && (
-                  <p className="text-sm text-red-500 mt-1">{errors.marketSegment.message}</p>
-                )}
-              </div>
-            </div>
-
-            <div>
-              <Label htmlFor="password">{t("auth.password")} ({t("common.optional")})</Label>
+              <Label htmlFor="password">{t("auth.passwordRequired")}</Label>
               <Input
                 id="password"
                 type="password"
@@ -447,13 +382,10 @@ export default function RegisterWithInvite() {
               {errors.password && (
                 <p className="text-sm text-red-500 mt-1">{errors.password.message}</p>
               )}
-              <p className="text-sm text-muted-foreground mt-1">
-                {t('admin.passwordOptionalHint')}
-              </p>
             </div>
 
             <div>
-              <Label htmlFor="confirmPassword">{t("auth.confirmPassword")} ({t("common.optional")})</Label>
+              <Label htmlFor="confirmPassword">{t("auth.confirmPasswordRequired")}</Label>
               <Input
                 id="confirmPassword"
                 type="password"
@@ -607,54 +539,10 @@ export default function RegisterWithInvite() {
               </div>
             )}
 
-            <div>
-              <Label htmlFor="address">Dirección</Label>
-              <Input
-                id="address"
-                type="text"
-                placeholder="Dirección completa"
-                {...register("address")}
-                disabled={isSubmitting}
-              />
-              {errors.address && (
-                <p className="text-sm text-red-500 mt-1">{errors.address.message}</p>
-              )}
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="zipCode">Código Postal</Label>
-                <Input
-                  id="zipCode"
-                  type="text"
-                  placeholder="Código postal"
-                  {...register("zipCode")}
-                  disabled={isSubmitting}
-                />
-                {errors.zipCode && (
-                  <p className="text-sm text-red-500 mt-1">{errors.zipCode.message}</p>
-                )}
-              </div>
-
-              <div>
-                <Label htmlFor="contactNumber">Número de Contacto</Label>
-                <Input
-                  id="contactNumber"
-                  type="tel"
-                  placeholder="+57 123 456 7890"
-                  {...register("contactNumber")}
-                  disabled={isSubmitting}
-                />
-                {errors.contactNumber && (
-                  <p className="text-sm text-red-500 mt-1">{errors.contactNumber.message}</p>
-                )}
-              </div>
-            </div>
-
             <Alert>
               <AlertDescription className="text-xs">
-                Una vez completado el registro, tu cuenta estará lista para usar inmediatamente.
-                Recibirás un email de confirmación.
+                Una vez completado el registro, su cuenta estará lista para usar inmediatamente.
+                Recibirá un email de confirmación.
               </AlertDescription>
             </Alert>
 
@@ -676,7 +564,7 @@ export default function RegisterWithInvite() {
 
           <div className="mt-6 text-center">
             <a href="/login" className="text-sm text-primary-600 hover:text-primary-700">
-              ¿Ya tienes una cuenta? Inicia sesión
+              ¿Ya tiene una cuenta? Inicie sesión
             </a>
           </div>
         </CardContent>

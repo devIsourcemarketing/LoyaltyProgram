@@ -146,7 +146,7 @@ export default function RewardModal({ isOpen, onClose, reward }: RewardModalProp
       const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
       toast({
         title: "Imagen demasiado grande",
-        description: `El tamaño de la imagen es ${fileSizeMB}MB. El tamaño máximo permitido es 2MB. Por favor, reduce el tamaño de la imagen.`,
+        description: `El tamaño de la imagen es ${fileSizeMB}MB. El tamaño máximo permitido es 2MB. Por favor, reduzca el tamaño de la imagen.`,
         variant: "destructive",
       });
       return;
@@ -198,7 +198,7 @@ export default function RewardModal({ isOpen, onClose, reward }: RewardModalProp
       console.error('Image upload error:', error);
       toast({
         title: "Error",
-        description: "Error al subir la imagen. Por favor intenta de nuevo.",
+        description: "Error al subir la imagen. Por favor intente de nuevo.",
         variant: "destructive",
       });
     } finally {
