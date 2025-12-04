@@ -2716,15 +2716,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
           continue;
         }
 
-        // Map type to product type
-        let productType: "software" | "hardware" | "equipment";
+        // Map type to dealType (NEW CLIENT vs RENEWAL)
+        let dealType: "new_customer" | "renewal";
         if (typeOfDeal === "NEW CLIENT" || typeOfDeal === 'SOFTWARE') {
-          productType = "software";
+          dealType = "new_customer";
         } else if (typeOfDeal === "RENEWAL" || typeOfDeal === 'HARDWARE') {
-          productType = "hardware";
+          dealType = "renewal";
         } else {
-          productType = "equipment";
+          dealType = "new_customer"; // Default to new_customer
         }
+
+        // For Kaspersky, productType is always software
+        const productType: "software" | "hardware" | "equipment" = "software";
 
         const dealStatus = status as "pending" | "approved" | "rejected";
         const pointsEarned = dealStatus === "approved" ? calculatePointsForDeal(productType, parseFloat(amountStr)) : 0;
@@ -2732,6 +2735,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         dealsToInsert.push({
           userId: user.id,
           productType: productType,
+          dealType: dealType,
           productName: dealId ? `${typeOfDeal} - Deal #${dealId}` : `${typeOfDeal} Deal`,
           dealValue: amountStr,
           quantity: 1,
@@ -2780,7 +2784,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               if (regionConfig) {
                 // Calculate goals based on deal type
                 const dealValue = parseFloat(dealData.dealValue);
-                const dealTypeValue = dealData.productType === "software" ? "new_customer" : "renewal";
+                const dealTypeValue = dealData.dealType; // Use the actual dealType from the deal
                 const goalRate = dealTypeValue === "new_customer" 
                   ? regionConfig.newCustomerGoalRate 
                   : regionConfig.renewalGoalRate;
