@@ -87,6 +87,8 @@ export interface IStorage {
     totalDeals: number;
     pendingDeals: number;
     redeemedRewards: number;
+    totalGoals: number;
+    monthlyGoals: number;
   }>;
 
   // Deal methods
@@ -368,6 +370,12 @@ export class DatabaseStorage implements IStorage {
         )
       );
 
+    // Get total goals from all time
+    const [totalGoalsResult] = await db
+      .select({ total: sum(goalsHistory.goals) })
+      .from(goalsHistory)
+      .where(eq(goalsHistory.userId, userId));
+
     const [redeemedRewardsResult] = await db
       .select({ count: count() })
       .from(pointsHistory)
@@ -381,6 +389,7 @@ export class DatabaseStorage implements IStorage {
     const totalPoints = Number(totalPointsResult?.total || 0);
     const availablePoints = await this.getUserAvailablePoints(userId);
     const monthlyGoals = Number(monthlyGoalsResult?.total || 0);
+    const totalGoals = Number(totalGoalsResult?.total || 0);
 
     return {
       totalPoints,
@@ -388,6 +397,8 @@ export class DatabaseStorage implements IStorage {
       totalDeals: totalDealsResult?.count || 0,
       pendingDeals: monthlyGoals, // Now this shows monthly goals instead of pending deals count
       redeemedRewards: redeemedRewardsResult?.count || 0,
+      totalGoals,
+      monthlyGoals,
     };
   }
 

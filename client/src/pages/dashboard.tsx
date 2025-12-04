@@ -34,6 +34,8 @@ interface UserStats {
   totalDeals: number;
   pendingDeals: number;
   redeemedRewards: number;
+  totalGoals: number;
+  monthlyGoals: number;
 }
 
 interface Deal {
@@ -541,7 +543,7 @@ export default function Dashboard() {
             <div className="px-6 py-5">
               <div className="flex justify-between items-center">
                 <h3 className="text-xl font-semibold text-white">{t('dashboard.plays')}</h3>
-                <p className="white-text">{t('dashboard.accumulated')} <strong><span className="text-green-600">{statsLoading ? "..." : stats?.availablePoints?.toLocaleString() || "0"} {t('deals.points').toLowerCase()}</span></strong></p>
+                <p className="white-text">{t('dashboard.accumulated')} <strong><span className="text-green-600">{statsLoading ? "..." : stats?.totalGoals?.toFixed(1) || "0"} goles</span></strong></p>
               </div>
             </div>
             <div className="overflow-x-auto">
