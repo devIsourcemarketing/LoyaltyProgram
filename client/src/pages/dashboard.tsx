@@ -25,6 +25,8 @@ import logoHero from "@assets/logo-kaspersky-cup.png";
 import { useTranslation } from "@/hooks/useTranslation";
 import { isAdminRole } from "@/lib/roles";
 import { Footer } from "@/components/layout/footer";
+import { useSocket } from "@/hooks/useSocket";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface UserStats {
   totalPoints: number;
@@ -57,6 +59,8 @@ export default function Dashboard() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
   const [, navigate] = useLocation();
+  const socket = useSocket();
+  const queryClient = useQueryClient();
 
   const { data: user } = useQuery<AuthUser>({
     queryKey: ["/api/auth/me"],
@@ -68,6 +72,31 @@ export default function Dashboard() {
       navigate("/admin");
     }
   }, [user, navigate]);
+
+  // Listen for real-time updates via Socket.IO
+  useEffect(() => {
+    if (!socket || !user) return;
+
+    // Listen for deal approval events
+    const handleDealApproved = (data: { userId: string; dealId: string; points: number }) => {
+      console.log('🔔 Deal approved event received:', data);
+      
+      // Only refresh if it's for the current user
+      if (data.userId === user.id) {
+        // Invalidate and refetch user stats
+        queryClient.invalidateQueries({ queryKey: ["/api/users/stats"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/deals/recent"] });
+        
+        console.log('✅ Dashboard stats refreshed automatically');
+      }
+    };
+
+    socket.on('dealApproved', handleDealApproved);
+
+    return () => {
+      socket.off('dealApproved', handleDealApproved);
+    };
+  }, [socket, user, queryClient]);
 
   const { data: stats, isLoading: statsLoading } = useQuery<UserStats>({
     queryKey: ["/api/users/stats"],

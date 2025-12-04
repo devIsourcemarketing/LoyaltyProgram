@@ -350,10 +350,22 @@ export class DatabaseStorage implements IStorage {
       .from(deals)
       .where(eq(deals.userId, userId));
 
-    const [pendingDealsResult] = await db
-      .select({ count: count() })
-      .from(deals)
-      .where(and(eq(deals.userId, userId), eq(deals.status, "pending")));
+    // Get current month and year
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth() + 1; // 1-12
+    const currentYear = currentDate.getFullYear();
+
+    // Get monthly goals from goalsHistory instead of pending deals count
+    const [monthlyGoalsResult] = await db
+      .select({ total: sum(goalsHistory.goals) })
+      .from(goalsHistory)
+      .where(
+        and(
+          eq(goalsHistory.userId, userId),
+          eq(goalsHistory.month, currentMonth),
+          eq(goalsHistory.year, currentYear)
+        )
+      );
 
     const [redeemedRewardsResult] = await db
       .select({ count: count() })
@@ -367,12 +379,13 @@ export class DatabaseStorage implements IStorage {
 
     const totalPoints = Number(totalPointsResult?.total || 0);
     const availablePoints = await this.getUserAvailablePoints(userId);
+    const monthlyGoals = Number(monthlyGoalsResult?.total || 0);
 
     return {
       totalPoints,
       availablePoints,
       totalDeals: totalDealsResult?.count || 0,
-      pendingDeals: pendingDealsResult?.count || 0,
+      pendingDeals: monthlyGoals, // Now this shows monthly goals instead of pending deals count
       redeemedRewards: redeemedRewardsResult?.count || 0,
     };
   }
@@ -543,28 +556,36 @@ export class DatabaseStorage implements IStorage {
         description: `Points earned for deal: ${deal.productName}`,
       });
 
-      // Enviar notificación en tiempo real
-      await NotificationHelpers.dealApproved(
-        updatedDeal.userId,
-        id,
-        pointsEarned
-      );
+      // Enviar notificación en tiempo real (no bloqueante)
+      try {
+        await NotificationHelpers.dealApproved(
+          updatedDeal.userId,
+          id,
+          pointsEarned
+        );
+        // Emitir evento específico para actualizar el dashboard
+        const { emitDealApprovedEvent } = await import("./notifications");
+        emitDealApprovedEvent(updatedDeal.userId, id, pointsEarned);
+      } catch (error) {
+        console.warn("⚠️ Could not send real-time notification:", error);
+      }
     }
 
     // Add goals to history
     if (updatedDeal && goalsEarned > 0 && regionConfigId) {
-      const approvalDate = new Date();
+      // Use the deal's closeDate (transaction date) for month/year tracking
+      const transactionDate = new Date(deal.closeDate);
       await db.insert(goalsHistory).values({
         userId: updatedDeal.userId,
         dealId: id,
         goals: goalsEarned.toFixed(2),
-        month: approvalDate.getMonth() + 1, // 1-12
-        year: approvalDate.getFullYear(),
+        month: transactionDate.getMonth() + 1, // 1-12
+        year: transactionDate.getFullYear(),
         regionConfigId: regionConfigId,
         description: `${goalsEarned.toFixed(2)} goals earned from ${deal.dealType === "new_customer" ? "new customer" : "renewal"} deal: ${deal.productName}`,
       });
 
-      console.log(`📊 Goals history created for user ${updatedDeal.userId}: ${goalsEarned.toFixed(2)} goals`);
+      console.log(`📊 Goals history created for user ${updatedDeal.userId}: ${goalsEarned.toFixed(2)} goals for ${transactionDate.getMonth() + 1}/${transactionDate.getFullYear()}`);
     }
 
     return updatedDeal || undefined;

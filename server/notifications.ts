@@ -28,6 +28,19 @@ export async function createAndEmitNotification(
 }
 
 /**
+ * Emite un evento específico de deal aprobado para actualizar el dashboard
+ */
+export function emitDealApprovedEvent(userId: string, dealId: string, points: number) {
+  try {
+    const io = getIO();
+    io.emit('dealApproved', { userId, dealId, points });
+    console.log(`📡 Deal approved event emitted for user ${userId}`);
+  } catch (error) {
+    console.warn("⚠️ Could not emit dealApproved event:", error);
+  }
+}
+
+/**
  * Helper para crear notificaciones de diferentes tipos
  */
 export const NotificationHelpers = {

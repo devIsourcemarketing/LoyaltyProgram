@@ -2745,13 +2745,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
               description: `Points earned from bulk imported deal: ${dealData.productName}`,
             });
             
-            // Enviar email al usuario notificando los goles registrados
+            // Calculate and register goals for approved deals
             const dealUser = await storage.getUser(dealData.userId);
-            if (dealUser) {
+            if (dealUser && dealUser.region && dealUser.regionCategory) {
+              // Get region configuration to calculate goals
+              const regionConfigs = await storage.getAllRegionConfigs();
+              const regionConfig = regionConfigs.find(config => 
+                config.region === dealUser.region &&
+                config.category === dealUser.regionCategory &&
+                (dealUser.regionSubcategory ? config.subcategory === dealUser.regionSubcategory : !config.subcategory)
+              );
+              
+              if (regionConfig) {
+                // Calculate goals based on deal type
+                const dealValue = parseFloat(dealData.dealValue);
+                const dealTypeValue = dealData.productType === "software" ? "new_customer" : "renewal";
+                const goalRate = dealTypeValue === "new_customer" 
+                  ? regionConfig.newCustomerGoalRate 
+                  : regionConfig.renewalGoalRate;
+                const goalsEarned = dealValue / goalRate;
+                
+                // Use deal's closeDate for month/year tracking
+                const transactionDate = new Date(dealData.closeDate);
+                
+                // Import db and goalsHistory
+                const { db } = await import("./db");
+                const { goalsHistory } = await import("@shared/schema");
+                
+                // Register goals in history
+                await db.insert(goalsHistory).values({
+                  userId: dealData.userId,
+                  dealId: deal.id,
+                  goals: goalsEarned.toFixed(2),
+                  month: transactionDate.getMonth() + 1,
+                  year: transactionDate.getFullYear(),
+                  regionConfigId: regionConfig.id,
+                  description: `${goalsEarned.toFixed(2)} goals from imported ${dealTypeValue} deal: ${dealData.productName}`,
+                });
+                
+                console.log(`📊 Goals registered for imported deal: ${goalsEarned.toFixed(2)} goals for ${transactionDate.getMonth() + 1}/${transactionDate.getFullYear()}`);
+              }
+              
+              // Send email to user
               const updatedUser = await storage.getUser(dealData.userId);
               const totalGoles = updatedUser?.points || 0;
               
-              // Detectar idioma preferido del usuario
+              // Detect preferred language
               const userLanguage = await detectPreferredLanguage(req);
               
               await sendGolesRegistradosEmail({
