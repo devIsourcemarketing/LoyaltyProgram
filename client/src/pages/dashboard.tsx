@@ -204,28 +204,28 @@ export default function Dashboard() {
               
               {/* Right side - Stats Cards */}
               <div className="flex flex-col space-y-4 mt-8 lg:mt-0 lg:ml-8 min-w-[280px]">
-                {/* Available Points Card */}
+                {/* Total Goals Card */}
                 <div className="bg-white/80 backdrop-blur-sm rounded-lg p-4 flex items-center space-x-4 points-card green-background">
                   <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
                     <Coins className="text-gray-700 h-6 w-6 text-green-600" />
                   </div>
                   <div className="flex-1">
-                    <div className="text-gray-600 text-sm">{t('dashboard.availablePoints')}</div>
-                    <div className="text-2xl font-bold text-gray-900" data-testid="text-available-points">
-                      {statsLoading ? "..." : stats?.availablePoints?.toLocaleString() || "0"}
+                    <div className="text-gray-600 text-sm">{t('dashboard.totalGoalsAccumulated')}</div>
+                    <div className="text-2xl font-bold text-gray-900" data-testid="text-total-goals">
+                      {statsLoading ? "..." : stats?.totalGoals?.toFixed(1) || "0"}
                     </div>                    
                   </div>
                 </div>
 
-                {/* Pending Deals Card */}
+                {/* Monthly Goals Card */}
                 <div className="bg-white/80 backdrop-blur-sm rounded-lg p-4 flex items-center space-x-4 white-background">
                   <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center green-background">
                     <Handshake className="text-gray-700 h-6 w-6 white-text" />
                   </div>
                   <div className="flex-1">
-                    <div className="text-gray-600 text-sm">{t('dashboard.pendingDeals')}</div>
-                    <div className="text-2xl font-bold text-gray-900" data-testid="text-pending-deals">
-                      {statsLoading ? "..." : stats?.pendingDeals || "0"}
+                    <div className="text-gray-600 text-sm">{t('dashboard.monthlyGoals')}</div>
+                    <div className="text-2xl font-bold text-gray-900" data-testid="text-monthly-goals">
+                      {statsLoading ? "..." : stats?.monthlyGoals?.toFixed(1) || "0"}
                     </div>
                     <div className="text-gray-500 text-xs">{t('dashboard.awaitingApproval')}</div>
                   </div>
