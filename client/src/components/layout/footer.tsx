@@ -13,16 +13,16 @@ export function Footer() {
           <div>
             <h3 className="text-lg font-semibold mb-4">Kaspersky Lab</h3>
             <p className="text-gray-400 text-sm">
-              © {currentYear} AO Kaspersky Lab. Todos los derechos reservados.
+              © {currentYear} AO Kaspersky Lab. {t('common.rightsReserved')}
             </p>
           </div>
 
           {/* Social Links */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Síguenos</h3>
+            <h3 className="text-lg font-semibold mb-4">{t('common.followUs')}</h3>
             <div className="flex space-x-4">
               <a
-                href="https://facebook.com/kaspersky"
+                href={t('common.facebook')}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-white transition-colors"
@@ -31,7 +31,7 @@ export function Footer() {
                 <Facebook className="h-5 w-5" />
               </a>
               <a
-                href="https://twitter.com/kaspersky"
+                href={t('common.twitter')}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-white transition-colors"
@@ -40,7 +40,7 @@ export function Footer() {
                 <Twitter className="h-5 w-5" />
               </a>
               <a
-                href="https://linkedin.com/company/kaspersky-lab"
+                href={t('common.linkedin')}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-white transition-colors"
@@ -49,7 +49,7 @@ export function Footer() {
                 <Linkedin className="h-5 w-5" />
               </a>
               <a
-                href="https://youtube.com/kaspersky"
+                href={t('common.youtube')}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-white transition-colors"
@@ -58,7 +58,7 @@ export function Footer() {
                 <Youtube className="h-5 w-5" />
               </a>
               <a
-                href="https://instagram.com/kaspersky"
+                href={t('common.instagram')}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-white transition-colors"
@@ -76,39 +76,7 @@ export function Footer() {
                 <Users className="h-5 w-5" />
               </a>
             </div>
-          </div>
-
-          {/* Legal Links */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Legal</h3>
-            <ul className="space-y-2 text-sm text-gray-400">
-              <li>
-                <a href="#" className="hover:text-white transition-colors">
-                  Privacy Policy
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white transition-colors">
-                  Cookies
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white transition-colors">
-                  Anti-Corruption Objectives
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white transition-colors">
-                  B2C License Agreement
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white transition-colors">
-                  B2B License Agreement
-                </a>
-              </li>
-            </ul>
-          </div>
+          </div>          
         </div>
       </div>
     </footer>

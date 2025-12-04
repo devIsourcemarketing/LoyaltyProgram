@@ -238,6 +238,9 @@ button#radix-\:r7\::hover {
 .display-hero-dashboard {
     align-items: center;
 }
+.gray-border {
+  border-color: #111827;
+}
 /*--FAQ--*/
 .faq-answer {
   white-space: pre-line;
