@@ -2729,6 +2729,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // For Kaspersky, productType is always software
         const productType: "software" | "hardware" | "equipment" = "software";
 
+        // Check for duplicate license agreement number
+        if (dealId) {
+          const existingDeal = await storage.getDealByLicenseNumber(dealId);
+          if (existingDeal) {
+            errors.push(`Row ${i + 1}: Duplicate license agreement number '${dealId}' (already exists as deal #${existingDeal.id})`);
+            continue;
+          }
+        }
+
         const dealStatus = status as "pending" | "approved" | "rejected";
         const pointsEarned = dealStatus === "approved" ? calculatePointsForDeal(productType, parseFloat(amountStr)) : 0;
 
