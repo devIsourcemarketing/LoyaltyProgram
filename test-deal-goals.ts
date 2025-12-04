@@ -7,13 +7,13 @@ async function testDealGoalsCalculation() {
   console.log("=" . repeat(60));
   
   try {
-    // Find any test user with deals
+    // Find test user
     const testUser = await db.query.users.findFirst({
-      where: eq(users.isActive, true)
+      where: eq(users.email, "alejandrosoftware.engineering@gmail.com")
     });
 
     if (!testUser) {
-      console.error("❌ No active users found.");
+      console.error("❌ Test user not found.");
       return;
     }
 

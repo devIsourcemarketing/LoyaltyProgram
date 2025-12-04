@@ -60,6 +60,8 @@ export default function Dashboard() {
   const [isDealModalOpen, setIsDealModalOpen] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
+  const [dealsPage, setDealsPage] = useState(1);
+  const dealsPerPage = 10;
   const [, navigate] = useLocation();
   const socket = useSocket();
   const queryClient = useQueryClient();
@@ -106,6 +108,11 @@ export default function Dashboard() {
 
   const { data: recentDeals, isLoading: dealsLoading } = useQuery<Deal[]>({
     queryKey: ["/api/deals/recent"],
+    queryFn: async () => {
+      const response = await fetch("/api/deals/recent?limit=1000", { credentials: "include" });
+      if (!response.ok) throw new Error("Failed to fetch deals");
+      return response.json();
+    },
     select: (data) => data || [],
   });
 
@@ -575,7 +582,9 @@ export default function Dashboard() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-blue-800">
-                    {recentDeals.map((deal) => {
+                    {recentDeals
+                      .slice((dealsPage - 1) * dealsPerPage, dealsPage * dealsPerPage)
+                      .map((deal) => {
                       // Calcular goles según el tipo de deal:
                       // NEW_CLIENT: cada $1000 = 1 gol
                       // RENEWAL: cada $2000 = 1 gol
@@ -633,6 +642,40 @@ export default function Dashboard() {
                 </div>
               )}
             </div>
+            
+            {/* Pagination Controls */}
+            {recentDeals && recentDeals.length > dealsPerPage && (
+              <div className="px-6 py-4 bg-blue-900 border-t border-blue-800 flex items-center justify-between">
+                <div className="text-sm text-white/70">
+                  Mostrando {((dealsPage - 1) * dealsPerPage) + 1} - {Math.min(dealsPage * dealsPerPage, recentDeals.length)} de {recentDeals.length} deals
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setDealsPage(p => Math.max(1, p - 1))}
+                    disabled={dealsPage === 1}
+                    className="bg-blue-800 hover:bg-blue-700 text-white border-blue-700"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                    Anterior
+                  </Button>
+                  <div className="flex items-center gap-2 px-3 text-white">
+                    Página {dealsPage} de {Math.ceil(recentDeals.length / dealsPerPage)}
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setDealsPage(p => Math.min(Math.ceil(recentDeals.length / dealsPerPage), p + 1))}
+                    disabled={dealsPage >= Math.ceil(recentDeals.length / dealsPerPage)}
+                    className="bg-blue-800 hover:bg-blue-700 text-white border-blue-700"
+                  >
+                    Siguiente
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
         </div>
