@@ -43,6 +43,7 @@ interface Deal {
   dealType: string;
   pointsEarned: number;
   status: string;
+  closeDate: string;
   createdAt: string;
 }
 
@@ -563,7 +564,10 @@ export default function Dashboard() {
                         {t('deals.points').toUpperCase()}
                       </th>
                       <th className="px-6 py-4 text-left text-sm font-semibold text-white uppercase tracking-wider">
-                        FECHA
+                        FECHA VENTA
+                      </th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-white uppercase tracking-wider">
+                        FECHA REGISTRO
                       </th>
                       <th className="px-6 py-4 text-left text-sm font-semibold text-white uppercase tracking-wider">
                         {t('deals.status').toUpperCase()}
@@ -589,6 +593,13 @@ export default function Dashboard() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-white font-medium">
                           {goals}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-white">
+                          {new Date(deal.closeDate).toLocaleDateString('es-ES', { 
+                            year: 'numeric', 
+                            month: '2-digit', 
+                            day: '2-digit' 
+                          })}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-white">
                           {new Date(deal.createdAt).toLocaleDateString('es-ES', { 
