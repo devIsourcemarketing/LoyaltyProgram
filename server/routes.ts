@@ -4152,9 +4152,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const configs = await storage.getRegionConfigs();
       
-      // Construir jerarquía: Región → Categorías → Subcategorías
+      // Construir jerarquía: Región → Subcategorías (independientes del segmento de mercado)
       const hierarchy: Record<string, {
-        categories: Record<string, string[]>
+        subcategories: string[]
       }> = {};
 
       for (const config of configs) {
@@ -4162,17 +4162,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         // Inicializar región si no existe
         if (!hierarchy[config.region]) {
-          hierarchy[config.region] = { categories: {} };
-        }
-
-        // Inicializar categoría si no existe
-        if (!hierarchy[config.region].categories[config.category]) {
-          hierarchy[config.region].categories[config.category] = [];
+          hierarchy[config.region] = { subcategories: [] };
         }
 
         // Agregar subcategoría si existe y no está duplicada
-        if (config.subcategory && !hierarchy[config.region].categories[config.category].includes(config.subcategory)) {
-          hierarchy[config.region].categories[config.category].push(config.subcategory);
+        if (config.subcategory && !hierarchy[config.region].subcategories.includes(config.subcategory)) {
+          hierarchy[config.region].subcategories.push(config.subcategory);
         }
       }
 

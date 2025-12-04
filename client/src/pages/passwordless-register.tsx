@@ -20,7 +20,7 @@ import { LanguageSelector } from "@/components/LanguageSelector";
 
 // Tipo para la jerarquía de regiones desde la API
 type RegionHierarchy = Record<string, {
-  categories: Record<string, string[]>
+  subcategories: string[]
 }>;
 
 const passwordlessRegisterSchema = z.object({
@@ -55,7 +55,6 @@ export default function PasswordlessRegister() {
   const [selectedCity, setSelectedCity] = useState<string>("");
   const [selectedRegion, setSelectedRegion] = useState<string>("");
   const [selectedMarketSegment, setSelectedMarketSegment] = useState<string>("");
-  const [availableCategories, setAvailableCategories] = useState<string[]>([]);
   const [availableSubcategories, setAvailableSubcategories] = useState<string[]>([]);
 
   // Obtener jerarquía de regiones desde la API
@@ -98,31 +97,17 @@ export default function PasswordlessRegister() {
     }
   }, [form]);
 
-  // Actualizar categorías disponibles cuando se selecciona una región
+  // Actualizar subcategorías disponibles cuando se selecciona una región
   useEffect(() => {
     if (selectedRegion && regionHierarchy) {
-      const categories = Object.keys(regionHierarchy[selectedRegion]?.categories || {});
-      setAvailableCategories(categories);
-      
-      // Reset market segment y subcategory
-      setSelectedMarketSegment("");
-      form.setValue("marketSegment", "");
-      setAvailableSubcategories([]);
+      const subcategories = regionHierarchy[selectedRegion]?.subcategories || [];
+      setAvailableSubcategories(subcategories);
+      // Resetear subcategory cuando cambia la región
+      form.setValue("subcategory", "");
     } else {
-      setAvailableCategories([]);
       setAvailableSubcategories([]);
     }
   }, [selectedRegion, regionHierarchy, form]);
-
-  // Actualizar subcategorías disponibles cuando se selecciona un segmento de mercado
-  useEffect(() => {
-    if (selectedRegion && selectedMarketSegment && regionHierarchy) {
-      const subcategories = regionHierarchy[selectedRegion]?.categories[selectedMarketSegment] || [];
-      setAvailableSubcategories(subcategories);
-    } else {
-      setAvailableSubcategories([]);
-    }
-  }, [selectedMarketSegment, selectedRegion, regionHierarchy]);
 
   const registerMutation = useMutation({
     mutationFn: async (userData: PasswordlessRegisterForm) => {
@@ -334,7 +319,6 @@ export default function PasswordlessRegister() {
                           field.onChange(value);
                           setSelectedMarketSegment(value);
                           form.setValue("category", value as any, { shouldValidate: true });
-                          form.setValue("subcategory", "");
                         }}
                         disabled={registerMutation.isPending}
                       >
@@ -368,9 +352,7 @@ export default function PasswordlessRegister() {
                       onValueChange={(value) => {
                         setSelectedRegion(value);
                         form.setValue("region", value as any, { shouldValidate: true });
-                        setSelectedMarketSegment(""); // Reset market segment when region changes
-                        form.setValue("marketSegment", "");
-                        form.setValue("category", "" as any, { shouldValidate: false });
+                        // Solo resetear subcategory, el market segment es independiente de la región
                         form.setValue("subcategory", "", { shouldValidate: false });
                       }}
                       disabled={registerMutation.isPending}
