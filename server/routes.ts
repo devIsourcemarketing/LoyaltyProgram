@@ -723,6 +723,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { region, ...dealBody } = req.body;
       
+      // Validar si ya existe un deal con el mismo número de licencia
+      if (dealBody.licenseAgreementNumber) {
+        const existingDeal = await storage.getDealByLicenseNumber(dealBody.licenseAgreementNumber);
+        if (existingDeal) {
+          return res.status(409).json({ 
+            code: 'DUPLICATE_LICENSE_NUMBER',
+            message: 'A deal with this license agreement number already exists',
+            licenseNumber: dealBody.licenseAgreementNumber,
+            existingDeal: {
+              id: existingDeal.id,
+              licenseAgreementNumber: existingDeal.licenseAgreementNumber,
+              productType: existingDeal.productType,
+              productName: existingDeal.productName,
+              dealValue: existingDeal.dealValue,
+              status: existingDeal.status,
+              createdAt: existingDeal.createdAt
+            }
+          });
+        }
+      }
+      
       // Convert region name to regionId
       let regionId = null;
       if (region) {

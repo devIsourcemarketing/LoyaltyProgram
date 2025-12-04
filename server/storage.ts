@@ -92,6 +92,7 @@ export interface IStorage {
   // Deal methods
   createDeal(deal: InsertDeal): Promise<Deal>;
   getDeal(id: string): Promise<Deal | undefined>;
+  getDealByLicenseNumber(licenseNumber: string): Promise<Deal | undefined>;
   getUserDeals(userId: string): Promise<Deal[]>;
   getPendingDeals(regionId?: string): Promise<DealWithUser[]>;
   getAllDeals(page?: number, limit?: number, regionId?: string): Promise<{ deals: DealWithUser[]; total: number }>;
@@ -397,6 +398,14 @@ export class DatabaseStorage implements IStorage {
 
   async getDeal(id: string): Promise<Deal | undefined> {
     const [deal] = await db.select().from(deals).where(eq(deals.id, id));
+    return deal || undefined;
+  }
+
+  async getDealByLicenseNumber(licenseNumber: string): Promise<Deal | undefined> {
+    const [deal] = await db
+      .select()
+      .from(deals)
+      .where(eq(deals.licenseAgreementNumber, licenseNumber));
     return deal || undefined;
   }
 

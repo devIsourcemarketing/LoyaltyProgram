@@ -140,9 +140,25 @@ export default function DealModal({ isOpen, onClose, deal }: DealModalProps) {
       onClose();
     },
     onError: (error: any) => {
+      let title = t('common.error');
+      let description = error.message || t(isEditing ? 'deals.failedToUpdate' : 'deals.failedToRegister');
+      
+      // Handle duplicate deal error (409 Conflict)
+      if (error.status === 409 && error.data?.existingDeal) {
+        title = t('deals.duplicateDeal');
+        const { existingDeal } = error.data;
+        description = `${t('deals.duplicateLicenseNumber', { 
+          licenseNumber: existingDeal.licenseAgreementNumber 
+        })}\n${t('deals.existingDealInfo', {
+          productType: existingDeal.productType,
+          dealValue: existingDeal.dealValue,
+          status: existingDeal.status
+        })}`;
+      }
+      
       toast({
-        title: "Error",
-        description: error.message || `Failed to ${isEditing ? "update" : "register"} deal`,
+        title,
+        description,
         variant: "destructive",
       });
     },
