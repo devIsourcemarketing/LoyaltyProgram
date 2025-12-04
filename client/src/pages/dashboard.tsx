@@ -40,6 +40,7 @@ interface Deal {
   id: string;
   productName: string;
   dealValue: string;
+  dealType: string;
   pointsEarned: number;
   status: string;
   createdAt: string;
@@ -571,9 +572,12 @@ export default function Dashboard() {
                   </thead>
                   <tbody className="divide-y divide-blue-800">
                     {recentDeals.map((deal) => {
-                      // Calcular goles: cada $2000 = 1 gol
+                      // Calcular goles según el tipo de deal:
+                      // NEW_CLIENT: cada $1000 = 1 gol
+                      // RENEWAL: cada $2000 = 1 gol
                       const dealValueNum = Number(deal.dealValue);
-                      const goals = (dealValueNum / 2000).toFixed(1);
+                      const rate = deal.dealType === 'new_customer' ? 1000 : 2000;
+                      const goals = (dealValueNum / rate).toFixed(1);
                       
                       return (
                       <tr key={deal.id} data-testid={`row-deal-${deal.id}`} className="transition-colors">
