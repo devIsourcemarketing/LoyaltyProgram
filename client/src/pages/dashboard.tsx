@@ -573,13 +573,13 @@ export default function Dashboard() {
                         {t('deals.points').toUpperCase()}
                       </th>
                       <th className="px-6 py-4 text-left text-sm font-semibold text-white uppercase tracking-wider">
-                        FECHA VENTA
+                        {t('dashboard.saleDate').toUpperCase()}
                       </th>
                       <th className="px-6 py-4 text-left text-sm font-semibold text-white uppercase tracking-wider">
-                        FECHA REGISTRO
+                        {t('dashboard.registrationDate').toUpperCase()}
                       </th>
                       <th className="px-6 py-4 text-left text-sm font-semibold text-white uppercase tracking-wider">
-                        {t('deals.status').toUpperCase()}
+                        {t('dashboard.status').toUpperCase()}
                       </th>
                     </tr>
                   </thead>
@@ -647,9 +647,9 @@ export default function Dashboard() {
             
             {/* Pagination Controls */}
             {recentDeals && recentDeals.length > dealsPerPage && (
-              <div className="px-6 py-4 bg-blue-900 border-t border-blue-800 flex items-center justify-between">
-                <div className="text-sm text-white/70">
-                  Mostrando {((dealsPage - 1) * dealsPerPage) + 1} - {Math.min(dealsPage * dealsPerPage, recentDeals.length)} de {recentDeals.length} deals
+              <div className="px-6 py-4 bg-blue-900 border-t flex items-center justify-between green-background">
+                <div className="text-sm text-gray-900">
+                  {t('dashboard.showing')} {((dealsPage - 1) * dealsPerPage) + 1} - {Math.min(dealsPage * dealsPerPage, recentDeals.length)} de {recentDeals.length} {t('admin.deals')}
                 </div>
                 <div className="flex gap-2">
                   <Button
@@ -657,12 +657,12 @@ export default function Dashboard() {
                     size="sm"
                     onClick={() => setDealsPage(p => Math.max(1, p - 1))}
                     disabled={dealsPage === 1}
-                    className="bg-blue-800 hover:bg-blue-700 text-white border-blue-700"
+                    className="hover:green-background text-gray-900 green-background gray-border"
                   >
                     <ChevronLeft className="h-4 w-4" />
-                    Anterior
+                    {t('dashboard.previous')}
                   </Button>
-                  <div className="flex items-center gap-2 px-3 text-white">
+                  <div className="flex items-center gap-2 px-3 text-gray-900">
                     Página {dealsPage} de {Math.ceil(recentDeals.length / dealsPerPage)}
                   </div>
                   <Button
@@ -670,9 +670,9 @@ export default function Dashboard() {
                     size="sm"
                     onClick={() => setDealsPage(p => Math.min(Math.ceil(recentDeals.length / dealsPerPage), p + 1))}
                     disabled={dealsPage >= Math.ceil(recentDeals.length / dealsPerPage)}
-                    className="bg-blue-800 hover:bg-blue-700 text-white border-blue-700"
+                    className="hover:green-background text-gray-900 green-background gray-border"
                   >
-                    Siguiente
+                    {t('dashboard.next')}
                     <ChevronRight className="h-4 w-4" />
                   </Button>
                 </div>
