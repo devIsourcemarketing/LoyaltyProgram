@@ -256,11 +256,11 @@ export default function Navigation({ user }: NavigationProps) {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
-                <Link href="/profile">
+                {/* <Link href="/profile">
                   <DropdownMenuItem data-testid="menu-profile">
                     {t("common.profile")}
                   </DropdownMenuItem>
-                </Link>
+                </Link> */}
                 <DropdownMenuItem onClick={handleLogout} data-testid="menu-logout">
                   {t("common.logout")}
                 </DropdownMenuItem>
