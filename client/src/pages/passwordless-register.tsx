@@ -354,6 +354,15 @@ export default function PasswordlessRegister() {
                         form.setValue("region", value as any, { shouldValidate: true });
                         // Solo resetear subcategory, el market segment es independiente de la región
                         form.setValue("subcategory", "", { shouldValidate: false });
+                        
+                        // Auto-llenar país si es Brasil o México
+                        if (value === "BRASIL") {
+                          form.setValue("country", "BRASIL", { shouldValidate: true });
+                          setSelectedCountry("BRASIL");
+                        } else if (value === "MEXICO") {
+                          form.setValue("country", "MÉXICO", { shouldValidate: true });
+                          setSelectedCountry("MÉXICO");
+                        }
                       }}
                       disabled={registerMutation.isPending}
                     >
@@ -420,7 +429,7 @@ export default function PasswordlessRegister() {
                     <Select
                       value={field.value}
                       onValueChange={field.onChange}
-                      disabled={registerMutation.isPending}
+                      disabled={registerMutation.isPending || selectedRegion === "BRASIL" || selectedRegion === "MEXICO"}
                     >
                       <FormControl>
                         <SelectTrigger>
