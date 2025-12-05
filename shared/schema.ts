@@ -448,6 +448,8 @@ export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
+}).extend({
+  password: z.string().optional(), // Hacer contraseña opcional para usuarios passwordless
 });
 
 export const updateUserSchema = createInsertSchema(users).omit({

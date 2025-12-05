@@ -65,10 +65,24 @@ interface ReportsData {
 const createUserSchema = z.object({
   username: z.string().min(3, "Username must be at least 3 characters"),
   email: z.string().email("Invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  password: z.string().optional(),
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
-  country: z.string().min(1, "Country is required"),
+  companyName: z.string().min(1, "El nombre de la empresa es requerido"),
+  partnerCategory: z.string().min(1, "La categoría del partner es requerida"),
+  marketSegment: z.string().min(1, "El segmento del mercado es requerido"),
+  category: z.enum(["ENTERPRISE", "SMB", "MSSP"], {
+    required_error: "La categoría es requerida",
+  }),
+  region: z.enum(["NOLA", "SOLA", "BRASIL", "MEXICO"], {
+    required_error: "La región es requerida",
+  }),
+  subcategory: z.string().optional().nullable(),
+  country: z.string().min(1, "El país es requerido"),
+  address: z.string().optional().nullable(),
+  city: z.string().optional().nullable(),
+  zipCode: z.string().optional().nullable(),
+  contactNumber: z.string().optional().nullable(),
   role: z.enum(["user", "admin", "regional-admin", "super-admin"]).default("user"),
   isActive: z.boolean().default(true),
   adminRegionId: z.string().optional().nullable(),
@@ -80,7 +94,21 @@ const editUserSchema = z.object({
   email: z.string().email("Invalid email address"),
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
-  country: z.string().optional().nullable(),
+  companyName: z.string().min(1, "El nombre de la empresa es requerido"),
+  partnerCategory: z.string().min(1, "La categoría del partner es requerida"),
+  marketSegment: z.string().min(1, "El segmento del mercado es requerido"),
+  category: z.enum(["ENTERPRISE", "SMB", "MSSP"], {
+    required_error: "La categoría es requerida",
+  }),
+  region: z.enum(["NOLA", "SOLA", "BRASIL", "MEXICO"], {
+    required_error: "La región es requerida",
+  }),
+  subcategory: z.string().optional(),
+  country: z.string().min(1, "El país es requerido"),
+  address: z.string().optional(),
+  city: z.string().optional(),
+  zipCode: z.string().optional(),
+  contactNumber: z.string().optional(),
   role: z.enum(["user", "admin", "regional-admin", "super-admin"]),
   isActive: z.boolean(),
   adminRegionId: z.string().optional().nullable(),
@@ -89,9 +117,17 @@ const editUserSchema = z.object({
 type CreateUserForm = z.infer<typeof createUserSchema>;
 type EditUserForm = z.infer<typeof editUserSchema>;
 
+interface RegionHierarchy {
+  [region: string]: {
+    subcategories: string[];
+  };
+}
+
 export default function Admin() {
   const { t } = useTranslation();
   const [location] = useLocation();
+  const [availableSubcategoriesCreate, setAvailableSubcategoriesCreate] = useState<string[]>([]);
+  const [availableSubcategoriesEdit, setAvailableSubcategoriesEdit] = useState<string[]>([]);
   
   // Get tab from URL and update state when URL changes
   const getTabFromUrl = () => {
@@ -120,6 +156,16 @@ export default function Admin() {
   const [selectedReward, setSelectedReward] = useState<Reward | null>(null);
   const [isCreateUserModalOpen, setIsCreateUserModalOpen] = useState(false);
   const [isEditUserModalOpen, setIsEditUserModalOpen] = useState(false);
+
+  // Obtener jerarquía de regiones desde la API
+  const { data: regionHierarchy } = useQuery<RegionHierarchy>({
+    queryKey: ["/api/region-hierarchy"],
+    queryFn: async () => {
+      const response = await fetch("/api/region-hierarchy");
+      if (!response.ok) throw new Error("Failed to load region hierarchy");
+      return response.json();
+    },
+  });
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isDealModalOpen, setIsDealModalOpen] = useState(false);
   const [selectedDeal, setSelectedDeal] = useState<Deal | null>(null);
@@ -137,13 +183,24 @@ export default function Admin() {
   // User creation form
   const createUserForm = useForm<CreateUserForm>({
     resolver: zodResolver(createUserSchema),
+    mode: "onChange",
     defaultValues: {
       username: "",
       email: "",
-      password: "",
+      password: undefined,
       firstName: "",
       lastName: "",
+      companyName: "",
+      partnerCategory: "",
+      marketSegment: "",
+      category: "ENTERPRISE",
+      region: "NOLA",
+      subcategory: "",
       country: "",
+      address: "",
+      city: "",
+      zipCode: "",
+      contactNumber: "",
       role: "user",
       isActive: true,
     },
@@ -162,6 +219,34 @@ export default function Admin() {
       isActive: true,
     },
   });
+
+  // Actualizar subcategorías disponibles cuando se selecciona una región en el formulario de creación
+  useEffect(() => {
+    const selectedRegion = createUserForm.watch("region");
+    if (selectedRegion && regionHierarchy) {
+      const subcategories = regionHierarchy[selectedRegion]?.subcategories || [];
+      setAvailableSubcategoriesCreate(subcategories);
+      if (selectedRegion !== "NOLA") {
+        createUserForm.setValue("subcategory", "");
+      }
+    } else {
+      setAvailableSubcategoriesCreate([]);
+    }
+  }, [createUserForm.watch("region"), regionHierarchy]);
+
+  // Actualizar subcategorías disponibles cuando se selecciona una región en el formulario de edición
+  useEffect(() => {
+    const selectedRegion = editUserForm.watch("region");
+    if (selectedRegion && regionHierarchy) {
+      const subcategories = regionHierarchy[selectedRegion]?.subcategories || [];
+      setAvailableSubcategoriesEdit(subcategories);
+      if (selectedRegion !== "NOLA") {
+        editUserForm.setValue("subcategory", "");
+      }
+    } else {
+      setAvailableSubcategoriesEdit([]);
+    }
+  }, [editUserForm.watch("region"), regionHierarchy]);
 
   // Check if user is admin
   const { data: currentUser } = useQuery<AuthUser>({
@@ -411,6 +496,7 @@ export default function Admin() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/users/pending"] });
       toast({
         title: t("common.success"),
         description: t("common.userCreatedSuccessfully"),
@@ -428,14 +514,28 @@ export default function Admin() {
   });
 
   const handleCreateUser = (data: CreateUserForm) => {
+    console.log("handleCreateUser called with data:", data);
     // Si es regional-admin, automáticamente asignar su región
     // Si es super-admin, usar la región seleccionada
+    // Mapear category a regionCategory y subcategory a regionSubcategory para el backend
     const userData = {
       ...data,
+      regionCategory: data.category,
+      regionSubcategory: data.subcategory || null,
       adminRegionId: currentUser?.role === "regional-admin" && data.role === "regional-admin" 
         ? currentUser.adminRegionId 
         : data.adminRegionId
     };
+    console.log("userData before cleanup:", userData);
+    // Remover los campos originales ya que no existen en la DB
+    delete (userData as any).category;
+    delete (userData as any).subcategory;
+    // Remover password si no se proporcionó
+    if (!userData.password) {
+      delete (userData as any).password;
+    }
+    console.log("userData after cleanup:", userData);
+    
     createUserMutation.mutate(userData);
   };
 
@@ -470,7 +570,17 @@ export default function Admin() {
       email: user.email,
       firstName: user.firstName,
       lastName: user.lastName,
-      country: user.country,
+      companyName: user.companyName || "",
+      partnerCategory: user.partnerCategory || "",
+      marketSegment: user.marketSegment || "",
+      category: user.regionCategory || "ENTERPRISE",
+      region: user.region || "NOLA",
+      subcategory: user.regionSubcategory || "",
+      country: user.country || "",
+      address: user.address || "",
+      city: user.city || "",
+      zipCode: user.zipCode || "",
+      contactNumber: user.contactNumber || "",
       role: user.role,
       isActive: user.isActive,
       adminRegionId: user.adminRegionId || null,
@@ -480,7 +590,17 @@ export default function Admin() {
 
   const handleUpdateUser = (data: EditUserForm) => {
     if (selectedUser) {
-      editUserMutation.mutate({ userId: selectedUser.id, userData: data });
+      // Mapear category a regionCategory y subcategory a regionSubcategory para el backend
+      const userData = {
+        ...data,
+        regionCategory: data.category,
+        regionSubcategory: data.subcategory || null,
+      };
+      // Remover los campos originales ya que no existen en la DB
+      delete (userData as any).category;
+      delete (userData as any).subcategory;
+      
+      editUserMutation.mutate({ userId: selectedUser.id, userData });
     }
   };
 
@@ -1229,7 +1349,7 @@ export default function Admin() {
                           {t('admin.createUser')}
                         </Button>
                       </DialogTrigger>
-                  <DialogContent className="sm:max-w-[600px]">
+                  <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                       <DialogTitle>{t('admin.createNewUser')}</DialogTitle>
                       <DialogDescription>
@@ -1237,8 +1357,13 @@ export default function Admin() {
                       </DialogDescription>
                     </DialogHeader>
                     <Form {...createUserForm}>
-                      <form onSubmit={createUserForm.handleSubmit(handleCreateUser)} className="space-y-4">
-                        <div className="grid grid-cols-2 gap-4">
+                      <form onSubmit={createUserForm.handleSubmit(
+                        handleCreateUser,
+                        (errors) => {
+                          console.log("Form validation errors:", errors);
+                        }
+                      )} className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <FormField
                             control={createUserForm.control}
                             name="firstName"
@@ -1294,36 +1419,245 @@ export default function Admin() {
                             </FormItem>
                           )}
                         />
-                        
+
+                        {/* Password field removed - admin creates passwordless users */}
+
                         <FormField
                           control={createUserForm.control}
-                          name="password"
+                          name="companyName"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>{t('common.password')}</FormLabel>
+                              <FormLabel>{t('auth.companyName')} *</FormLabel>
                               <FormControl>
-                                <Input type="password" placeholder="••••••••" {...field} data-testid="input-password" />
+                                <Input placeholder={t('auth.companyNamePlaceholder')} {...field} data-testid="input-company-name" />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
                           )}
                         />
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <FormField
+                            control={createUserForm.control}
+                            name="partnerCategory"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>{t('auth.partnerCategory')} *</FormLabel>
+                                <Select onValueChange={field.onChange} value={field.value}>
+                                  <FormControl>
+                                    <SelectTrigger data-testid="select-partner-category">
+                                      <SelectValue placeholder={t('auth.selectPartnerCategory')} />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    <SelectItem value="PLATINUM">PLATINUM</SelectItem>
+                                    <SelectItem value="GOLD">GOLD</SelectItem>
+                                    <SelectItem value="SILVER">SILVER</SelectItem>
+                                    <SelectItem value="REGISTERED">REGISTERED</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={createUserForm.control}
+                            name="marketSegment"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>{t('auth.marketSegment')} *</FormLabel>
+                                <Select onValueChange={field.onChange} value={field.value}>
+                                  <FormControl>
+                                    <SelectTrigger data-testid="select-category">
+                                      <SelectValue placeholder={t('auth.selectMarketSegment')} />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    <SelectItem value="ENTERPRISE">ENTERPRISE</SelectItem>
+                                    <SelectItem value="SMB">SMB</SelectItem>
+                                    <SelectItem value="MSSP">MSSP</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <FormField
+                            control={createUserForm.control}
+                            name="region"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>{t('auth.regionLabel')} *</FormLabel>
+                                <Select 
+                                  onValueChange={(value) => {
+                                    field.onChange(value);
+                                    // Auto-llenar país si es Brasil o México
+                                    if (value === "BRASIL") {
+                                      createUserForm.setValue("country", "BRASIL");
+                                    } else if (value === "MEXICO") {
+                                      createUserForm.setValue("country", "MÉXICO");
+                                    }
+                                  }} 
+                                  value={field.value}
+                                >
+                                  <FormControl>
+                                    <SelectTrigger data-testid="select-region">
+                                      <SelectValue placeholder={t('admin.selectRegionPlaceholder')} />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    <SelectItem value="NOLA">NOLA (Norte de América Latina)</SelectItem>
+                                    <SelectItem value="SOLA">SOLA (Sur de América Latina)</SelectItem>
+                                    <SelectItem value="BRASIL">Brasil</SelectItem>
+                                    <SelectItem value="MEXICO">México</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          {createUserForm.watch("region") === "NOLA" && (
+                            <FormField
+                              control={createUserForm.control}
+                              name="subcategory"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>{t('auth.subcategoryLabel')} *</FormLabel>
+                                  <Select
+                                    value={field.value || ""}
+                                    onValueChange={(value) => createUserForm.setValue("subcategory", value)}
+                                  >
+                                    <FormControl>
+                                      <SelectTrigger data-testid="select-subcategory">
+                                        <SelectValue placeholder={t('auth.selectYourSubcategory')} />
+                                      </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                      {availableSubcategoriesCreate.length > 0 ? (
+                                        availableSubcategoriesCreate.map((subcategory) => (
+                                          <SelectItem key={subcategory} value={subcategory}>
+                                            {subcategory}
+                                          </SelectItem>
+                                        ))
+                                      ) : (
+                                        <SelectItem value="N/A" disabled>{t('auth.noSubcategoriesAvailable')}</SelectItem>
+                                      )}
+                                    </SelectContent>
+                                  </Select>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          )}
+                        </div>
                         
                         <FormField
                           control={createUserForm.control}
                           name="country"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>{t('common.country')}</FormLabel>
+                              <FormLabel>{t('auth.countryLabel')} *</FormLabel>
+                              <Select 
+                                onValueChange={field.onChange} 
+                                value={field.value}
+                                disabled={createUserForm.watch("region") === "BRASIL" || createUserForm.watch("region") === "MEXICO"}
+                              >
+                                <FormControl>
+                                  <SelectTrigger data-testid="select-country">
+                                    <SelectValue placeholder={t('auth.selectCountryPlaceholder')} />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  <SelectItem value="ARGENTINA">ARGENTINA</SelectItem>
+                                  <SelectItem value="BOLIVIA">BOLIVIA</SelectItem>
+                                  <SelectItem value="BRASIL">BRASIL</SelectItem>
+                                  <SelectItem value="CHILE">CHILE</SelectItem>
+                                  <SelectItem value="COLOMBIA">COLOMBIA</SelectItem>
+                                  <SelectItem value="COSTA RICA">COSTA RICA</SelectItem>
+                                  <SelectItem value="ECUADOR">ECUADOR</SelectItem>
+                                  <SelectItem value="EL SALVADOR">EL SALVADOR</SelectItem>
+                                  <SelectItem value="GUATEMALA">GUATEMALA</SelectItem>
+                                  <SelectItem value="HONDURAS">HONDURAS</SelectItem>
+                                  <SelectItem value="MÉXICO">MÉXICO</SelectItem>
+                                  <SelectItem value="NICARAGUA">NICARAGUA</SelectItem>
+                                  <SelectItem value="PANAMÁ">PANAMÁ</SelectItem>
+                                  <SelectItem value="PARAGUAY">PARAGUAY</SelectItem>
+                                  <SelectItem value="PERÚ">PERÚ</SelectItem>
+                                  <SelectItem value="PUERTO RICO">PUERTO RICO</SelectItem>
+                                  <SelectItem value="REPÚBLICA DOMINICANA">REPÚBLICA DOMINICANA</SelectItem>
+                                  <SelectItem value="URUGUAY">URUGUAY</SelectItem>
+                                  <SelectItem value="VENEZUELA">VENEZUELA</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={createUserForm.control}
+                          name="address"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t('auth.addressLabel')}</FormLabel>
                               <FormControl>
-                                <Input placeholder="United States" {...field} data-testid="input-country" />
+                                <Input placeholder={t('auth.addressPlaceholder')} {...field} value={field.value || ""} data-testid="input-address" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <FormField
+                            control={createUserForm.control}
+                            name="city"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>{t('auth.cityLabel')}</FormLabel>
+                                <FormControl>
+                                  <Input placeholder={t('auth.cityPlaceholder')} {...field} value={field.value || ""} data-testid="input-city" />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={createUserForm.control}
+                            name="zipCode"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>{t('auth.zipCodeLabel')}</FormLabel>
+                                <FormControl>
+                                  <Input placeholder={t('auth.zipCodePlaceholder')} {...field} value={field.value || ""} data-testid="input-zip-code" />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+
+                        <FormField
+                          control={createUserForm.control}
+                          name="contactNumber"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t('auth.contactNumberLabel')}</FormLabel>
+                              <FormControl>
+                                <Input placeholder={t('auth.contactNumberPlaceholder')} {...field} value={field.value || ""} data-testid="input-contact-number" />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
                           )}
                         />
                         
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <FormField
                             control={createUserForm.control}
                             name="role"
@@ -1425,7 +1759,7 @@ export default function Admin() {
 
                 {/* Edit User Modal */}
                 <Dialog open={isEditUserModalOpen} onOpenChange={setIsEditUserModalOpen}>
-                  <DialogContent className="sm:max-w-[600px]">
+                  <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                       <DialogTitle>{t('admin.editUser')}</DialogTitle>
                       <DialogDescription>
@@ -1434,7 +1768,7 @@ export default function Admin() {
                     </DialogHeader>
                     <Form {...editUserForm}>
                       <form onSubmit={editUserForm.handleSubmit(handleUpdateUser)} className="space-y-4">
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <FormField
                             control={editUserForm.control}
                             name="firstName"
@@ -1493,16 +1827,257 @@ export default function Admin() {
                         
                         <FormField
                           control={editUserForm.control}
+                          name="companyName"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t('auth.companyName')}</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  placeholder={t('auth.companyNamePlaceholder')} 
+                                  {...field} 
+                                  value={field.value || ""} 
+                                  data-testid="input-edit-company-name" 
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <FormField
+                            control={editUserForm.control}
+                            name="partnerCategory"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>{t('auth.partnerCategory')}</FormLabel>
+                                <Select onValueChange={field.onChange} value={field.value || ""}>
+                                  <FormControl>
+                                    <SelectTrigger data-testid="select-edit-partner-category">
+                                      <SelectValue placeholder={t('auth.selectPartnerCategory')} />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    <SelectItem value="PLATINUM">PLATINUM</SelectItem>
+                                    <SelectItem value="GOLD">GOLD</SelectItem>
+                                    <SelectItem value="SILVER">SILVER</SelectItem>
+                                    <SelectItem value="REGISTERED">REGISTERED</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={editUserForm.control}
+                            name="marketSegment"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>{t('auth.marketSegment')}</FormLabel>
+                                <Select onValueChange={field.onChange} value={field.value || ""}>
+                                  <FormControl>
+                                    <SelectTrigger data-testid="select-edit-category">
+                                      <SelectValue placeholder={t('auth.selectMarketSegment')} />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    <SelectItem value="ENTERPRISE">ENTERPRISE</SelectItem>
+                                    <SelectItem value="SMB">SMB</SelectItem>
+                                    <SelectItem value="MSSP">MSSP</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <FormField
+                            control={editUserForm.control}
+                            name="region"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>{t('auth.regionLabel')}</FormLabel>
+                                <Select 
+                                  onValueChange={(value) => {
+                                    field.onChange(value);
+                                    // Auto-llenar país si es Brasil o México
+                                    if (value === "BRASIL") {
+                                      editUserForm.setValue("country", "BRASIL");
+                                    } else if (value === "MEXICO") {
+                                      editUserForm.setValue("country", "MÉXICO");
+                                    }
+                                  }} 
+                                  value={field.value || ""}
+                                >
+                                  <FormControl>
+                                    <SelectTrigger data-testid="select-edit-region">
+                                      <SelectValue placeholder={t('admin.selectRegionPlaceholder')} />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    <SelectItem value="NOLA">NOLA (Norte de América Latina)</SelectItem>
+                                    <SelectItem value="SOLA">SOLA (Sur de América Latina)</SelectItem>
+                                    <SelectItem value="BRASIL">Brasil</SelectItem>
+                                    <SelectItem value="MEXICO">México</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          {editUserForm.watch("region") === "NOLA" && (
+                            <FormField
+                              control={editUserForm.control}
+                              name="subcategory"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>{t('auth.subcategoryLabel')} *</FormLabel>
+                                  <Select
+                                    value={field.value || ""}
+                                    onValueChange={(value) => editUserForm.setValue("subcategory", value)}
+                                  >
+                                    <FormControl>
+                                      <SelectTrigger data-testid="select-edit-subcategory">
+                                        <SelectValue placeholder={t('auth.selectYourSubcategory')} />
+                                      </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                      {availableSubcategoriesEdit.length > 0 ? (
+                                        availableSubcategoriesEdit.map((subcategory) => (
+                                          <SelectItem key={subcategory} value={subcategory}>
+                                            {subcategory}
+                                          </SelectItem>
+                                        ))
+                                      ) : (
+                                        <SelectItem value="N/A" disabled>{t('auth.noSubcategoriesAvailable')}</SelectItem>
+                                      )}
+                                    </SelectContent>
+                                  </Select>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          )}
+                        </div>
+
+                        <FormField
+                          control={editUserForm.control}
                           name="country"
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>{t('common.country')}</FormLabel>
+                              <Select 
+                                onValueChange={field.onChange} 
+                                value={field.value || ""}
+                                disabled={editUserForm.watch("region") === "BRASIL" || editUserForm.watch("region") === "MEXICO"}
+                              >
+                                <FormControl>
+                                  <SelectTrigger data-testid="select-edit-country">
+                                    <SelectValue placeholder={t('auth.selectCountryPlaceholder')} />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  <SelectItem value="ARGENTINA">ARGENTINA</SelectItem>
+                                  <SelectItem value="BOLIVIA">BOLIVIA</SelectItem>
+                                  <SelectItem value="BRASIL">BRASIL</SelectItem>
+                                  <SelectItem value="CHILE">CHILE</SelectItem>
+                                  <SelectItem value="COLOMBIA">COLOMBIA</SelectItem>
+                                  <SelectItem value="COSTA RICA">COSTA RICA</SelectItem>
+                                  <SelectItem value="ECUADOR">ECUADOR</SelectItem>
+                                  <SelectItem value="EL SALVADOR">EL SALVADOR</SelectItem>
+                                  <SelectItem value="GUATEMALA">GUATEMALA</SelectItem>
+                                  <SelectItem value="HONDURAS">HONDURAS</SelectItem>
+                                  <SelectItem value="MÉXICO">MÉXICO</SelectItem>
+                                  <SelectItem value="NICARAGUA">NICARAGUA</SelectItem>
+                                  <SelectItem value="PANAMÁ">PANAMÁ</SelectItem>
+                                  <SelectItem value="PARAGUAY">PARAGUAY</SelectItem>
+                                  <SelectItem value="PERÚ">PERÚ</SelectItem>
+                                  <SelectItem value="PUERTO RICO">PUERTO RICO</SelectItem>
+                                  <SelectItem value="REPÚBLICA DOMINICANA">REPÚBLICA DOMINICANA</SelectItem>
+                                  <SelectItem value="URUGUAY">URUGUAY</SelectItem>
+                                  <SelectItem value="VENEZUELA">VENEZUELA</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={editUserForm.control}
+                          name="address"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t('auth.addressLabel')}</FormLabel>
                               <FormControl>
                                 <Input 
-                                  placeholder="United States" 
+                                  placeholder={t('auth.addressPlaceholder')} 
                                   {...field} 
                                   value={field.value || ""} 
-                                  data-testid="input-edit-country" 
+                                  data-testid="input-edit-address" 
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <FormField
+                            control={editUserForm.control}
+                            name="city"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>{t('auth.cityLabel')}</FormLabel>
+                                <FormControl>
+                                  <Input 
+                                    placeholder={t('auth.cityPlaceholder')} 
+                                    {...field} 
+                                    value={field.value || ""} 
+                                    data-testid="input-edit-city" 
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={editUserForm.control}
+                            name="zipCode"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>{t('auth.zipCodeLabel')}</FormLabel>
+                                <FormControl>
+                                  <Input 
+                                    placeholder={t('auth.zipCodePlaceholder')} 
+                                    {...field} 
+                                    value={field.value || ""} 
+                                    data-testid="input-edit-zip-code" 
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+
+                        <FormField
+                          control={editUserForm.control}
+                          name="contactNumber"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t('auth.contactNumberLabel')}</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  placeholder={t('auth.contactNumberPlaceholder')} 
+                                  {...field} 
+                                  value={field.value || ""} 
+                                  data-testid="input-edit-contact-number" 
                                 />
                               </FormControl>
                               <FormMessage />
@@ -1510,7 +2085,7 @@ export default function Admin() {
                           )}
                         />
                         
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <FormField
                             control={editUserForm.control}
                             name="role"

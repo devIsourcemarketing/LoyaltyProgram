@@ -1384,11 +1384,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Email already exists" });
       }
 
-      const hashedPassword = await bcrypt.hash(userData.password, 10);
+      // Si no hay contraseña, generar una aleatoria (usuario passwordless)
+      const passwordToHash = userData.password || nanoid(32);
+      const hashedPassword = await bcrypt.hash(passwordToHash, 10);
       
       const user = await storage.createUser({
         ...userData,
         password: hashedPassword,
+        isPasswordless: !userData.password, // Marcar como passwordless si no se proporcionó contraseña
       });
 
       res.status(201).json({ 
@@ -1397,8 +1400,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
-        role: user.role,
+        companyName: user.companyName,
+        partnerCategory: user.partnerCategory,
+        marketSegment: user.marketSegment,
+        regionCategory: user.regionCategory,
+        regionSubcategory: user.regionSubcategory,
+        region: user.region,
         country: user.country,
+        address: user.address,
+        city: user.city,
+        zipCode: user.zipCode,
+        contactNumber: user.contactNumber,
+        role: user.role,
         isActive: user.isActive,
         createdAt: user.createdAt
       });
