@@ -384,6 +384,48 @@ const emailTexts = {
       pt: 'Detalhes da sua viagem',
       en: 'Your trip details'
     }
+  },
+  ticketResponse: {
+    subject: {
+      es: 'Respuesta a su ticket de soporte - Kaspersky Cup',
+      pt: 'Resposta ao seu ticket de suporte - Kaspersky Cup',
+      en: 'Response to your support ticket - Kaspersky Cup'
+    },
+    responseReceived: {
+      es: 'Hemos respondido a su ticket de soporte',
+      pt: 'Respondemos ao seu ticket de suporte',
+      en: 'We have responded to your support ticket'
+    },
+    ticketSubject: {
+      es: 'Asunto del ticket:',
+      pt: 'Assunto do ticket:',
+      en: 'Ticket subject:'
+    },
+    adminResponse: {
+      es: 'Respuesta del equipo:',
+      pt: 'Resposta da equipe:',
+      en: 'Team response:'
+    },
+    viewTicket: {
+      es: 'Ver mi ticket',
+      pt: 'Ver meu ticket',
+      en: 'View my ticket'
+    },
+    viewAllTickets: {
+      es: 'Ver todos mis tickets',
+      pt: 'Ver todos os meus tickets',
+      en: 'View all my tickets'
+    },
+    thankYou: {
+      es: 'Gracias por contactarnos.',
+      pt: 'Obrigado por nos contatar.',
+      en: 'Thank you for contacting us.'
+    },
+    hereToHelp: {
+      es: 'Estamos aquí para ayudarte con <span class="highlight-text">Kaspersky Cup</span>.',
+      pt: 'Estamos aqui para ajudá-lo com a <span class="highlight-text">Kaspersky Cup</span>.',
+      en: 'We are here to help you with <span class="highlight-text">Kaspersky Cup</span>.'
+    }
   }
 };
 
@@ -2149,6 +2191,16 @@ export interface MagicLinkEmailData {
   firstName: string;
   lastName: string;
   loginToken: string;
+  language?: EmailLanguage;
+}
+
+export interface TicketResponseEmailData {
+  email: string;
+  firstName: string;
+  lastName: string;
+  ticketSubject: string;
+  adminResponse: string;
+  ticketId: string;
   language?: EmailLanguage;
 }
 
@@ -4930,6 +4982,255 @@ Kaspersky Cup
     return true;
   } catch (error) {
     console.error('Error sending ganador premio mayor email:', error);
+    return false;
+  }
+}
+
+/**
+ * Envía un email cuando el admin responde a un ticket de soporte
+ */
+export async function sendTicketResponseEmail(data: TicketResponseEmailData): Promise<boolean> {
+  const lang = data.language || 'es';
+  try {
+    if (!BREVO_API_KEY) {
+      console.warn('⚠️  BREVO_API_KEY no configurada. Email no enviado.');
+      console.log('📧 Simulated ticket response email to:', data.email);
+      return true;
+    }
+
+    console.log('📤 Intentando enviar email de respuesta a ticket...');
+    console.log('   Destinatario:', data.email);
+    console.log('   Idioma detectado:', lang);
+
+    // Imágenes dinámicas según idioma - usando imagen genérica de soporte
+    const images = getEmailImageURLs('registro-passwordless', lang);
+    const heroImageUrl = images.getImage('Group 65.png');
+    const heroImage2xUrl = images.getImage('Group 65.png', true);
+    
+    const userName = `${data.firstName} ${data.lastName}`.trim();
+    
+    const sendSmtpEmail = new brevo.SendSmtpEmail();
+    sendSmtpEmail.to = [{ email: data.email, name: userName }];
+    sendSmtpEmail.sender = { email: FROM_EMAIL, name: 'Kaspersky Cup' };
+    sendSmtpEmail.subject = `🎫 ${emailTexts.ticketResponse.subject[lang]}`;  
+    sendSmtpEmail.htmlContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+          * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+          }
+          
+          body {
+            font-family: Arial, sans-serif;
+            background-color: #FFFFFF;
+            margin: 0;
+            padding: 0;
+          }
+          
+          .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #FFFFFF;
+          }
+          
+          .hero-image-section {
+            text-align: center;
+            padding: 0;
+            margin: 0;
+          }
+          
+          .hero-image {
+            width: 100%;
+            max-width: 600px;
+            height: auto;
+            display: block;
+          }
+          
+          .content-section {
+            background-color: #FFFFFF;
+            padding: 32px 40px;
+          }
+          
+          .greeting {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1D1D1B;
+            margin-bottom: 4px;
+          }
+          
+          .name {
+            font-size: 24px;
+            font-weight: 700;
+            color: #29CCB1;
+            margin-bottom: 20px;
+          }
+          
+          .message {
+            font-size: 14px;
+            color: #1D1D1B;
+            line-height: 1.6;
+            margin-bottom: 20px;
+          }
+          
+          .highlight-text {
+            color: #29CCB1;
+            font-weight: 600;
+          }
+          
+          .ticket-box {
+            background-color: #F5F5F5;
+            border-left: 4px solid #29CCB1;
+            padding: 16px 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+          }
+          
+          .ticket-label {
+            font-size: 12px;
+            color: #666666;
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+          }
+          
+          .ticket-content {
+            font-size: 14px;
+            color: #1D1D1B;
+            line-height: 1.6;
+          }
+          
+          .response-box {
+            background-color: #F0FBF9;
+            border: 2px solid #29CCB1;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+          }
+          
+          .footer-section {
+            background-color: #1D1D1B;
+            color: #FFFFFF;
+            padding: 32px 40px;
+            text-align: center;
+          }
+          
+          .social-title {
+            font-size: 13px;
+            margin-bottom: 16px;
+          }
+          
+          .social-links {
+            margin-bottom: 20px;
+          }
+          
+          .social-links a {
+            display: inline-block;
+            margin: 0 8px;
+          }
+          
+          .footer-logo {
+            font-size: 16px;
+            font-weight: 700;
+            color: #FFFFFF;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="email-container">
+          <!-- Imagen hero con srcset para Retina -->
+          <div class="hero-image-section">
+            <img 
+              src="${heroImageUrl}" 
+              srcset="${heroImageUrl} 1x, ${heroImage2xUrl} 2x"
+              alt="Kaspersky Cup" 
+              class="hero-image"
+            />
+          </div>
+          
+          <!-- Contenido principal -->
+          <div class="content-section">
+            <div class="greeting">${emailTexts.common.greeting[lang]}</div>
+            <div class="name">${userName}</div>
+            
+            <p class="message">
+              ${emailTexts.ticketResponse.responseReceived[lang]}
+            </p>
+            
+            <div class="ticket-box">
+              <div class="ticket-label">${emailTexts.ticketResponse.ticketSubject[lang]}</div>
+              <div class="ticket-content">${data.ticketSubject}</div>
+            </div>
+            
+            <div class="response-box">
+              <div class="ticket-label">${emailTexts.ticketResponse.adminResponse[lang]}</div>
+              <div class="ticket-content">${data.adminResponse}</div>
+            </div>
+            
+            <p class="message">
+              ${emailTexts.ticketResponse.thankYou[lang]}
+            </p>
+            
+            <p class="message">
+              ${emailTexts.ticketResponse.hereToHelp[lang]}
+            </p>
+          </div>
+          
+          <!-- Footer con redes sociales -->
+          <div class="footer-section">
+            <div class="social-title">${emailTexts.common.followKaspersky[lang]}</div>
+            <div class="social-links">
+              <a href="https://www.facebook.com/Kaspersky"><img src="${images.common.socialIcons.facebook}" style="width: 24px; height: 24px; margin: 0 8px;" alt="Facebook" /></a>
+              <a href="https://twitter.com/kaspersky"><img src="${images.common.socialIcons.twitter}" style="width: 24px; height: 24px; margin: 0 8px;" alt="Twitter" /></a>
+              <a href="https://www.linkedin.com/company/kaspersky-lab"><img src="${images.common.socialIcons.linkedin}" style="width: 24px; height: 24px; margin: 0 8px;" alt="LinkedIn" /></a>
+              <a href="https://www.instagram.com/kasperskylab/"><img src="${images.common.socialIcons.instagram}" style="width: 24px; height: 24px; margin: 0 8px;" alt="Instagram" /></a>
+              <a href="https://www.youtube.com/user/Kaspersky"><img src="${images.common.socialIcons.youtube}" style="width: 24px; height: 24px; margin: 0 8px;" alt="YouTube" /></a>
+            </div>
+            
+            <!-- Logo Kaspersky al final -->
+            <div class="footer-logo">
+              <img src="${images.common.logoKaspersky}" alt="Kaspersky" style="max-width: 120px; height: auto;" />
+            </div>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+    sendSmtpEmail.textContent = `
+${emailTexts.ticketResponse.subject[lang]}
+
+${emailTexts.common.greeting[lang]} ${userName}
+
+${emailTexts.ticketResponse.responseReceived[lang]}
+
+${emailTexts.ticketResponse.ticketSubject[lang]}
+${data.ticketSubject}
+
+${emailTexts.ticketResponse.adminResponse[lang]}
+${data.adminResponse}
+
+${emailTexts.ticketResponse.thankYou[lang]}
+
+${emailTexts.ticketResponse.hereToHelp[lang]}
+
+${emailTexts.common.followKaspersky[lang]}
+${emailTexts.common.kasperskyCup[lang]}
+    `.trim();
+
+    await apiInstance.sendTransacEmail(sendSmtpEmail);
+    console.log('✅ Ticket response email sent successfully to:', data.email);
+    return true;
+  } catch (error) {
+    console.error('❌ Error sending ticket response email:', error);
+    if (error instanceof Error && 'body' in error) {
+      console.error('   Error body:', JSON.stringify((error as any).body, null, 2));
+    }
+    console.error('   Error message:', (error as Error).message);
     return false;
   }
 }

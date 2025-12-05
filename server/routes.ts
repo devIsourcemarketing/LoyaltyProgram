@@ -21,7 +21,8 @@ import {
   sendRegistroPasswordlessEmail,
   sendBienvenidaEmail,
   sendPendienteAprobacionEmail,
-  sendGanadorPremioMayorEmail
+  sendGanadorPremioMayorEmail,
+  sendTicketResponseEmail
 } from "./email.js";
 import { 
   sendEmailWithRetry,
@@ -3654,6 +3655,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
           ticket.userId,
           ticket.subject
         );
+        
+        // Obtener información del usuario para enviar el email
+        const user = await storage.getUser(ticket.userId);
+        if (user && user.email) {
+          // Detectar idioma preferido del usuario
+          const userLanguage = await detectPreferredLanguage(req);
+          
+          // Enviar email de notificación
+          try {
+            await sendTicketResponseEmail({
+              email: user.email,
+              firstName: user.firstName,
+              lastName: user.lastName,
+              ticketSubject: ticket.subject,
+              adminResponse: updates.adminResponse,
+              ticketId: ticket.id,
+              language: userLanguage
+            });
+            console.log('✅ Ticket response email sent to:', user.email);
+          } catch (emailError) {
+            console.error('⚠️ Failed to send ticket response email, but ticket was updated:', emailError);
+            // No fallar la request si el email falla
+          }
+        }
       }
 
       res.json(ticket);
@@ -3663,6 +3688,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       console.error("Update support ticket error:", error);
       res.status(500).json({ message: "Failed to update support ticket" });
+    }
+  });
+
+  // Test endpoint para probar el email de respuesta a ticket
+  app.post("/api/test/ticket-response-email", async (req, res) => {
+    try {
+      const { email } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ message: "Email es requerido" });
+      }
+
+      const testData = {
+        email: email,
+        firstName: 'Alejandro',
+        lastName: 'Test',
+        ticketSubject: 'Problema con el canje de puntos',
+        adminResponse: 'Hola, hemos revisado tu caso y el problema con el canje de puntos ya ha sido solucionado. Los puntos están ahora disponibles en tu cuenta. Si tienes alguna otra pregunta, no dudes en contactarnos. ¡Gracias por tu paciencia!',
+        ticketId: 'test-ticket-123',
+        language: 'es' as const
+      };
+
+      console.log('📧 Enviando email de prueba a:', email);
+      const result = await sendTicketResponseEmail(testData);
+      
+      if (result) {
+        console.log('✅ Email de prueba enviado exitosamente');
+        res.json({ 
+          success: true, 
+          message: 'Email enviado exitosamente. Revisa tu bandeja de entrada (puede tardar unos segundos).' 
+        });
+      } else {
+        console.log('❌ Error al enviar email de prueba');
+        res.status(500).json({ 
+          success: false, 
+          message: 'Error al enviar el email' 
+        });
+      }
+    } catch (error) {
+      console.error('❌ Error en endpoint de prueba:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: 'Error al enviar el email',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
     }
   });
 

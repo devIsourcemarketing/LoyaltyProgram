@@ -18,7 +18,7 @@
  * --lastName: Apellido (opcional, default: "Prueba")
  */
 
-import { sendExpectationEmail, sendRegistroExitosoEmail, sendBienvenidaEmail, sendMagicLinkEmail, sendGolesRegistradosEmail, sendPendienteAprobacionEmail, sendRedemptionApprovedEmail, sendGanadorPremioMayorEmail } from './server/email';
+import { sendExpectationEmail, sendRegistroExitosoEmail, sendBienvenidaEmail, sendMagicLinkEmail, sendGolesRegistradosEmail, sendPendienteAprobacionEmail, sendRedemptionApprovedEmail, sendGanadorPremioMayorEmail, sendTicketResponseEmail } from './server/email';
 
 // Función para obtener argumentos de línea de comandos
 function getArg(name: string, defaultValue?: string): string {
@@ -129,6 +129,17 @@ async function testEmail() {
         );
         break;
       
+      case 'ticket-response':
+        console.log('📤 Enviando Email de Respuesta a Ticket...\n');
+        result = await sendTicketResponseEmail({ 
+          email, 
+          firstName, 
+          lastName,
+          ticketSubject: 'Problema con el canje de puntos',
+          adminResponse: 'Hemos revisado tu solicitud y hemos verificado que tus puntos han sido actualizados correctamente. El canje del premio "Balón Oficial Kaspersky Cup" ya está en proceso de aprobación. Recibirás un correo de confirmación en las próximas 24-48 horas.\n\nSi tienes alguna otra pregunta, no dudes en contactarnos.'
+        });
+        break;
+      
       // Aquí puedes agregar más tipos de email
       // case 'otro-tipo':
       //   result = await sendOtroEmail({ email, firstName, lastName });
@@ -145,6 +156,7 @@ async function testEmail() {
         console.log('   - pendiente-aprobacion');
         console.log('   - aprobacion-premio');
         console.log('   - ganador-premio-mayor');
+        console.log('   - ticket-response');
         process.exit(1);
     }
 
