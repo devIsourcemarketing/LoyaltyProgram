@@ -3659,8 +3659,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Obtener información del usuario para enviar el email
         const user = await storage.getUser(ticket.userId);
         if (user && user.email) {
-          // Detectar idioma preferido del usuario
-          const userLanguage = await detectPreferredLanguage(req);
+          // Detectar idioma del usuario según su región
+          let userLanguage: 'es' | 'pt' | 'en' = 'es';
+          if (user.region === 'BRASIL') {
+            userLanguage = 'pt';
+          }
+          
+          console.log('🌍 Sending ticket response email with language:', {
+            userId: user.id,
+            region: user.region,
+            detectedLanguage: userLanguage,
+            email: user.email
+          });
           
           // Enviar email de notificación
           try {
