@@ -130,7 +130,7 @@ export default function Dashboard() {
     lastName: string;
     totalGoals: number;
   }>>({
-    queryKey: ["/api/users/leaderboard"],
+    queryKey: ["/api/users/leaderboard?limit=1000"],
     select: (data) => data || [],
   });
 
@@ -355,62 +355,56 @@ export default function Dashboard() {
                 </div>
               ) : leaderboard && leaderboard.length > 0 ? (
                 <div className="space-y-3">
-                  {leaderboard.map((leaderUser, index) => {
-                    const isCurrentUser = leaderUser.userId === user.id;
-                    const position = index + 1;
-                    
-                    // Medal colors for top 3
-                    const getMedalColor = () => {
-                      if (position === 1) return "green-background";
-                      if (position === 2) return "from-gray-400 to-gray-600";
-                      if (position === 3) return "from-orange-400 to-orange-600";
-                      return "from-blue-400 to-blue-600";
-                    };
+                  {(() => {
+                    // Find current user position in the full leaderboard
+                    const userPosition = leaderboard.findIndex(u => u.userId === user.id) + 1;
+                    const currentUserData = userPosition > 0 ? leaderboard[userPosition - 1] : null;
+
+                    if (!currentUserData) {
+                      return (
+                        <div className="text-center py-8">
+                          <p className="text-gray-600">{t('dashboard.noLeaderboardData')}</p>
+                        </div>
+                      );
+                    }
 
                     return (
                       <div
-                        key={leaderUser.userId}
-                        className={`flex items-center space-x-4 p-4 rounded-lg transition-all ${
-                          isCurrentUser 
-                            ? "bg-gradient-to-r from-blue-50 to-indigo-50 shadow-lg transform scale-105 green-background" 
-                            : "bg-gray-50 hover:bg-gray-100"
-                        }`}
-                        data-testid={`leaderboard-item-${position}`}
+                        className="flex items-center space-x-4 p-4 rounded-lg transition-all bg-gradient-to-r from-blue-50 to-indigo-50 shadow-lg green-background"
+                        data-testid={`leaderboard-item-${userPosition}`}
                       >
                         {/* Position Badge */}
-                        <div className={`w-12 h-12 bg-gradient-to-br ${getMedalColor()} ${isCurrentUser ? "bg-gradient-to-br white-background" : "bg-gradient-to-br"} rounded-full flex items-center justify-center flex-shrink-0`}>
-                          <span className={`text-white font-bold text-lg ${isCurrentUser ? "text-white text-green-600" : "text-white"}`}>
-                            {position}
+                        <div className="w-12 h-12 bg-gradient-to-br white-background rounded-full flex items-center justify-center flex-shrink-0">
+                          <span className="text-white font-bold text-lg text-green-600">
+                            {userPosition}
                           </span>
                         </div>
 
                         {/* User Info */}
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center space-x-2">
-                            <h3 className={`font-semibold truncate ${isCurrentUser ? "text-blue-900 white-text" : "text-gray-900"}`}>
-                              {leaderUser.firstName} {leaderUser.lastName}
+                            <h3 className="font-semibold truncate text-blue-900 white-text">
+                              {currentUserData.firstName} {currentUserData.lastName}
                             </h3>
-                            {isCurrentUser && (
-                              <Badge className="bg-blue-600 text-white white-background text-green-600">{t('dashboard.you')}</Badge>
-                            )}
+                            <Badge className="bg-blue-600 text-white white-background text-green-600">{t('dashboard.you')}</Badge>
                           </div>
-                          <p className={`text-sm ${isCurrentUser ? "text-blue-700 white-text" : "text-gray-600"}`}>
-                            {isCurrentUser ? leaderUser.email : `@${leaderUser.username}`}
+                          <p className="text-sm text-blue-700 white-text">
+                            @{currentUserData.username}
                           </p>
                         </div>
 
                         {/* Goals */}
                         <div className="text-right">
-                          <div className={`text-2xl font-bold ${isCurrentUser ? "text-blue-900 white-text" : "text-gray-900"}`}>
-                            {leaderUser.totalGoals.toLocaleString()}
+                          <div className="text-2xl font-bold text-blue-900 white-text">
+                            {currentUserData.totalGoals.toLocaleString()}
                           </div>
-                          <div className={`text-sm ${isCurrentUser ? "text-blue-700 white-text" : "text-gray-600"}`}>
+                          <div className="text-sm text-blue-700 white-text">
                             {t('dashboard.goals').toLowerCase()}
                           </div>
                         </div>
                       </div>
                     );
-                  })}
+                  })()}
                 </div>
               ) : (
                 <div className="text-center py-8">
@@ -430,6 +424,13 @@ export default function Dashboard() {
             <h2 className="text-3xl font-bold text-blue-600 mb-2 text-green-600" data-testid="text-available-rewards-title">
               {t('admin.prizeOfTheMonth')}
             </h2>
+            <Button
+              onClick={() => navigate("/rewards")}
+              className="mt-4 bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg"
+              data-testid="button-claim-rewards"
+            >
+              {t('rewards.claimReward')}
+            </Button>
           </div>
           
           <div className="relative px-4 py-4">
@@ -578,9 +579,6 @@ export default function Dashboard() {
                       <th className="px-6 py-4 text-left text-sm font-semibold text-white uppercase tracking-wider">
                         {t('dashboard.registrationDate').toUpperCase()}
                       </th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-white uppercase tracking-wider">
-                        {t('dashboard.status').toUpperCase()}
-                      </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-blue-800">
@@ -618,20 +616,6 @@ export default function Dashboard() {
                             month: '2-digit', 
                             day: '2-digit' 
                           })}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span 
-                            className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                              deal.status === 'approved' 
-                                ? 'bg-green-100 text-green-800' 
-                                : deal.status === 'pending' 
-                                  ? 'bg-yellow-100 text-yellow-800'
-                                  : 'bg-red-100 text-red-800'
-                            }`}
-                            data-testid={`status-${deal.status}-${deal.id}`}
-                          >
-                            {deal.status.charAt(0).toUpperCase() + deal.status.slice(1)}
-                          </span>
                         </td>
                       </tr>
                       );
