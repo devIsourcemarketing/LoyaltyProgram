@@ -21,6 +21,11 @@ import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import type { AuthUser } from "@/lib/auth";
 import backgroundImage from "@assets/hero-usuario.png";
+import premiMayorImage from "@assets/premiomayor.png";
+import bigPrize1 from "@assets/bp-icon01.png";
+import bigPrize2 from "@assets/bp-icon02.png";
+import bigPrize3 from "@assets/bp-icon03.png";
+import bigPrize4 from "@assets/bp-icon04.png";
 import logoHero from "@assets/logo-kaspersky-cup.png";
 import { useTranslation } from "@/hooks/useTranslation";
 import { isAdminRole } from "@/lib/roles";
@@ -330,6 +335,62 @@ export default function Dashboard() {
           </Card>
         </div>
       )}
+
+      {/* Big Prize Section - Only show for regular users */}
+      <div 
+        className="relative z-10 flex flex-col lg:flex-row justify-between items-start p-8 min-h-[500px] bigPrize-section"
+        style={{ backgroundImage: `url(${premiMayorImage})` }}>
+          {/* Left side - Welcome Message */}
+          <div className="flex-1 flex flex-col justify-center text-bigPrize">
+            <h2 className="text-4xl lg:text-5xl font-bold mb-2 text-green-600" data-testid="text-big-prize">
+              {t('dashboard.bigPrize')}
+            </h2>
+            <p className="text-4xl lg:text-5xl font-medium mb-2 text-[#ffffff]">
+              {t('dashboard.bigPrizeSubtitle')}
+            </p>
+            <p className="sub-text-welcome font-normal text-[#ffffff]">
+              {t('dashboard.bigPrizeText')}            
+            </p>
+            <h2 className="text-4xl lg:text-5xl mb-2 font-medium text-green-600">
+              {t('dashboard.includes')}
+            </h2>
+          </div>
+      </div>
+      <div className="flex-1 flex flex-col justify-center big-prize-includes">
+          <div className="includes-col" data-testid="includes-col1">
+            <img src={bigPrize1} alt="Kaspersky Cup" className="big-prize-icon"/>
+            <p className="includes-text font-bold text-gray-900">
+              {t('dashboard.includesText1')}            
+            </p>
+          </div>
+          <div className="includes-col" data-testid="includes-col2">
+            <img src={bigPrize2} alt="Kaspersky Cup" className="big-prize-icon"/>
+            <p className="includes-text font-bold text-gray-900">
+              {t('dashboard.includesText2')}
+            </p>
+          </div>
+          <div className="includes-col" data-testid="includes-col3">
+            <img src={bigPrize3} alt="Kaspersky Cup" className="big-prize-icon"/>
+            <p className="includes-text font-bold text-gray-900">
+              {t('dashboard.includesText3')}
+            </p>
+          </div>
+          <div className="includes-col" data-testid="includes-col4">
+            <img src={bigPrize4} alt="Kaspersky Cup" className="big-prize-icon"/>
+            <p className="includes-text font-bold text-gray-900">
+              {t('dashboard.includesText4')}            
+            </p>
+          </div>
+      </div>
+
+      <div className="big-prize-final">
+          <p className="sub-text-welcome font-medium text-gray-900">
+            {t('dashboard.bigPrizeFinalText')}            
+          </p>
+          <h2 className="text-4xl lg:text-5xl font-medium mb-2 text-green-600">
+            {t('dashboard.bigPrizeFinalTitle')}
+          </h2>
+      </div>
 
       {/* Leaderboard - Only show for regular users */}
       {user.role !== "admin" && (
