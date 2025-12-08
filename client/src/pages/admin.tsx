@@ -2854,9 +2854,6 @@ export default function Admin() {
                             </div>
                             
                             <div className="flex gap-2 mb-3">
-                              <Badge variant="outline">
-                                {reward.category}
-                              </Badge>
                               {reward.region && (
                                 <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
                                   {reward.region}

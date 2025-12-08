@@ -84,34 +84,12 @@ export default function Rewards() {
     redeemMutation.mutate(reward.id);
   };
 
-  const getRewardIcon = (category: string) => {
-    switch (category.toLowerCase()) {
-      case "gift cards":
-        return <CreditCard className="w-6 h-6 text-white" />;
-      case "travel":
-        return <Plane className="w-6 h-6 text-white" />;
-      case "electronics":
-        return <Laptop className="w-6 h-6 text-white" />;
-      case "accessories":
-        return <Smartphone className="w-6 h-6 text-white" />;
-      default:
-        return <Gift className="w-6 h-6 text-white" />;
-    }
+  const getDefaultRewardIcon = () => {
+    return <Gift className="w-6 h-6 text-white" />;
   };
 
-  const getCategoryColor = (category: string) => {
-    switch (category.toLowerCase()) {
-      case "gift cards":
-        return "from-green-400 to-green-600";
-      case "travel":
-        return "from-blue-400 to-blue-600";
-      case "electronics":
-        return "from-purple-400 to-purple-600";
-      case "accessories":
-        return "from-orange-400 to-orange-600";
-      default:
-        return "from-gray-400 to-gray-600";
-    }
+  const getDefaultColor = () => {
+    return "from-green-400 to-green-600";
   };
 
   const getStatusColor = (status: string) => {
@@ -161,24 +139,27 @@ export default function Rewards() {
     });
   };
 
-  const categories = Array.from(new Set(rewards?.map(reward => reward.category) || []));
-
-  const filteredRewards = (category?: string) => {
-    if (!category) return rewards || [];
-    return rewards?.filter(reward => reward.category === category) || [];
-  };
+  // All rewards are displayed without category filtering
+  const allRewards = rewards || [];
 
   const availableRewards = () => {
     if (!rewards || !stats) return [];
     return rewards.filter(reward => stats.availablePoints >= reward.pointsCost);
   };
 
-  // Check if user has a pending redemption for this reward
-  const hasPendingRedemption = (rewardId: string) => {
+  // Check if user has already redeemed this reward (pending, approved, or delivered)
+  const hasRedeemedReward = (rewardId: string) => {
     if (!userRewards) return false;
     return userRewards.some(
-      (ur: any) => ur.rewardId === rewardId && ur.status === 'pending'
+      (ur: any) => ur.rewardId === rewardId && (ur.status === 'pending' || ur.status === 'approved' || ur.status === 'delivered')
     );
+  };
+  
+  // Get the status of the redemption for a specific reward
+  const getRedemptionStatus = (rewardId: string): 'pending' | 'approved' | 'delivered' | 'rejected' | null => {
+    if (!userRewards) return null;
+    const redemption = userRewards.find((ur: any) => ur.rewardId === rewardId && (ur.status === 'pending' || ur.status === 'approved' || ur.status === 'delivered'));
+    return redemption ? redemption.status : null;
   };
 
   return (
@@ -211,8 +192,8 @@ export default function Rewards() {
       <div className="relative z-10 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-      {/* Redemption Period Alert */}
-      {pointsConfig?.redemptionStartDate && pointsConfig?.redemptionEndDate && (
+      {/* Redemption Period Alert - Commented out until schema is updated */}
+      {/* {pointsConfig?.redemptionStartDate && pointsConfig?.redemptionEndDate && (
         <Alert className="mb-6 bg-blue-50 border-blue-200" data-testid="alert-redemption-period">
           <Calendar className="h-4 w-4 text-blue-600" />
           <AlertDescription className="text-blue-900">
@@ -230,7 +211,7 @@ export default function Rewards() {
             })}
           </AlertDescription>
         </Alert>
-      )}
+      )} */}
 
       <Tabs defaultValue="all" className="w-full">
         <TabsList className="grid w-full grid-cols-2">
@@ -259,18 +240,29 @@ export default function Rewards() {
           ) : rewards && rewards.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {rewards.map((reward) => {
-                const isPending = hasPendingRedemption(reward.id);
-                const canRedeem = stats && stats.availablePoints >= reward.pointsCost && !isPending;
+                const isRedeemed = hasRedeemedReward(reward.id);
+                const redemptionStatus = getRedemptionStatus(reward.id);
+                const canRedeem = stats && stats.availablePoints >= reward.pointsCost && !isRedeemed;
+                
+                // Determinar el mensaje a mostrar según el estado
+                let statusMessage = "";
+                if (redemptionStatus === 'pending') {
+                  statusMessage = t("rewards.inExchange");
+                } else if (redemptionStatus === 'approved') {
+                  statusMessage = t("rewards.approved");
+                } else if (redemptionStatus === 'delivered') {
+                  statusMessage = t("rewards.delivered");
+                }
                 
                 return (
-                <Card key={reward.id} className={`shadow-material overflow-hidden ${isPending ? 'opacity-60 bg-gray-50' : ''}`} data-testid={`card-reward-${reward.id}`}>
+                <Card key={reward.id} className={`shadow-material overflow-hidden ${isRedeemed ? 'opacity-60 bg-gray-50' : ''}`} data-testid={`card-reward-${reward.id}`}>
                   {/* Image Header */}
                   {reward.imageUrl && (
                     <div className="w-full h-52 bg-gray-50 relative">
                       <img 
                         src={reward.imageUrl} 
                         alt={reward.name}
-                        className={`w-full h-full object-cover ${isPending ? 'grayscale' : ''}`}
+                        className={`w-full h-full object-cover ${isRedeemed ? 'grayscale' : ''}`}
                         style={{ objectPosition: 'center' }}
                         onError={(e) => {
                           e.currentTarget.style.display = 'none';
@@ -282,31 +274,32 @@ export default function Rewards() {
                   <CardContent className="p-6">
                     <div className="flex items-center space-x-4 mb-4 reward-info">
                       {!reward.imageUrl && (
-                        <div className={`w-12 h-12 bg-gradient-to-br rounded-lg flex items-center justify-center ${isPending ? 'bg-gray-400' : 'green-background'}`}>
-                          {getRewardIcon(reward.category)}
+                        <div className={`w-12 h-12 bg-gradient-to-br rounded-lg flex items-center justify-center ${isRedeemed ? 'bg-gray-400' : 'green-background'}`}>
+                          {getDefaultRewardIcon()}
                         </div>
                       )}
                       <div className="flex-1">
-                        <h3 className={`font-semibold ${isPending ? 'text-gray-500' : 'text-gray-900'}`}>{reward.name}</h3>
+                        <h3 className={`font-semibold ${isRedeemed ? 'text-gray-500' : 'text-gray-900'}`}>{reward.name}</h3>
                         <p className="text-sm text-gray-600 text-center">
-                          <span className={`goal-number ${isPending ? 'text-gray-500' : 'text-green-600'}`}>
-                            {stats ? stats.availablePoints : 0}/{reward.pointsCost.toLocaleString()}
+                          <span className={`goal-number ${isRedeemed ? 'text-gray-500' : 'text-green-600'}`}>
+                            {reward.pointsCost.toLocaleString()}
                           </span> Goles
                         </p>
                       </div>
                     </div>
                     
                     {reward.description && (
-                      <p className={`text-sm mb-4 text-center ${isPending ? 'text-gray-500' : 'text-gray-600'}`}>{reward.description}</p>
+                      <p className={`text-sm mb-4 text-center ${isRedeemed ? 'text-gray-500' : 'text-gray-600'}`}>{reward.description}</p>
                     )}
                     
-                    <Badge variant="outline" className={`mb-4 reward-category ${isPending ? 'text-gray-500 border-gray-300' : ''}`}>
-                      {reward.category}
-                    </Badge>
-                    
-                    {isPending ? (
-                      <div className="w-full text-center py-3 bg-gray-200 text-gray-700 rounded-md font-medium">
-                        {t("rewards.inExchange")}
+                    {isRedeemed ? (
+                      <div className={`w-full text-center py-3 rounded-md font-medium ${
+                        redemptionStatus === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                        redemptionStatus === 'approved' ? 'bg-green-100 text-green-800' :
+                        redemptionStatus === 'delivered' ? 'bg-blue-100 text-blue-800' :
+                        'bg-gray-200 text-gray-700'
+                      }`}>
+                        {statusMessage}
                       </div>
                     ) : (
                       <Button
@@ -379,8 +372,8 @@ export default function Rewards() {
                   )}
                   <CardContent className="p-6">
                     {!reward.imageUrl && (
-                      <div className={`w-12 h-12 bg-gradient-to-br ${getCategoryColor(reward.category)} rounded-lg flex items-center justify-center green-background mb-4`}>
-                        {getRewardIcon(reward.category)}
+                      <div className={`w-12 h-12 bg-gradient-to-br ${getDefaultColor()} rounded-lg flex items-center justify-center green-background mb-4`}>
+                        {getDefaultRewardIcon()}
                       </div>
                     )}
                     <div className="mb-4">
@@ -427,58 +420,7 @@ export default function Rewards() {
           )}
         </TabsContent>
 
-        {categories.map((category) => (
-          <TabsContent key={category} value={category} className="mt-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredRewards(category).map((reward) => (
-                <Card key={reward.id} className="shadow-material overflow-hidden">
-                  {reward.imageUrl && (
-                    <div className="w-full h-52 bg-gray-50 relative">
-                      <img 
-                        src={reward.imageUrl} 
-                        alt={reward.name}
-                        className="w-full h-full object-cover"
-                        style={{ objectPosition: 'center' }}
-                        onError={(e) => {
-                          e.currentTarget.parentElement!.style.display = 'none';
-                        }}
-                      />
-                    </div>
-                  )}
-                  <CardContent className="p-6">
-                    {!reward.imageUrl && (
-                      <div className={`w-12 h-12 bg-gradient-to-br ${getCategoryColor(reward.category)} rounded-lg flex items-center justify-center green-background mb-4`}>
-                        {getRewardIcon(reward.category)}
-                      </div>
-                    )}
-                    <div className="mb-4">
-                      <h3 className="font-semibold text-gray-900">{reward.name}</h3>
-                      <p className="text-sm text-gray-600">
-                        <span className="goal-number text-green-600">{reward.pointsCost.toLocaleString()}</span> Goals
-                      </p>
-                    </div>
-                    
-                    {reward.description && (
-                      <p className="text-sm text-gray-600 mb-4 text-center">{reward.description}</p>
-                    )}
-                    
-                    <Button
-                      className="w-full gradient-green"
-                      onClick={() => handleRedeem(reward)}
-                      disabled={!stats || stats.availablePoints < reward.pointsCost || redeemMutation.isPending}
-                    >
-                      {!stats || stats.availablePoints < reward.pointsCost
-                        ? t("rewards.insufficientPoints")
-                        : redeemMutation.isPending
-                        ? t("rewards.redeeming")
-                        : t("rewards.redeem")}
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
-        ))}
+        {/* Category filtering removed */}
 
         <TabsContent value="my-rewards" className="mt-6">
           {userRewardsLoading ? (

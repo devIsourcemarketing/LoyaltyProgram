@@ -706,7 +706,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     try {
       const limit = req.query.limit ? parseInt(req.query.limit as string) : 5;
-      const topUsers = await storage.getTopUsersByPoints(limit);
+      const topUsers = await storage.getTopUsersByGoals(limit); // Changed to use goals instead of points
       res.json(topUsers);
     } catch (error) {
       console.error("Failed to get leaderboard:", error);

@@ -128,7 +128,7 @@ export default function Dashboard() {
     username: string;
     firstName: string;
     lastName: string;
-    totalPoints: number;
+    totalGoals: number;
   }>>({
     queryKey: ["/api/users/leaderboard"],
     select: (data) => data || [],
@@ -399,13 +399,13 @@ export default function Dashboard() {
                           </p>
                         </div>
 
-                        {/* Points */}
+                        {/* Goals */}
                         <div className="text-right">
                           <div className={`text-2xl font-bold ${isCurrentUser ? "text-blue-900 white-text" : "text-gray-900"}`}>
-                            {leaderUser.totalPoints.toLocaleString()}
+                            {leaderUser.totalGoals.toLocaleString()}
                           </div>
                           <div className={`text-sm ${isCurrentUser ? "text-blue-700 white-text" : "text-gray-600"}`}>
-                            {t('deals.points').toLowerCase()}
+                            {t('dashboard.goals').toLowerCase()}
                           </div>
                         </div>
                       </div>
@@ -481,7 +481,7 @@ export default function Dashboard() {
                           <div className="w-full h-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center rounded-lg gradient-green">
                             <div className="text-white text-center">
                               <Gift className="w-8 h-8 mx-auto mb-2" />
-                              <div className="text-sm font-medium">{reward.category}</div>
+                              <div className="text-sm font-medium">{reward.name}</div>
                             </div>
                           </div>
                         )}

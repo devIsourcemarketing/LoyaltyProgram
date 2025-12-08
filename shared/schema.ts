@@ -85,7 +85,7 @@ export const rewards = pgTable("rewards", {
   name: text("name").notNull(),
   description: text("description"),
   pointsCost: integer("points_cost").notNull(),
-  category: text("category").notNull(),
+  category: text("category"), // Campo opcional - ya no se utiliza en la UI
   region: regionEnum("region").notNull(), // Región a la que pertenece el reward
   isActive: boolean("is_active").notNull().default(true),
   stockQuantity: integer("stock_quantity"),

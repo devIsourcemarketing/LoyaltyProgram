@@ -20,7 +20,6 @@ const rewardSchema = z.object({
   name: z.string().min(1, "Reward name is required"),
   description: z.string().optional(),
   pointsCost: z.string().min(1, "Points cost is required"),
-  category: z.string().min(1, "Category is required"),
   region: z.string().min(1, "Region is required"),
   isActive: z.boolean().default(true),
   stockQuantity: z.string().optional(),
@@ -35,17 +34,6 @@ interface RewardModalProps {
   onClose: () => void;
   reward?: Reward | null;
 }
-
-const categories = [
-  "Gift Cards",
-  "Electronics",
-  "Travel",
-  "Accessories",
-  "Software",
-  "Training",
-  "Merchandise",
-  "Experiences"
-];
 
 export default function RewardModal({ isOpen, onClose, reward }: RewardModalProps) {
   const { toast } = useToast();
@@ -67,7 +55,6 @@ export default function RewardModal({ isOpen, onClose, reward }: RewardModalProp
       name: "",
       description: "",
       pointsCost: "",
-      category: "",
       region: "",
       isActive: true,
       stockQuantity: "",
@@ -85,7 +72,6 @@ export default function RewardModal({ isOpen, onClose, reward }: RewardModalProp
         name: reward.name || "",
         description: reward.description || "",
         pointsCost: reward.pointsCost?.toString() || "",
-        category: reward.category || "",
         region: reward.region || "",
         isActive: reward.isActive ?? true,
         stockQuantity: reward.stockQuantity?.toString() || "",
@@ -107,7 +93,6 @@ export default function RewardModal({ isOpen, onClose, reward }: RewardModalProp
         name: "",
         description: "",
         pointsCost: "",
-        category: "",
         region: defaultRegion,
         isActive: true,
         stockQuantity: "",
@@ -331,65 +316,38 @@ export default function RewardModal({ isOpen, onClose, reward }: RewardModalProp
               )}
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <FormField
-                control={form.control}
-                name="category"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Category</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger data-testid="select-category">
-                          <SelectValue placeholder="Select category" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {categories.map((category) => (
-                          <SelectItem key={category} value={category}>
-                            {category}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="region"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("rewards.regionLabel")}</FormLabel>
-                    <Select 
-                      onValueChange={field.onChange} 
-                      value={field.value}
-                      disabled={currentUser?.role === "regional-admin"}
-                    >
-                      <FormControl>
-                        <SelectTrigger data-testid="select-region">
-                          <SelectValue placeholder={t("admin.selectRegionPlaceholder")} />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="NOLA">NOLA</SelectItem>
-                        <SelectItem value="SOLA">SOLA</SelectItem>
-                        <SelectItem value="BRASIL">BRASIL</SelectItem>
-                        <SelectItem value="MEXICO">MEXICO</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                    {currentUser?.role === "regional-admin" && field.value && (
-                      <p className="text-xs text-gray-500 mt-1">
-                        Región bloqueada: {field.value}
-                      </p>
-                    )}
-                  </FormItem>
-                )}
-              />
-            </div>
+            <FormField
+              control={form.control}
+              name="region"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("rewards.regionLabel")}</FormLabel>
+                  <Select 
+                    onValueChange={field.onChange} 
+                    value={field.value}
+                    disabled={currentUser?.role === "regional-admin"}
+                  >
+                    <FormControl>
+                      <SelectTrigger data-testid="select-region">
+                        <SelectValue placeholder={t("admin.selectRegionPlaceholder")} />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="NOLA">NOLA</SelectItem>
+                      <SelectItem value="SOLA">SOLA</SelectItem>
+                      <SelectItem value="BRASIL">BRASIL</SelectItem>
+                      <SelectItem value="MEXICO">MEXICO</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                  {currentUser?.role === "regional-admin" && field.value && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      Región bloqueada: {field.value}
+                    </p>
+                  )}
+                </FormItem>
+              )}
+            />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <FormField

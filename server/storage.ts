@@ -167,6 +167,15 @@ export interface IStorage {
       totalPoints: number;
     }>
   >;
+  getTopUsersByGoals(limit?: number): Promise<
+    Array<{
+      userId: string;
+      username: string;
+      firstName: string;
+      lastName: string;
+      totalGoals: number;
+    }>
+  >;
 
   // Campaign methods
   getCampaigns(region?: Region): Promise<Campaign[]>;
@@ -1149,6 +1158,44 @@ export class DatabaseStorage implements IStorage {
       firstName: row.firstName || "",
       lastName: row.lastName || "",
       totalPoints: Number(row.totalPoints || 0),
+    }));
+  }
+
+  async getTopUsersByGoals(limit = 5): Promise<
+    Array<{
+      userId: string;
+      username: string;
+      firstName: string;
+      lastName: string;
+      totalGoals: number;
+    }>
+  > {
+    const result = await db
+      .select({
+        userId: goalsHistory.userId,
+        username: users.username,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        totalGoals: sum(goalsHistory.goals),
+      })
+      .from(goalsHistory)
+      .innerJoin(users, eq(goalsHistory.userId, users.id))
+      .groupBy(
+        goalsHistory.userId,
+        users.username,
+        users.firstName,
+        users.lastName,
+      )
+      .having(sql`SUM(${goalsHistory.goals}) > 0`)
+      .orderBy(desc(sum(goalsHistory.goals)))
+      .limit(limit);
+
+    return result.map((row) => ({
+      userId: row.userId,
+      username: row.username || "",
+      firstName: row.firstName || "",
+      lastName: row.lastName || "",
+      totalGoals: Number(row.totalGoals || 0),
     }));
   }
 
