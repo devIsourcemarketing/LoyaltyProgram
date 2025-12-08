@@ -63,8 +63,26 @@ function getEmailImageURLs(emailType: string, lang: EmailLanguage = 'es') {
       // Codificar espacios como %20
       const encodedName = name.replace(/ /g, '%20');
       
-      // Retornar URL con carpeta de idioma incluida en el Public ID
-      return `${basePath}/${encodedName}`;
+      // Agregar versión específica para las imágenes de registro-passwordless en português
+      // Esto fuerza a Cloudinary a usar las imágenes actualizadas del 2025-12-03
+      let url = `${basePath}/${encodedName}`;
+      
+      if (emailType === 'registro-passwordless' && lang === 'pt') {
+        // Timestamp de cuando se subieron las imágenes actualizadas en português
+        // Group 65: v1765212377 (nueva imagen correcta subida el 2025-12-08)
+        // Logo: v1764782734, Logo@2x: v1764782736
+        if (name.includes('Group 65')) {
+          // Usar la misma versión para normal y retina (la imagen es la misma)
+          const version = 'v1765212377';
+          url = url.replace('/loyalty-program/', `/${version}/loyalty-program/`);
+        } else if (name.includes('Logo - Kaspersky Cup')) {
+          const version = retina ? 'v1764782736' : 'v1764782734';
+          url = url.replace('/loyalty-program/', `/${version}/loyalty-program/`);
+        }
+      }
+      
+      // Agregar extensión .png al final
+      return `${url}.png`;
     },
     // Imágenes comunes (shared entre idiomas)
     common: {
@@ -2898,6 +2916,14 @@ export async function sendRegistroPasswordlessEmail(data: RegistroPasswordlessEm
     const heroImage2xUrl = images.getImage('Group 65.png', true);
     const logoUrl = images.getImage('Logo - Kaspersky Cup.png');
     const logo2xUrl = images.getImage('Logo - Kaspersky Cup.png', true);
+    
+    // Log de las URLs generadas para debug
+    console.log('🖼️  URLs de imágenes:');
+    console.log('   Hero Image:', heroImageUrl);
+    console.log('   Hero Image 2x:', heroImage2xUrl);
+    console.log('   Logo:', logoUrl);
+    console.log('   Logo 2x:', logo2xUrl);
+    
     const userName = data.firstName || 'Usuario';
     const magicLink = `${APP_URL}/auth/verify-magic-link/${data.loginToken}`;
     
