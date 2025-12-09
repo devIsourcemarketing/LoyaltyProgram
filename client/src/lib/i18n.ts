@@ -625,6 +625,8 @@ const translations = {
       rejected: "Rejected",
       textHeroRewards: "Make every play end in a goal",
       subTextHeroRewards: "Leave everything on the field and make every play end in a goal",
+      bigPrize: "Big Prize",
+      monthlyPrize: "Monthly Prize",
     },
     admin: {
       panel: "Admin Panel",
@@ -1805,6 +1807,8 @@ const translations = {
       rejected: "Rechazado",
       textHeroRewards: "Haga que cada jugada termine en gol",
       subTextHeroRewards: "Deje todo en la cancha y asegúrese de que cada jugada cuente.",
+      bigPrize: "Gran Premio",
+      monthlyPrize: "Premio del Mes",
     },
     admin: {
       panel: "Panel de Administrador",
@@ -2956,6 +2960,8 @@ const translations = {
       rejected: "Rejeitado",
       textHeroRewards: "Na Kaspersky Cup suas vendas valem gols.",
       subTextHeroRewards: "De o seu melhor em campo, faça uma goleada e ganhe muitos prêmios.",
+      bigPrize: "Grande Prêmio",
+      monthlyPrize: "Prêmio do Mês",
     },
     admin: {
       panel: "Painel do Administrador",
