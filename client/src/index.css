@@ -162,7 +162,7 @@
 .background-form-login {
   background-color: rgb(255 255 255 / 80%);
 }
-/*--user--*/
+/*--Dashboard--*/
 .gradient-green {
   background: #3DE8CA;
   background: linear-gradient(51deg,rgba(61, 232, 202, 1) 0%, rgba(51, 255, 119, 1) 100%);
@@ -188,7 +188,39 @@
 .green-background-opacity15 {
   background: rgba(41, 204, 177, .15)
 }
-/*--reward-screen--*/
+/*--Big Prize Dashboard--*/
+.bigPrize-section {
+    background-size: cover;
+    background-position: center;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+}
+.text-bigPrize {
+    max-width: 400px;
+    gap: 5px;
+}
+.big-prize-includes {
+    flex-direction: row;
+    justify-content: space-evenly;
+    margin-top: -38px;
+    position: relative;
+    z-index: 10;
+}
+.includes-col {
+    width: 200px;
+    text-align: center;
+}
+img.big-prize-icon {
+    margin: 0 auto 11px auto;
+}
+.big-prize-final {
+    text-align: center;
+    padding: 50px 0 50px 0;
+    margin-bottom: 50px;
+    border-bottom: 3px solid #F1F5F8;
+}
+/*--Reward-screen--*/
 .reward-info {
     flex-direction: column;
     gap: 20px;
@@ -206,6 +238,24 @@
     margin: 0 auto 15px auto;
     display: block;
     width: fit-content;
+}
+.monthly-prize-card {
+    max-width: 340px;
+    margin: 0 auto;
+}
+.big-prize-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.includes-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 10px;
+}
+p.sub-text-welcome-rewards {
+    max-width: 330px;
 }
 /*--toolbar--*/
 .logo-toolbar {
@@ -245,40 +295,9 @@ button#radix-\:r7\::hover {
 .faq-answer {
   white-space: pre-line;
 }
-/*--Big Prize--*/
-.bigPrize-section {
-    background-size: cover;
-    background-position: center;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-}
-.text-bigPrize {
-    max-width: 400px;
-    gap: 5px;
-}
-.big-prize-includes {
-    flex-direction: row;
-    justify-content: space-evenly;
-    margin-top: -38px;
-    position: relative;
-    z-index: 10;
-}
-.includes-col {
-    width: 200px;
-    text-align: center;
-}
-img.big-prize-icon {
-    margin: 0 auto 11px auto;
-}
-.big-prize-final {
-    text-align: center;
-    padding: 50px 0 50px 0;
-    margin-bottom: 50px;
-    border-bottom: 3px solid #F1F5F8;
-}
-/*--*/
+/*--------------------------------------------*/
 @media only screen and (max-width: 992px) {
+  /*--Big Prize Dashboard--*/
   .big-prize-includes {
     flex-wrap: wrap;
   }
@@ -295,5 +314,22 @@ img.big-prize-icon {
   }
   .text-bigPrize {
     text-align: center;
+  }
+}
+/*--------------------------------------------*/
+@media only screen and (max-width: 767px) {
+  /*--Reward-screen--*/
+  .big-prize-image {
+    display: flex;
+    justify-content: center;
+  }
+  .big-prize-text {
+    align-items: center;
+    text-align: center;
+  }
+  .includes-row {
+    gap: 0;
+    margin-bottom: 20px;
+    flex-direction: column;
   }
 }

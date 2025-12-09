@@ -12,6 +12,11 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { apiRequest } from "@/lib/queryClient";
 import type { Reward, UserReward, PointsConfig } from "@shared/schema";
 import rewardsBackgroundImage from "@assets/rewards-banner.png";
+import premioMayorImage from "@assets/premio-mayor-rewards.png";
+import bigPrizeIcon1 from "@assets/pm-icon-01.png";
+import bigPrizeIcon2 from "@assets/pm-icon-02.png";
+import bigPrizeIcon3 from "@assets/pm-icon-03.png";
+import bigPrizeIcon4 from "@assets/pm-icon-04.png";
 
 interface UserStats {
   availablePoints: number;
@@ -213,15 +218,62 @@ export default function Rewards() {
         </Alert>
       )} */}
 
-      <Tabs defaultValue="all" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="all">{t("rewards.allRewards")}</TabsTrigger>
+      <Tabs defaultValue="bigPrize" className="w-full">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="bigPrize">{t("rewards.bigPrize")}</TabsTrigger>
+          <TabsTrigger value="all">{t("rewards.monthlyPrize")}</TabsTrigger>
           <TabsTrigger value="my-rewards">{t("rewards.myRewards")}</TabsTrigger>
         </TabsList>
 
+        <TabsContent value="bigPrize" className="mt-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+              <div className="big-prize-image">
+                <img src={premioMayorImage} alt="Kaspersky Cup" className=""/>
+              </div>
+              <div className="big-prize-text">
+                  <h2 className="text-2xl lg:text-3xl font-medium mb-2 text-green-600" data-testid="text-big-prize">
+                    {t('dashboard.bigPrize')}
+                  </h2>
+                  <p className="text-3xl lg:text-4xl font-bold mb-2 text-gray-900">
+                    {t('dashboard.bigPrizeSubtitle')}
+                  </p>
+                  <p className="text-1xl lg:text-1xl sub-text-welcome-rewards font-medium text-gray-900">
+                    {t('dashboard.bigPrizeText')}            
+                  </p>
+                  <h2 className="text-2xl lg:text-3xl mb-2 font-medium text-green-600">
+                    {t('dashboard.includes')}
+                  </h2>
+                  <div className="includes-row" data-testid="includes-row1">
+                    <img src={bigPrizeIcon1} alt="Kaspersky Cup" className="big-prize-icon-rewards"/>
+                    <p className="includes-text-rewards font-medium text-gray-900">
+                      {t('dashboard.includesText1')}            
+                    </p>
+                  </div>
+                  <div className="includes-row" data-testid="includes-row2">
+                    <img src={bigPrizeIcon2} alt="Kaspersky Cup" className="big-prize-icon-rewards"/>
+                    <p className="includes-text-rewards font-medium text-gray-900">
+                      {t('dashboard.includesText2')}
+                    </p>
+                  </div>
+                  <div className="includes-row" data-testid="includes-row3">
+                    <img src={bigPrizeIcon3} alt="Kaspersky Cup" className="big-prize-icon-rewards"/>
+                    <p className="includes-text-rewards font-medium text-gray-900">
+                      {t('dashboard.includesText3')}
+                    </p>
+                  </div>
+                  <div className="includes-row" data-testid="includes-row4">
+                    <img src={bigPrizeIcon4} alt="Kaspersky Cup" className="big-prize-icon-rewards"/>
+                    <p className="includes-text-rewards font-medium text-gray-900">
+                      {t('dashboard.includesText4')}            
+                    </p>
+                  </div>
+              </div>              
+            </div>
+        </TabsContent>
+
         <TabsContent value="all" className="mt-6">
           {rewardsLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-6 monthly-prize-card">
               {[...Array(6)].map((_, i) => (
                 <Card key={i} className="shadow-material">
                   <CardContent className="p-6">
@@ -238,7 +290,7 @@ export default function Rewards() {
               ))}
             </div>
           ) : rewards && rewards.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-6 monthly-prize-card">
               {rewards.map((reward) => {
                 const isRedeemed = hasRedeemedReward(reward.id);
                 const redemptionStatus = getRedemptionStatus(reward.id);
