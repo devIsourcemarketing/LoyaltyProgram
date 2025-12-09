@@ -245,3 +245,55 @@ button#radix-\:r7\::hover {
 .faq-answer {
   white-space: pre-line;
 }
+/*--Big Prize--*/
+.bigPrize-section {
+    background-size: cover;
+    background-position: center;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+}
+.text-bigPrize {
+    max-width: 400px;
+    gap: 5px;
+}
+.big-prize-includes {
+    flex-direction: row;
+    justify-content: space-evenly;
+    margin-top: -38px;
+    position: relative;
+    z-index: 10;
+}
+.includes-col {
+    width: 200px;
+    text-align: center;
+}
+img.big-prize-icon {
+    margin: 0 auto 11px auto;
+}
+.big-prize-final {
+    text-align: center;
+    padding: 50px 0 50px 0;
+    margin-bottom: 50px;
+    border-bottom: 3px solid #F1F5F8;
+}
+/*--*/
+@media only screen and (max-width: 992px) {
+  .big-prize-includes {
+    flex-wrap: wrap;
+  }
+  .includes-col {
+    width: 50%;
+    margin-bottom: 40px;
+  }
+  img.big-prize-icon {
+    max-width: 110px;
+  }
+  p.includes-text {
+    max-width: 190px;
+    margin: 0 auto;
+  }
+  .text-bigPrize {
+    text-align: center;
+  }
+}
