@@ -21,6 +21,15 @@ interface GrandPrizeCriteria {
   minPoints?: number;
   minDeals?: number;
   region?: string;
+  marketSegment?: string; // ENTERPRISE, SMB, MSSP
+  partnerCategory?: string; // PLATINUM, GOLD, SILVER, REGISTERED
+  regionSubcategory?: string; // COLOMBIA, CENTRO AMERICA, etc.
+  prizeDescription?: string; // Language-independent prize description
+  prizeLocation?: string; // New York New Jersey Stadium, etc.
+  prizeCountry?: string; // USA, CANADA, MEXICO
+  prizeDate?: string; // June 30, July 2, etc.
+  prizeRound?: string; // 32, 16, Final
+  rankingPosition?: number; // 1 = first place, 2 = second place, etc.
   startDate?: string;
   endDate?: string;
   redemptionStartDate?: string; // When winners can claim prize
@@ -53,6 +62,15 @@ export default function GrandPrizeTab() {
     minPoints: 0,
     minDeals: 0,
     // region se asigna automáticamente del contexto
+    marketSegment: "",
+    partnerCategory: "",
+    regionSubcategory: "",
+    prizeDescription: "",
+    prizeLocation: "",
+    prizeCountry: "",
+    prizeDate: "",
+    prizeRound: "",
+    rankingPosition: 1,
     startDate: "",
     endDate: "",
     redemptionStartDate: "",
@@ -153,6 +171,15 @@ export default function GrandPrizeTab() {
         minPoints: 0,
         minDeals: 0,
         // region se asigna automáticamente del contexto
+        marketSegment: "",
+        partnerCategory: "",
+        regionSubcategory: "",
+        prizeDescription: "",
+        prizeLocation: "",
+        prizeCountry: "",
+        prizeDate: "",
+        prizeRound: "",
+        rankingPosition: 1,
         startDate: "",
         endDate: "",
         redemptionStartDate: "",
@@ -224,6 +251,15 @@ export default function GrandPrizeTab() {
       minPoints: criteriaToEdit.minPoints || 0,
       minDeals: criteriaToEdit.minDeals || 0,
       region: criteriaToEdit.region || "all",
+      marketSegment: criteriaToEdit.marketSegment || "_all",
+      partnerCategory: criteriaToEdit.partnerCategory || "_all",
+      regionSubcategory: criteriaToEdit.regionSubcategory || "",
+      prizeDescription: criteriaToEdit.prizeDescription || "",
+      prizeLocation: criteriaToEdit.prizeLocation || "",
+      prizeCountry: criteriaToEdit.prizeCountry || "",
+      prizeDate: criteriaToEdit.prizeDate || "",
+      prizeRound: criteriaToEdit.prizeRound || "",
+      rankingPosition: criteriaToEdit.rankingPosition || 1,
       startDate: criteriaToEdit.startDate ? new Date(criteriaToEdit.startDate).toISOString().split('T')[0] : "",
       endDate: criteriaToEdit.endDate ? new Date(criteriaToEdit.endDate).toISOString().split('T')[0] : "",
       redemptionStartDate: criteriaToEdit.redemptionStartDate ? new Date(criteriaToEdit.redemptionStartDate).toISOString().split('T')[0] : "",
@@ -243,6 +279,15 @@ export default function GrandPrizeTab() {
       minPoints: 0,
       minDeals: 0,
       region: "all",
+      marketSegment: "",
+      partnerCategory: "",
+      regionSubcategory: "",
+      prizeDescription: "",
+      prizeLocation: "",
+      prizeCountry: "",
+      prizeDate: "",
+      prizeRound: "",
+      rankingPosition: 1,
       startDate: "",
       endDate: "",
       redemptionStartDate: "",
@@ -419,6 +464,199 @@ export default function GrandPrizeTab() {
           {/* Región - OCULTO: se usa automáticamente la región del contexto */}
           <input type="hidden" value={selectedRegion} />
 
+          <Separator />
+
+          {/* Prize Segmentation Section */}
+          <div className="space-y-4 bg-blue-50 p-4 rounded-lg">
+            <div className="flex items-center gap-2">
+              <Award className="w-4 h-4 text-blue-600" />
+              <Label className="text-base font-semibold text-blue-900">{t('admin.prizeSegmentation')}</Label>
+            </div>
+            <p className="text-sm text-blue-700">
+              {t('admin.prizeSegmentationDesc')}
+            </p>
+
+            <div className="grid grid-cols-2 gap-4">
+              {/* Market Segment */}
+              <div className="space-y-2">
+                <Label htmlFor="market-segment">{t('admin.marketSegment')}</Label>
+                <Select
+                  value={criteria.marketSegment || "_all"}
+                  onValueChange={(value) => setCriteria({ ...criteria, marketSegment: value === "_all" ? undefined : value })}
+                >
+                  <SelectTrigger id="market-segment">
+                    <SelectValue placeholder={t('admin.allSegments')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="_all">{t('admin.allSegments')}</SelectItem>
+                    <SelectItem value="ENTERPRISE">ENTERPRISE</SelectItem>
+                    <SelectItem value="SMB">SMB</SelectItem>
+                    <SelectItem value="MSSP">MSSP</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Partner Category */}
+              <div className="space-y-2">
+                <Label htmlFor="partner-category">{t('admin.partnerCategory')}</Label>
+                <Select
+                  value={criteria.partnerCategory || "_all"}
+                  onValueChange={(value) => setCriteria({ ...criteria, partnerCategory: value === "_all" ? undefined : value })}
+                >
+                  <SelectTrigger id="partner-category">
+                    <SelectValue placeholder={t('admin.allCategories')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="_all">{t('admin.allCategories')}</SelectItem>
+                    <SelectItem value="PLATINUM">PLATINUM</SelectItem>
+                    <SelectItem value="GOLD">GOLD</SelectItem>
+                    <SelectItem value="SILVER">SILVER</SelectItem>
+                    <SelectItem value="SILVER & REGISTERED">SILVER & REGISTERED</SelectItem>
+                    <SelectItem value="REGISTERED">REGISTERED</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Region Subcategory */}
+            <div className="space-y-2">
+              <Label htmlFor="regionSubcategory">{t('admin.subregion')}</Label>
+              <Select
+                value={criteria.regionSubcategory || "_none"}
+                onValueChange={(value) => setCriteria({ ...criteria, regionSubcategory: value === "_none" ? undefined : value })}
+              >
+                <SelectTrigger id="regionSubcategory">
+                  <SelectValue placeholder={t('admin.allSubregions')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="_none">{t('admin.allSubregions')}</SelectItem>
+                  {selectedRegion === "NOLA" && (
+                    <>
+                      <SelectItem value="COLOMBIA">COLOMBIA</SelectItem>
+                      <SelectItem value="CENTRO AMERICA">CENTRO AMERICA</SelectItem>
+                      <SelectItem value="COLOMBIA & CENTRO AMÉRICA">COLOMBIA & CENTRO AMÉRICA</SelectItem>
+                    </>
+                  )}
+                  {selectedRegion === "SOLA" && (
+                    <>
+                      <SelectItem value="ARGENTINA">ARGENTINA</SelectItem>
+                      <SelectItem value="CHILE">CHILE</SelectItem>
+                      <SelectItem value="PERU">PERU</SelectItem>
+                    </>
+                  )}
+                  {selectedRegion === "MEXICO" && (
+                    <SelectItem value="MEXICO">MEXICO</SelectItem>
+                  )}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-gray-500">
+                {t('admin.subregionHelp')}
+              </p>
+            </div>
+
+            {/* Ranking Position */}
+            <div className="space-y-2">
+              <Label htmlFor="ranking-position">{t('admin.rankingPositionToWin')}</Label>
+              <Input
+                id="ranking-position"
+                type="number"
+                min="1"
+                value={criteria.rankingPosition || 1}
+                onChange={(e) => setCriteria({ ...criteria, rankingPosition: parseInt(e.target.value) || 1 })}
+              />
+              <p className="text-xs text-gray-500">
+                {t('admin.rankingPositionHelp')}
+              </p>
+            </div>
+          </div>
+
+          <Separator />
+
+          {/* Prize Details Section */}
+          <div className="space-y-4 bg-green-50 p-4 rounded-lg">
+            <div className="flex items-center gap-2">
+              <Trophy className="w-4 h-4 text-green-600" />
+              <Label className="text-base font-semibold text-green-900">{t('admin.prizeDetails')}</Label>
+            </div>
+            <p className="text-sm text-green-700">
+              {t('admin.prizeDetailsDesc')}
+            </p>
+
+            <div className="space-y-2">
+              <Label htmlFor="prize-description">{t('admin.prizeDescription')}</Label>
+              <Input
+                id="prize-description"
+                value={criteria.prizeDescription || ""}
+                onChange={(e) => setCriteria({ ...criteria, prizeDescription: e.target.value })}
+                placeholder={t('admin.grandPrizeDescriptionPlaceholder')}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="prize-location">{t('admin.stadiumLocation')}</Label>
+                <Input
+                  id="prize-location"
+                  value={criteria.prizeLocation || ""}
+                  onChange={(e) => setCriteria({ ...criteria, prizeLocation: e.target.value })}
+                  placeholder={t('admin.stadiumPlaceholder')}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="prize-country">{t('admin.country')}</Label>
+                <Select
+                  value={criteria.prizeCountry || "_none"}
+                  onValueChange={(value) => setCriteria({ ...criteria, prizeCountry: value === "_none" ? undefined : value })}
+                >
+                  <SelectTrigger id="prize-country">
+                    <SelectValue placeholder={t('admin.country')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="_none">{t('admin.notSpecified')}</SelectItem>
+                    <SelectItem value="USA">USA</SelectItem>
+                    <SelectItem value="CANADA">CANADA</SelectItem>
+                    <SelectItem value="MEXICO">MEXICO</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="prize-date">{t('admin.eventDateLabel')}</Label>
+                <Input
+                  id="prize-date"
+                  value={criteria.prizeDate || ""}
+                  onChange={(e) => setCriteria({ ...criteria, prizeDate: e.target.value })}
+                  placeholder={t('admin.eventDatePlaceholder')}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="prize-round">{t('admin.tournamentRound')}</Label>
+                <Select
+                  value={criteria.prizeRound || "_none"}
+                  onValueChange={(value) => setCriteria({ ...criteria, prizeRound: value === "_none" ? undefined : value })}
+                >
+                  <SelectTrigger id="prize-round">
+                    <SelectValue placeholder={t('admin.tournamentRoundPlaceholder')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="_none">{t('admin.notSpecified')}</SelectItem>
+                    <SelectItem value="32">Round of 32</SelectItem>
+                    <SelectItem value="16">Round of 16</SelectItem>
+                    <SelectItem value="Quarter Finals">Quarter Finals</SelectItem>
+                    <SelectItem value="Semi Finals">Semi Finals</SelectItem>
+                    <SelectItem value="Final">Final</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+
+          <Separator />
+
           {/* Rango de Fechas - Evaluation Period */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
@@ -507,7 +745,7 @@ export default function GrandPrizeTab() {
                 ? t("common.saving")
                 : editingId 
                   ? t("admin.updateCriteria")
-                  : t("admin.createNewCriteria")}
+                  : t("admin.createNewCriterion")}
             </Button>
             {editingId && (
               <Button 
@@ -530,7 +768,7 @@ export default function GrandPrizeTab() {
             {t("admin.configuredCriteria")}
           </CardTitle>
           <CardDescription>
-            {t("admin.allGrandPrizeCriteria")}
+            {t("admin.allGrandPrizeCriteriaDesc")}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -547,21 +785,41 @@ export default function GrandPrizeTab() {
                     <div className="flex items-center gap-2 mb-1">
                       <p className="font-medium">{crit.name}</p>
                       {crit.isActive && (
-                        <Badge variant="default" className="bg-green-600">Activo</Badge>
+                        <Badge variant="default" className="bg-green-600">{t('admin.active')}</Badge>
+                      )}
+                      {crit.rankingPosition && crit.rankingPosition > 1 && (
+                        <Badge variant="outline" className="bg-orange-50 text-orange-700">
+                          {crit.rankingPosition === 1 ? t('admin.firstPlaceBadge') : 
+                           crit.rankingPosition === 2 ? t('admin.secondPlaceBadge') : 
+                           crit.rankingPosition === 3 ? t('admin.thirdPlaceBadge') :
+                           `${crit.rankingPosition}th`}
+                        </Badge>
                       )}
                     </div>
                     <div className="text-sm text-muted-foreground space-y-1">
                       <p>Tipo: {
                         crit.criteriaType === "points" ? t("admin.onlyPoints") :
                         crit.criteriaType === "deals" ? t("admin.onlyDeals") :
+                        crit.criteriaType === "top_goals" ? t("admin.topGoalsRanking") :
                         `Combinado (${crit.pointsWeight}% puntos / ${crit.dealsWeight}% deals)`
                       }</p>
                       <p>
                         Región: {crit.region === "all" ? "Todas" : crit.region}
-                        {crit.startDate && crit.endDate && (
-                          <> • {new Date(crit.startDate).toLocaleDateString()} - {new Date(crit.endDate).toLocaleDateString()}</>
-                        )}
+                        {crit.marketSegment && <> • {crit.marketSegment}</>}
+                        {crit.partnerCategory && <> • {crit.partnerCategory}</>}
+                        {crit.regionSubcategory && <> • {crit.regionSubcategory}</>}
                       </p>
+                      {crit.prizeLocation && (
+                        <p className="flex items-center gap-1">
+                          <Trophy className="w-3 h-3" />
+                          {crit.prizeLocation} ({crit.prizeCountry}) - {crit.prizeDate}, Round {crit.prizeRound}
+                        </p>
+                      )}
+                      {crit.startDate && crit.endDate && (
+                        <p>
+                          Período: {new Date(crit.startDate).toLocaleDateString()} - {new Date(crit.endDate).toLocaleDateString()}
+                        </p>
+                      )}
                       {(crit.minPoints || crit.minDeals) && (
                         <p>
                           Mínimos: 
@@ -626,10 +884,10 @@ export default function GrandPrizeTab() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <TrendingUp className="w-5 h-5" />
-              Ranking Actual
+              {t('admin.currentRanking')}
             </CardTitle>
             <CardDescription>
-              Usuarios ordenados según los criterios definidos
+              {t('admin.usersOrderedByCriteria')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -673,7 +931,7 @@ export default function GrandPrizeTab() {
               </div>
             ) : (
               <div className="text-center py-8 text-muted-foreground">
-                No hay usuarios que cumplan con los criterios actuales
+                {t('admin.noUsersMatchCriteria')}
               </div>
             )}
           </CardContent>

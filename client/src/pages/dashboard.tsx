@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -14,7 +14,10 @@ import {
   ClipboardCheck,
   TrendingUp,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Trophy,
+  MapPin,
+  Calendar
 } from "lucide-react";
 import DealModal from "@/components/modals/deal-modal";
 import { useState, useEffect } from "react";
@@ -60,6 +63,105 @@ interface Reward {
   pointsCost: number;
   category: string;
   imageUrl?: string;
+}
+
+// Component to display user's specific grand prize
+function GrandPrizeCard() {
+  const { t } = useTranslation();
+  
+  const { data: grandPrize, isLoading } = useQuery({
+    queryKey: ["/api/users/my-grand-prize"],
+    queryFn: async () => {
+      const response = await fetch("/api/users/my-grand-prize", { credentials: "include" });
+      if (!response.ok) return null;
+      return response.json();
+    },
+  });
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardContent className="p-6">
+          <Skeleton className="h-32 w-full" />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!grandPrize) {
+    return null; // No specific prize for this user
+  }
+
+  const getRankingLabel = (position: number) => {
+    if (position === 1) return `🥇 ${t('admin.firstPlace')}`;
+    if (position === 2) return `🥈 ${t('admin.secondPlace')}`;
+    if (position === 3) return `🥉 ${t('admin.thirdPlace')}`;
+    return `${t('admin.nthPlace').replace('{position}', position.toString())}`;
+  };
+
+  return (
+    <Card className="bg-gradient-to-br from-yellow-50 via-orange-50 to-red-50 border-2 border-yellow-400">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-2xl">
+          <Trophy className="w-6 h-6 text-yellow-600" />
+          {grandPrize.prizeDescription || t('admin.grandPrize')}
+        </CardTitle>
+        <CardDescription className="text-base font-medium">
+          {t('admin.yourGrandPrize')} - {getRankingLabel(grandPrize.rankingPosition)}
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="grid grid-cols-2 gap-4">
+          <div className="flex items-center gap-2">
+            <MapPin className="w-5 h-5 text-blue-600" />
+            <div>
+              <p className="text-sm text-gray-600">{t('admin.location')}</p>
+              <p className="font-semibold">{grandPrize.prizeLocation}</p>
+              <p className="text-sm text-gray-500">{grandPrize.prizeCountry}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Calendar className="w-5 h-5 text-purple-600" />
+            <div>
+              <p className="text-sm text-gray-600">{t('admin.eventDate')}</p>
+              <p className="font-semibold">{grandPrize.prizeDate}</p>
+              <p className="text-sm text-gray-500">{t('admin.round')} {grandPrize.prizeRound}</p>
+            </div>
+          </div>
+        </div>
+
+        {grandPrize.marketSegment && (
+          <div className="flex gap-2 flex-wrap">
+            <Badge variant="outline" className="bg-blue-50 text-blue-700">
+              {grandPrize.marketSegment}
+            </Badge>
+            {grandPrize.partnerCategory && (
+              <Badge variant="outline" className="bg-purple-50 text-purple-700">
+                {grandPrize.partnerCategory}
+              </Badge>
+            )}
+            {grandPrize.regionSubcategory && (
+              <Badge variant="outline" className="bg-green-50 text-green-700">
+                {grandPrize.regionSubcategory}
+              </Badge>
+            )}
+          </div>
+        )}
+
+        <div className="bg-white/60 p-4 rounded-lg">
+          <p className="text-sm text-gray-700">
+            {grandPrize.startDate && grandPrize.endDate ? (
+              <>
+                {t('admin.competitionPeriod')}: {new Date(grandPrize.startDate).toLocaleDateString()} - {new Date(grandPrize.endDate).toLocaleDateString()}
+              </>
+            ) : (
+              t('admin.qualifyForPrize')
+            )}
+          </p>
+        </div>
+      </CardContent>
+    </Card>
+  );
 }
 
 export default function Dashboard() {
@@ -327,12 +429,15 @@ export default function Dashboard() {
                       <p className="text-sm opacity-90 text-gray-900">
                         {t('dashboard.topScorerReward')}
                       </p>
-                    </div>                    
+                    </div>
                   </div>
                 </div>
               </div>
             </CardContent>
           </Card>
+
+          {/* User's Specific Grand Prize Card */}
+          <GrandPrizeCard />
         </div>
       )}
 

@@ -4403,6 +4403,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get user's specific grand prize (matches their region, market segment, partner category, subregion)
+  app.get("/api/users/my-grand-prize", async (req, res) => {
+    if (!req.session.userId) {
+      return res.status(401).json({ message: "Authentication required" });
+    }
+
+    try {
+      const userId = req.session.userId;
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const prize = await storage.getUserGrandPrize(user);
+      res.json(prize);
+    } catch (error) {
+      console.error("Get user grand prize error:", error);
+      res.status(500).json({ message: "Failed to get user grand prize" });
+    }
+  });
+
   app.get("/api/admin/grand-prize/ranking/:criteriaId", async (req, res) => {
     if (!req.session.userId || req.session.userRole !== "admin") {
       return res.status(403).json({ message: "Admin access required" });

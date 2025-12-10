@@ -245,6 +245,15 @@ export const grandPrizeCriteria = pgTable("grand_prize_criteria", {
   minPoints: integer("min_points").default(0),
   minDeals: integer("min_deals").default(0),
   region: text("region").notNull(), // "NOLA", "SOLA", "BRASIL", "MEXICO"
+  marketSegment: text("market_segment"), // "ENTERPRISE", "SMB", "MSSP" - Opcional: null = aplica a todos
+  partnerCategory: text("partner_category"), // "PLATINUM", "GOLD", "SILVER", "REGISTERED" - Opcional: null = aplica a todos
+  regionSubcategory: text("region_subcategory"), // "COLOMBIA", "CENTRO AMERICA", etc. - Opcional: null = aplica a todos
+  prizeDescription: text("prize_description"), // Descripción del premio específico (independiente del idioma)
+  prizeLocation: text("prize_location"), // Ej: "New York New Jersey Stadium", "BC Place Vancouver"
+  prizeCountry: text("prize_country"), // País del premio: "USA", "CANADA", "MEXICO"
+  prizeDate: text("prize_date"), // Fecha del evento: "June 30", "July 2"
+  prizeRound: text("prize_round"), // Ronda del torneo: "32", "16", "Final"
+  rankingPosition: integer("ranking_position").default(1), // Posición en el ranking para ganar (1 = primero, 2 = segundo, etc.)
   startDate: timestamp("start_date"), // Criteria evaluation period start
   endDate: timestamp("end_date"), // Criteria evaluation period end
   redemptionStartDate: timestamp("redemption_start_date"), // When winners can claim prize

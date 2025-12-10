@@ -274,6 +274,7 @@ export interface IStorage {
   updateGrandPrizeCriteria(id: string, updates: UpdateGrandPrizeCriteria): Promise<GrandPrizeCriteria | undefined>;
   deleteGrandPrizeCriteria(id: string): Promise<void>;
   getGrandPrizeRanking(criteriaId: string): Promise<any[]>;
+  getUserGrandPrize(user: User): Promise<GrandPrizeCriteria | null>;
 
   // Monthly Prizes methods
   getMonthlyPrizes(month?: number, year?: number, region?: string): Promise<MonthlyRegionPrize[]>;
@@ -2371,6 +2372,8 @@ export class DatabaseStorage implements IStorage {
       id: randomUUID(),
       startDate: data.startDate ? new Date(data.startDate) : null,
       endDate: data.endDate ? new Date(data.endDate) : null,
+      redemptionStartDate: data.redemptionStartDate ? new Date(data.redemptionStartDate) : null,
+      redemptionEndDate: data.redemptionEndDate ? new Date(data.redemptionEndDate) : null,
     };
 
     const [newCriteria] = await db
@@ -2403,6 +2406,12 @@ export class DatabaseStorage implements IStorage {
     }
     if (updates.endDate !== undefined) {
       processedUpdates.endDate = updates.endDate ? new Date(updates.endDate) : null;
+    }
+    if (updates.redemptionStartDate !== undefined) {
+      processedUpdates.redemptionStartDate = updates.redemptionStartDate ? new Date(updates.redemptionStartDate) : null;
+    }
+    if (updates.redemptionEndDate !== undefined) {
+      processedUpdates.redemptionEndDate = updates.redemptionEndDate ? new Date(updates.redemptionEndDate) : null;
     }
 
     const [updated] = await db
@@ -2457,7 +2466,7 @@ export class DatabaseStorage implements IStorage {
 
     const userStats = await dealsQuery;
 
-    // Join with user data and filter by region
+    // Join with user data and filter by region + market segment + partner category + subregion
     const usersWithStats = await Promise.all(
       userStats.map(async (stat) => {
         const user = await this.getUser(stat.userId);
@@ -2466,6 +2475,33 @@ export class DatabaseStorage implements IStorage {
         // Filter by region if specified
         if (criteria.region && criteria.region !== "all" && user.region !== criteria.region) {
           return null;
+        }
+
+        // Filter by market segment if specified (null = applies to all)
+        if (criteria.marketSegment && user.marketSegment !== criteria.marketSegment) {
+          return null;
+        }
+
+        // Filter by partner category if specified (null = applies to all)
+        if (criteria.partnerCategory && user.partnerCategory !== criteria.partnerCategory) {
+          return null;
+        }
+
+        // Filter by region subcategory if specified (null = applies to all)
+        if (criteria.regionSubcategory) {
+          // Handle special case: "COLOMBIA & CENTRO AMÉRICA" means both
+          if (criteria.regionSubcategory.includes('&')) {
+            const subregions = criteria.regionSubcategory.split('&').map(s => s.trim().toUpperCase());
+            const userSubregion = (user.regionSubcategory || '').toUpperCase();
+            if (!subregions.some(sr => userSubregion.includes(sr))) {
+              return null;
+            }
+          } else {
+            // Exact match for single subregion
+            if ((user.regionSubcategory || '').toUpperCase() !== criteria.regionSubcategory.toUpperCase()) {
+              return null;
+            }
+          }
         }
 
         // Filter by minimum requirements
@@ -2507,6 +2543,93 @@ export class DatabaseStorage implements IStorage {
       }));
 
     return filteredRanking;
+  }
+
+  async getUserGrandPrize(user: User): Promise<GrandPrizeCriteria | null> {
+    // Find the grand prize that matches the user's profile most specifically
+    // Priority: region + marketSegment + partnerCategory + subregion
+    // Then fallback to less specific combinations
+
+    const filters = [eq(grandPrizeCriteria.isActive, true)];
+
+    // Must match region
+    if (user.region) {
+      filters.push(eq(grandPrizeCriteria.region, user.region));
+    }
+
+    const allCriteria = await db
+      .select()
+      .from(grandPrizeCriteria)
+      .where(and(...filters));
+
+    if (allCriteria.length === 0) {
+      return null;
+    }
+
+    // Score each criterion by how specifically it matches the user
+    const scored = allCriteria.map(criterion => {
+      let score = 0;
+
+      // Match market segment (highest priority)
+      if (criterion.marketSegment) {
+        if (user.marketSegment === criterion.marketSegment) {
+          score += 1000;
+        } else {
+          return null; // Doesn't match - exclude
+        }
+      }
+
+      // Match partner category
+      if (criterion.partnerCategory) {
+        if (user.partnerCategory === criterion.partnerCategory) {
+          score += 100;
+        } else {
+          // Check for "SILVER & REGISTERED" special case
+          if (criterion.partnerCategory.includes('&')) {
+            const categories = criterion.partnerCategory.split('&').map(c => c.trim().toUpperCase());
+            const userCat = (user.partnerCategory || '').toUpperCase();
+            if (categories.some(cat => userCat.includes(cat))) {
+              score += 100;
+            } else {
+              return null; // Doesn't match
+            }
+          } else {
+            return null; // Doesn't match - exclude
+          }
+        }
+      }
+
+      // Match region subcategory
+      if (criterion.regionSubcategory) {
+        const userSubregion = (user.regionSubcategory || '').toUpperCase();
+        
+        // Handle "COLOMBIA & CENTRO AMÉRICA" case
+        if (criterion.regionSubcategory.includes('&')) {
+          const subregions = criterion.regionSubcategory.split('&').map(s => s.trim().toUpperCase());
+          if (subregions.some(sr => userSubregion.includes(sr))) {
+            score += 10;
+          } else {
+            return null; // Doesn't match
+          }
+        } else {
+          if (userSubregion.includes(criterion.regionSubcategory.toUpperCase())) {
+            score += 10;
+          } else {
+            return null; // Doesn't match
+          }
+        }
+      }
+
+      return { criterion, score };
+    }).filter(item => item !== null);
+
+    if (scored.length === 0) {
+      return null;
+    }
+
+    // Sort by score descending and return the best match
+    scored.sort((a, b) => b!.score - a!.score);
+    return scored[0]!.criterion;
   }
 
   // Monthly Prizes methods
