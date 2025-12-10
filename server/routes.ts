@@ -4358,6 +4358,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.post("/api/admin/grand-prize/criteria", async (req, res) => {
+    if (!req.session.userId) {
+      return res.status(401).json({ message: "Authentication required" });
+    }
+    
     const userRole = req.session?.userRole;
     
     if (!isAdminRole(userRole)) {
@@ -4369,12 +4373,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(criteria);
     } catch (error) {
       console.error("Create grand prize criteria error:", error);
-      res.status(500).json({ message: "Failed to create grand prize criteria" });
+      res.status(500).json({ message: "Failed to create grand prize criteria", error: error instanceof Error ? error.message : String(error) });
     }
   });
 
   app.patch("/api/admin/grand-prize/criteria/:id", async (req, res) => {
-    if (!req.session.userId || req.session.userRole !== "admin") {
+    if (!req.session.userId) {
+      return res.status(401).json({ message: "Authentication required" });
+    }
+    
+    if (req.session.userRole !== "admin" && req.session.userRole !== "super-admin" && req.session.userRole !== "regional-admin") {
       return res.status(403).json({ message: "Admin access required" });
     }
 
@@ -4384,12 +4392,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(criteria);
     } catch (error) {
       console.error("Update grand prize criteria error:", error);
-      res.status(500).json({ message: "Failed to update grand prize criteria" });
+      res.status(500).json({ message: "Failed to update grand prize criteria", error: error instanceof Error ? error.message : String(error) });
     }
   });
 
   app.delete("/api/admin/grand-prize/criteria/:id", async (req, res) => {
-    if (!req.session.userId || req.session.userRole !== "admin") {
+    if (!req.session.userId) {
+      return res.status(401).json({ message: "Authentication required" });
+    }
+    
+    if (req.session.userRole !== "admin" && req.session.userRole !== "super-admin" && req.session.userRole !== "regional-admin") {
       return res.status(403).json({ message: "Admin access required" });
     }
 
@@ -4399,7 +4411,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Criteria deleted successfully" });
     } catch (error) {
       console.error("Delete grand prize criteria error:", error);
-      res.status(500).json({ message: "Failed to delete grand prize criteria" });
+      res.status(500).json({ message: "Failed to delete grand prize criteria", error: error instanceof Error ? error.message : String(error) });
     }
   });
 
@@ -4426,7 +4438,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.get("/api/admin/grand-prize/ranking/:criteriaId", async (req, res) => {
-    if (!req.session.userId || req.session.userRole !== "admin") {
+    if (!req.session.userId) {
+      return res.status(401).json({ message: "Authentication required" });
+    }
+    
+    const userRole = req.session?.userRole;
+    if (!isAdminRole(userRole)) {
       return res.status(403).json({ message: "Admin access required" });
     }
 

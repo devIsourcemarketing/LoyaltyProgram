@@ -69,27 +69,24 @@ interface Reward {
 function GrandPrizeCard() {
   const { t } = useTranslation();
   
-  const { data: grandPrize, isLoading } = useQuery({
+  const { data: grandPrize, isLoading, error } = useQuery({
     queryKey: ["/api/users/my-grand-prize"],
     queryFn: async () => {
       const response = await fetch("/api/users/my-grand-prize", { credentials: "include" });
-      if (!response.ok) return null;
+      if (!response.ok) {
+        if (response.status === 404 || response.status === 401) {
+          return null; // No prize for this user
+        }
+        throw new Error('Failed to fetch grand prize');
+      }
       return response.json();
     },
+    retry: false,
   });
 
-  if (isLoading) {
-    return (
-      <Card>
-        <CardContent className="p-6">
-          <Skeleton className="h-32 w-full" />
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (!grandPrize) {
-    return null; // No specific prize for this user
+  // Don't show anything while loading or if there's no prize
+  if (isLoading || !grandPrize) {
+    return null;
   }
 
   const getRankingLabel = (position: number) => {
