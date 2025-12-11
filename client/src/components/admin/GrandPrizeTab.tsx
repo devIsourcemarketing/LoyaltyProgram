@@ -62,14 +62,14 @@ export default function GrandPrizeTab() {
     minPoints: 0,
     minDeals: 0,
     // region se asigna automáticamente del contexto
-    marketSegment: "",
-    partnerCategory: "",
-    regionSubcategory: "",
+    marketSegment: "_all",
+    partnerCategory: "_all",
+    regionSubcategory: "_none",
     prizeDescription: "",
     prizeLocation: "",
-    prizeCountry: "",
+    prizeCountry: "_none",
     prizeDate: "",
-    prizeRound: "",
+    prizeRound: "_none",
     rankingPosition: 1,
     startDate: "",
     endDate: "",
@@ -171,14 +171,14 @@ export default function GrandPrizeTab() {
         minPoints: 0,
         minDeals: 0,
         // region se asigna automáticamente del contexto
-        marketSegment: "",
-        partnerCategory: "",
-        regionSubcategory: "",
+        marketSegment: "_all",
+        partnerCategory: "_all",
+        regionSubcategory: "_none",
         prizeDescription: "",
         prizeLocation: "",
-        prizeCountry: "",
+        prizeCountry: "_none",
         prizeDate: "",
-        prizeRound: "",
+        prizeRound: "_none",
         rankingPosition: 1,
         startDate: "",
         endDate: "",
@@ -235,12 +235,34 @@ export default function GrandPrizeTab() {
   });
 
   const handleSaveCriteria = () => {
-    // SIMPLE: Automáticamente usar la región del contexto
-    const dataToSave = {
+    // Limpiar valores especiales antes de enviar al backend
+    const cleanedCriteria: any = {
       ...criteria,
       region: selectedRegion, // Siempre usar la región seleccionada arriba
+      marketSegment: criteria.marketSegment === "_all" ? null : criteria.marketSegment,
+      partnerCategory: criteria.partnerCategory === "_all" ? null : criteria.partnerCategory,
+      regionSubcategory: criteria.regionSubcategory === "_none" || !criteria.regionSubcategory ? null : criteria.regionSubcategory,
+      prizeCountry: criteria.prizeCountry === "_none" ? null : criteria.prizeCountry,
+      prizeRound: criteria.prizeRound === "_none" ? null : criteria.prizeRound,
+      // Limpiar campos vacíos
+      prizeDescription: criteria.prizeDescription || null,
+      prizeLocation: criteria.prizeLocation || null,
+      prizeDate: criteria.prizeDate || null,
+      startDate: criteria.startDate || null,
+      endDate: criteria.endDate || null,
+      redemptionStartDate: criteria.redemptionStartDate || null,
+      redemptionEndDate: criteria.redemptionEndDate || null,
     };
-    saveCriteriaMutation.mutate(dataToSave);
+    
+    // Remover campos undefined del objeto
+    Object.keys(cleanedCriteria).forEach(key => {
+      if (cleanedCriteria[key] === undefined) {
+        delete cleanedCriteria[key];
+      }
+    });
+    
+    console.log('Saving grand prize criteria:', cleanedCriteria);
+    saveCriteriaMutation.mutate(cleanedCriteria);
   };
 
   const handleEditCriteria = (criteriaToEdit: GrandPrizeCriteria) => {
@@ -253,12 +275,12 @@ export default function GrandPrizeTab() {
       region: criteriaToEdit.region || "all",
       marketSegment: criteriaToEdit.marketSegment || "_all",
       partnerCategory: criteriaToEdit.partnerCategory || "_all",
-      regionSubcategory: criteriaToEdit.regionSubcategory || "",
+      regionSubcategory: criteriaToEdit.regionSubcategory || "_none",
       prizeDescription: criteriaToEdit.prizeDescription || "",
       prizeLocation: criteriaToEdit.prizeLocation || "",
-      prizeCountry: criteriaToEdit.prizeCountry || "",
+      prizeCountry: criteriaToEdit.prizeCountry || "_none",
       prizeDate: criteriaToEdit.prizeDate || "",
-      prizeRound: criteriaToEdit.prizeRound || "",
+      prizeRound: criteriaToEdit.prizeRound || "_none",
       rankingPosition: criteriaToEdit.rankingPosition || 1,
       startDate: criteriaToEdit.startDate ? new Date(criteriaToEdit.startDate).toISOString().split('T')[0] : "",
       endDate: criteriaToEdit.endDate ? new Date(criteriaToEdit.endDate).toISOString().split('T')[0] : "",
@@ -279,14 +301,14 @@ export default function GrandPrizeTab() {
       minPoints: 0,
       minDeals: 0,
       region: "all",
-      marketSegment: "",
-      partnerCategory: "",
-      regionSubcategory: "",
+      marketSegment: "_all",
+      partnerCategory: "_all",
+      regionSubcategory: "_none",
       prizeDescription: "",
       prizeLocation: "",
-      prizeCountry: "",
+      prizeCountry: "_none",
       prizeDate: "",
-      prizeRound: "",
+      prizeRound: "_none",
       rankingPosition: 1,
       startDate: "",
       endDate: "",

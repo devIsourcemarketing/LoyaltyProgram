@@ -77,12 +77,19 @@ function GrandPrizeCard() {
         if (response.status === 404 || response.status === 401) {
           return null; // No prize for this user
         }
-        throw new Error('Failed to fetch grand prize');
+        const errorText = await response.text();
+        console.error('Grand Prize fetch error:', response.status, errorText);
+        throw new Error(`Failed to fetch grand prize: ${errorText}`);
       }
-      return response.json();
+      const data = await response.json();
+      console.log('Grand Prize data received:', data);
+      return data;
     },
     retry: false,
   });
+
+  // Log the query state for debugging
+  console.log('GrandPrizeCard state:', { isLoading, error: error?.message, hasData: !!grandPrize });
 
   // Don't show anything while loading or if there's no prize
   if (isLoading || !grandPrize) {

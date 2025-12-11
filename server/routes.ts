@@ -4388,10 +4388,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     try {
       const { id } = req.params;
+      console.log('Updating grand prize criteria:', id, 'with data:', JSON.stringify(req.body, null, 2));
       const criteria = await storage.updateGrandPrizeCriteria(id, req.body);
+      console.log('Updated criteria successfully:', criteria?.id);
       res.json(criteria);
     } catch (error) {
       console.error("Update grand prize criteria error:", error);
+      if (error instanceof Error) {
+        console.error("Error stack:", error.stack);
+      }
       res.status(500).json({ message: "Failed to update grand prize criteria", error: error instanceof Error ? error.message : String(error) });
     }
   });
