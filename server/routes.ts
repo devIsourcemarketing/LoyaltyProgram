@@ -2379,7 +2379,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // CSV upload routes
   app.post("/api/admin/csv/upload-url", async (req, res) => {
     const userRole = req.session?.userRole;
+    console.log(`📋 CSV Upload URL Request - User Role: ${userRole}, isAdminRole: ${isAdminRole(userRole)}`);
+    
     if (!isAdminRole(userRole)) {
+      console.log(`❌ Access denied for role: ${userRole}`);
       return res.status(403).json({ message: "Admin access required" });
     }
 
@@ -2393,7 +2396,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const baseUrl = process.env.APP_URL || `${protocol}://${host}`;
       
       const uploadURL = `${baseUrl}/api/admin/csv/upload/${uploadId}`;
-      console.log(`📋 Generated upload URL: ${uploadURL}`);
+      console.log(`✅ Generated upload URL for ${userRole}: ${uploadURL}`);
       res.json({ uploadURL });
     } catch (error) {
       console.error("Error getting upload URL:", error);
@@ -2404,7 +2407,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Receive CSV upload
   app.put("/api/admin/csv/upload/:uploadId", async (req, res) => {
     const userRole = req.session?.userRole;
+    console.log(`📤 CSV Upload Data - User Role: ${userRole}, Upload ID: ${req.params.uploadId}`);
+    
     if (!isAdminRole(userRole)) {
+      console.log(`❌ Upload access denied for role: ${userRole}`);
       return res.status(403).json({ message: "Admin access required" });
     }
 
@@ -2422,7 +2428,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
         global.csvUploads[req.params.uploadId] = csvContent;
         
-        console.log(`📤 CSV uploaded: ${req.params.uploadId}, size: ${csvContent.length} bytes`);
+        console.log(`✅ CSV uploaded by ${userRole}: ${req.params.uploadId}, size: ${csvContent.length} bytes`);
         console.log(`📋 First 200 chars: ${csvContent.substring(0, 200)}`);
         
         res.json({ 
@@ -2517,13 +2523,106 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/admin/csv/process", async (req, res) => {
     const userRole = req.session?.userRole;
+    console.log(`⚙️ CSV Process Request - User Role: ${userRole}, isAdminRole: ${isAdminRole(userRole)}`);
+    
     if (!isAdminRole(userRole)) {
+      console.log(`❌ Process access denied for role: ${userRole}`);
       return res.status(403).json({ message: "Admin access required" });
     }
 
     try {
+      // Detect user language for error messages
+      const userLanguage = await detectPreferredLanguage(req);
+      
+      // Translation helper for CSV errors
+      const t = (key: string, params?: Record<string, any>): string => {
+        const translations: Record<string, Record<string, string>> = {
+          en: {
+            columnMismatch: 'Column count mismatch',
+            userRequired: 'User identifier (email or username) is required',
+            invalidAmount: `Amount must be a valid number (received: "${params?.value}")`,
+            invalidType: `TYPE OF DEAL must be NEW CLIENT, RENEWAL, or UPSELL (received: "${params?.value}")`,
+            dealIdRequired: 'DEAL ID is required',
+            invalidStatus: `Status must be pending, approved, or rejected (received: "${params?.value}")`,
+            invalidDate: `Invalid date format. Use MM/DD/YYYY or DD/MM/YYYY (received: "${params?.value}")`,
+            userNotFound: `User '${params?.user}' not found in system`,
+            duplicate: `License agreement number '${params?.dealId}' already exists in system`,
+            insertFailed: `Failed to insert deal: ${params?.error}`,
+            noValidDeals: 'No valid deals to import',
+            errorsFound: '{count} error(s): {summary}',
+            duplicates: 'duplicate(s)',
+            usersNotFound: 'user(s) not found',
+            formatErrors: 'format error(s)',
+            missingFields: 'missing field(s)',
+            invalidDates: 'invalid date(s)',
+            importSuccess: 'Successfully imported {valid} of {total} deal(s) ({rate}% success rate)',
+            invalidFormat: `CSV must have either English format (USER ID, TYPE OF DEAL, DEAL ID, AMOUNT USD, DATE) or Spanish format (usuario, valor, status, tipo). Found: ${params?.headers}`,
+            minTwoRows: 'CSV file must have at least a header and one data row',
+            csvNotFound: 'CSV file not found. Please upload again.',
+          },
+          es: {
+            columnMismatch: 'No coincide el número de columnas',
+            userRequired: 'Se requiere identificador de usuario (email o nombre de usuario)',
+            invalidAmount: `El monto debe ser un número válido (recibido: "${params?.value}")`,
+            invalidType: `TIPO DE DEAL debe ser NEW CLIENT, RENEWAL o UPSELL (recibido: "${params?.value}")`,
+            dealIdRequired: 'Se requiere DEAL ID',
+            invalidStatus: `El estado debe ser pending, approved o rejected (recibido: "${params?.value}")`,
+            invalidDate: `Formato de fecha inválido. Use MM/DD/YYYY o DD/MM/YYYY (recibido: "${params?.value}")`,
+            userNotFound: `Usuario '${params?.user}' no encontrado en el sistema`,
+            duplicate: `El número de acuerdo '${params?.dealId}' ya existe en el sistema`,
+            insertFailed: `Error al insertar deal: ${params?.error}`,
+            noValidDeals: 'No hay deals válidos para importar',
+            errorsFound: '{count} error(es): {summary}',
+            duplicates: 'duplicado(s)',
+            usersNotFound: 'usuario(s) no encontrado(s)',
+            formatErrors: 'error(es) de formato',
+            missingFields: 'campo(s) faltante(s)',
+            invalidDates: 'fecha(s) inválida(s)',
+            importSuccess: '{valid} de {total} deal(s) importados exitosamente ({rate}% de éxito)',
+            invalidFormat: `El CSV debe tener formato Inglés (USER ID, TYPE OF DEAL, DEAL ID, AMOUNT USD, DATE) o Español (usuario, valor, status, tipo). Encontrado: ${params?.headers}`,
+            minTwoRows: 'El archivo CSV debe tener al menos un encabezado y una fila de datos',
+            csvNotFound: 'Archivo CSV no encontrado. Por favor, vuelva a cargar.',
+          },
+          pt: {
+            columnMismatch: 'Número de colunas não corresponde',
+            userRequired: 'Identificador de usuário (email ou nome de usuário) é obrigatório',
+            invalidAmount: `O valor deve ser um número válido (recebido: "${params?.value}")`,
+            invalidType: `TIPO DE DEAL deve ser NEW CLIENT, RENEWAL ou UPSELL (recebido: "${params?.value}")`,
+            dealIdRequired: 'DEAL ID é obrigatório',
+            invalidStatus: `O status deve ser pending, approved ou rejected (recebido: "${params?.value}")`,
+            invalidDate: `Formato de data inválido. Use MM/DD/YYYY ou DD/MM/YYYY (recebido: "${params?.value}")`,
+            userNotFound: `Usuário '${params?.user}' não encontrado no sistema`,
+            duplicate: `O número de acordo '${params?.dealId}' já existe no sistema`,
+            insertFailed: `Falha ao inserir deal: ${params?.error}`,
+            noValidDeals: 'Não há deals válidos para importar',
+            errorsFound: '{count} erro(s): {summary}',
+            duplicates: 'duplicado(s)',
+            usersNotFound: 'usuário(s) não encontrado(s)',
+            formatErrors: 'erro(s) de formato',
+            missingFields: 'campo(s) ausente(s)',
+            invalidDates: 'data(s) inválida(s)',
+            importSuccess: '{valid} de {total} deal(s) importados com sucesso ({rate}% de sucesso)',
+            invalidFormat: `O CSV deve ter formato Inglês (USER ID, TYPE OF DEAL, DEAL ID, AMOUNT USD, DATE) ou Espanhol (usuario, valor, status, tipo). Encontrado: ${params?.headers}`,
+            minTwoRows: 'O arquivo CSV deve ter pelo menos um cabeçalho e uma linha de dados',
+            csvNotFound: 'Arquivo CSV não encontrado. Por favor, faça upload novamente.',
+          },
+        };
+        
+        const lang = translations[userLanguage] || translations.en;
+        let text = lang[key] || translations.en[key] || key;
+        
+        // Replace placeholders
+        if (params) {
+          Object.keys(params).forEach(k => {
+            text = text.replace(`{${k}}`, String(params[k]));
+          });
+        }
+        
+        return text;
+      };
+      
       const { csvPath } = req.body;
-      console.log(`🔄 Processing CSV request. csvPath:`, csvPath);
+      console.log(`🔄 Processing CSV request by ${userRole}. csvPath:`, csvPath);
       console.log(`📊 Request body:`, req.body);
       console.log(`📂 Available uploads:`, Object.keys(global.csvUploads || {}));
       
@@ -2545,14 +2644,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const csvContent = global.csvUploads?.[uploadId];
       if (!csvContent) {
         console.error(`❌ CSV not found in memory with ID: ${uploadId}`);
-        return res.status(404).json({ message: "CSV file not found. Please upload again." });
+        return res.status(404).json({ message: t('csvNotFound') });
       }
       
-      console.log(`✅ Found CSV in memory, length: ${csvContent.length} bytes`);
+      console.log(`✅ Found CSV in memory for ${userRole}, length: ${csvContent.length} bytes`);
       console.log(`📄 First 200 chars:`, csvContent.substring(0, 200));
       
       // Helper function to parse CSV line respecting quotes
-      function parseCSVLine(line: string): string[] {
+      const parseCSVLine = (line: string): string[] => {
         const result = [];
         let current = '';
         let inQuotes = false;
@@ -2571,14 +2670,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
         result.push(current.trim());
         return result;
-      }
+      };
       
       // Parse CSV content
       const lines = csvContent.trim().split('\n');
       console.log(`📝 Total lines: ${lines.length}`);
       
       if (lines.length < 2) {
-        return res.status(400).json({ message: "CSV file must have at least a header and one data row" });
+        return res.status(400).json({ message: t('minTwoRows') });
       }
 
       const header = parseCSVLine(lines[0].toLowerCase());
@@ -2592,7 +2691,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!isEnglishFormat && !isSpanishFormat) {
         return res.status(400).json({ 
-          message: `CSV must have either English format (USER ID, TYPE OF DEAL, DEAL ID, AMOUNT USD, DATE) or Spanish format (usuario, valor, status, tipo). Found: ${header.join(', ')}` 
+          message: t('invalidFormat', { headers: header.join(', ') })
         });
       }
 
@@ -2616,8 +2715,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         dateIndex = -1; // Not used in Spanish format
       }
 
+      // Error tracking with categories
+      interface CSVError {
+        row: number;
+        type: 'duplicate' | 'user_not_found' | 'invalid_format' | 'missing_field' | 'invalid_date';
+        message: string;
+        field?: string;
+      }
+      
       const dealsToInsert = [];
-      const errors = [];
+      const errors: CSVError[] = [];
+      const errorStats = {
+        duplicate: 0,
+        user_not_found: 0,
+        invalid_format: 0,
+        missing_field: 0,
+        invalid_date: 0,
+      };
 
       // Process each data row
       for (let i = 1; i < lines.length; i++) {
@@ -2625,7 +2739,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log(`📝 Row ${i + 1} parsed:`, row);
         
         if (row.length < header.length - 1) { // Allow optional columns
-          errors.push(`Row ${i + 1}: Column count mismatch`);
+          errors.push({ row: i + 1, type: 'invalid_format', message: t('columnMismatch') });
+          errorStats.invalid_format++;
           continue;
         }
 
@@ -2659,28 +2774,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         // Validate data
         if (!userIdentifier) {
-          errors.push(`Row ${i + 1}: User identifier (email or username) is required`);
+          errors.push({ row: i + 1, type: 'missing_field', message: t('userRequired'), field: 'user' });
+          errorStats.missing_field++;
           continue;
         }
 
         if (!amountStr || isNaN(parseFloat(amountStr))) {
           console.log(`❌ Row ${i + 1} - Invalid amount: "${amountStr}", isNaN: ${isNaN(parseFloat(amountStr))}`);
-          errors.push(`Row ${i + 1}: Amount must be a valid number`);
+          errors.push({ row: i + 1, type: 'invalid_format', message: t('invalidAmount', { value: amountStr }), field: 'amount' });
+          errorStats.invalid_format++;
           continue;
         }
 
         if (isEnglishFormat) {
           if (!['NEW CLIENT', 'RENEWAL', 'UPSELL'].includes(typeOfDeal)) {
-            errors.push(`Row ${i + 1}: TYPE OF DEAL must be NEW CLIENT, RENEWAL, or UPSELL`);
+            errors.push({ row: i + 1, type: 'invalid_format', message: t('invalidType', { value: typeOfDeal }), field: 'type' });
+            errorStats.invalid_format++;
             continue;
           }
           if (!dealId) {
-            errors.push(`Row ${i + 1}: DEAL ID is required`);
+            errors.push({ row: i + 1, type: 'missing_field', message: t('dealIdRequired'), field: 'dealId' });
+            errorStats.missing_field++;
             continue;
           }
         } else {
           if (!['pending', 'approved', 'rejected'].includes(status)) {
-            errors.push(`Row ${i + 1}: Status must be pending, approved, or rejected`);
+            errors.push({ row: i + 1, type: 'invalid_format', message: t('invalidStatus', { value: status }), field: 'status' });
+            errorStats.invalid_format++;
             continue;
           }
         }
@@ -2706,11 +2826,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
             
             if (isNaN(closeDate.getTime())) {
-              errors.push(`Row ${i + 1}: Invalid date format. Use MM/DD/YYYY or DD/MM/YYYY`);
+              errors.push({ row: i + 1, type: 'invalid_date', message: t('invalidDate', { value: dateStr }), field: 'date' });
+              errorStats.invalid_date++;
               continue;
             }
           } catch (error) {
-            errors.push(`Row ${i + 1}: Invalid date format`);
+            errors.push({ row: i + 1, type: 'invalid_date', message: t('invalidDate', { value: dateStr }), field: 'date' });
+            errorStats.invalid_date++;
             continue;
           }
         } else {
@@ -2726,7 +2848,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
         
         if (!user) {
-          errors.push(`Row ${i + 1}: User '${userIdentifier}' not found`);
+          errors.push({ row: i + 1, type: 'user_not_found', message: t('userNotFound', { user: userIdentifier }), field: 'user' });
+          errorStats.user_not_found++;
           continue;
         }
 
@@ -2747,7 +2870,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (dealId) {
           const existingDeal = await storage.getDealByLicenseNumber(dealId);
           if (existingDeal) {
-            errors.push(`Row ${i + 1}: Duplicate license agreement number '${dealId}' (already exists as deal #${existingDeal.id})`);
+            errors.push({ row: i + 1, type: 'duplicate', message: t('duplicate', { dealId }), field: 'dealId' });
+            errorStats.duplicate++;
             continue;
           }
         }
@@ -2771,11 +2895,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       if (errors.length > 0 && dealsToInsert.length === 0) {
+        console.log(`❌ All deals failed validation. Errors:`, errors);
+        
+        // Create user-friendly error summary with translations
+        const errorSummary = [];
+        if (errorStats.duplicate > 0) errorSummary.push(`${errorStats.duplicate} ${t('duplicates')}`);
+        if (errorStats.user_not_found > 0) errorSummary.push(`${errorStats.user_not_found} ${t('usersNotFound')}`);
+        if (errorStats.invalid_format > 0) errorSummary.push(`${errorStats.invalid_format} ${t('formatErrors')}`);
+        if (errorStats.missing_field > 0) errorSummary.push(`${errorStats.missing_field} ${t('missingFields')}`);
+        if (errorStats.invalid_date > 0) errorSummary.push(`${errorStats.invalid_date} ${t('invalidDates')}`);
+        
+        const errorMessage = t('errorsFound', { 
+          count: errors.length, 
+          summary: errorSummary.join(', ') 
+        });
+        
         return res.status(400).json({ 
-          message: "No valid deals to import", 
-          errors: errors.slice(0, 10) // Limit error messages
+          success: false,
+          message: `${t('noValidDeals')}. ${errorMessage}`,
+          stats: {
+            total_rows: lines.length - 1,
+            valid_deals: 0,
+            failed_deals: errors.length,
+            errors_by_type: errorStats,
+          },
+          detailedErrors: errors, // Full error objects for modal
+          errorStats: errorStats, // Error statistics for modal
+          importedCount: 0,
+          totalProcessed: lines.length - 1,
+          errors: errors.slice(0, 15).map(e => `Row ${e.row}: ${e.message}`),
+          has_more_errors: errors.length > 15,
         });
       }
+      
+      if (errors.length > 0) {
+        console.log(`⚠️ Some deals had errors (${errors.length}):`, errors.slice(0, 5));
+      }
+      
+      console.log(`✅ ${dealsToInsert.length} deals ready to insert`);
 
       // Insert deals
       const insertedDeals = [];
@@ -2855,15 +3012,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         } catch (error) {
           console.error("Error inserting deal:", error);
-          errors.push(`Failed to insert deal for user ${dealData.userId}`);
+          errors.push({ row: 0, type: 'invalid_format', message: t('insertFailed', { error: error instanceof Error ? error.message : 'Unknown error' }) });
+          errorStats.invalid_format++;
         }
       }
 
-      res.json({
-        message: `Successfully imported ${insertedDeals.length} deals`,
-        imported: insertedDeals.length,
-        errors: errors.length > 0 ? errors.slice(0, 10) : undefined
+      // Calculate success statistics
+      const totalRows = lines.length - 1; // Exclude header
+      const successRate = totalRows > 0 ? ((insertedDeals.length / totalRows) * 100).toFixed(1) : '0';
+      
+      // Create response with detailed statistics and translated message
+      const successMessage = t('importSuccess', { 
+        valid: insertedDeals.length, 
+        total: totalRows, 
+        rate: successRate 
       });
+      
+      const response: any = {
+        success: true,
+        message: successMessage,
+        stats: {
+          total_rows: totalRows,
+          valid_deals: insertedDeals.length,
+          failed_deals: errors.length,
+          success_rate: `${successRate}%`,
+        },
+        imported: insertedDeals.length,
+        importedCount: insertedDeals.length,
+        totalProcessed: totalRows,
+      };
+      
+      // Add error details if any occurred
+      if (errors.length > 0) {
+        const errorSummary = [];
+        if (errorStats.duplicate > 0) errorSummary.push(`${errorStats.duplicate} ${t('duplicates')}`);
+        if (errorStats.user_not_found > 0) errorSummary.push(`${errorStats.user_not_found} ${t('usersNotFound')}`);
+        if (errorStats.invalid_format > 0) errorSummary.push(`${errorStats.invalid_format} ${t('formatErrors')}`);
+        if (errorStats.missing_field > 0) errorSummary.push(`${errorStats.missing_field} ${t('missingFields')}`);
+        if (errorStats.invalid_date > 0) errorSummary.push(`${errorStats.invalid_date} ${t('invalidDates')}`);
+        
+        const errorMessage = t('errorsFound', { 
+          count: errors.length, 
+          summary: errorSummary.join(', ') 
+        });
+        
+        response.message += `. ${errorMessage}`;
+        response.stats.errors_by_type = errorStats;
+        response.detailedErrors = errors; // Full error objects for modal
+        response.errorStats = errorStats; // Error statistics for modal
+        response.errors = errors.slice(0, 15).map(e => `Row ${e.row}: ${e.message}`); // Backward compatibility
+        response.has_more_errors = errors.length > 15;
+      }
+      
+      console.log(`✅ CSV Import Complete - Success: ${insertedDeals.length}, Errors: ${errors.length}`);
+      res.json(response);
 
     } catch (error) {
       console.error("Error processing CSV:", error);

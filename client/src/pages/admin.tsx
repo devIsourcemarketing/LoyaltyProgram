@@ -49,6 +49,7 @@ import ProgramConfigTab from "@/components/admin/ProgramConfigTab";
 import GrandPrizeTab from "@/components/admin/GrandPrizeTab";
 import MonthlyPrizesTab from "@/components/admin/MonthlyPrizesTab";
 import MastersTab from "@/components/admin/MastersTab";
+import { CSVErrorModal } from "@/components/CSVErrorModal";
 import type { User, Deal, Reward } from "@shared/schema";
 import type { AuthUser } from "@/lib/auth";
 import type { UploadResult } from '@uppy/core';
@@ -156,6 +157,10 @@ export default function Admin() {
   const [selectedReward, setSelectedReward] = useState<Reward | null>(null);
   const [isCreateUserModalOpen, setIsCreateUserModalOpen] = useState(false);
   const [isEditUserModalOpen, setIsEditUserModalOpen] = useState(false);
+  const [csvErrorModalOpen, setCSVErrorModalOpen] = useState(false);
+  const [csvErrors, setCSVErrors] = useState<any[]>([]);
+  const [csvErrorStats, setCSVErrorStats] = useState<any>(null);
+  const [csvProcessingResult, setCSVProcessingResult] = useState<any>(null);
 
   // Obtener jerarquía de regiones desde la API
   const { data: regionHierarchy } = useQuery<RegionHierarchy>({
@@ -828,28 +833,64 @@ export default function Admin() {
 
   const processCSVMutation = useMutation({
     mutationFn: async (csvPath: string) => {
+      console.log(`⚙️ Processing CSV for role: ${currentUser?.role}, path: ${csvPath}`);
       const response = await apiRequest("POST", `/api/admin/csv/process`, { csvPath });
-      return await response.json();
+      const result = await response.json();
+      console.log(`✅ CSV processing response:`, result);
+      return result;
     },
     onSuccess: (data: any) => {
-      toast({
-        title: t("common.success"),
-        description: `${data.message}${data.errors ? `. ${data.errors.length} errors occurred.` : ''}`,
-      });
+      console.log(`🎉 CSV processing successful for ${currentUser?.role}:`, data);
+      
+      // If there are errors, show modal instead of toast
+      if (data.detailedErrors && data.detailedErrors.length > 0) {
+        setCSVErrors(data.detailedErrors);
+        setCSVErrorStats(data.errorStats);
+        setCSVProcessingResult({
+          totalProcessed: data.totalProcessed || 0,
+          successCount: data.importedCount || 0,
+        });
+        setCSVErrorModalOpen(true);
+      } else {
+        // No errors - show success toast
+        toast({
+          title: t('common.success'),
+          description: data.message || t('admin.csvImport.successTitle'),
+        });
+      }
+      
       queryClient.invalidateQueries({ queryKey: ["/api/admin/deals"] });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/deals/pending"] });
     },
     onError: (error: any) => {
-      toast({
-        title: t("common.error"),
-        description: error.message || "Failed to process CSV file",
-        variant: "destructive",
-      });
+      console.error(`❌ CSV processing failed for ${currentUser?.role}:`, error);
+      
+      // Extract error data from the error object
+      const errorData = error.data || {};
+      
+      // If error has detailed errors, show modal
+      if (errorData.detailedErrors && errorData.detailedErrors.length > 0) {
+        setCSVErrors(errorData.detailedErrors);
+        setCSVErrorStats(errorData.errorStats);
+        setCSVProcessingResult({
+          totalProcessed: errorData.totalProcessed || 0,
+          successCount: errorData.importedCount || 0,
+        });
+        setCSVErrorModalOpen(true);
+      } else {
+        // Generic error - show toast
+        toast({
+          title: t('common.error'),
+          description: error.message || t('common.error'),
+          variant: "destructive",
+        });
+      }
     },
   });
 
   const handleGetCSVUploadParameters = async () => {
     try {
+      console.log(`📋 Requesting CSV upload URL for role: ${currentUser?.role}`);
       const response = await apiRequest("POST", "/api/admin/csv/upload-url");
       const data: any = await response.json();
       
@@ -863,15 +904,17 @@ export default function Admin() {
         throw new Error("No upload URL received");
       }
       
+      console.log(`✅ Received upload URL: ${data.uploadURL}`);
       return {
         method: 'PUT' as const,
         url: data.uploadURL,
       };
     } catch (error) {
       console.error("Error getting upload parameters:", error);
+      console.error("User role:", currentUser?.role);
       toast({
         title: t("common.error"),
-        description: "Failed to get upload URL",
+        description: `Failed to get upload URL: ${error instanceof Error ? error.message : 'Unknown error'}`,
         variant: "destructive",
       });
       throw error;
@@ -879,15 +922,22 @@ export default function Admin() {
   };
 
   const handleCSVUploadComplete = (result: UploadResult<Record<string, unknown>, Record<string, unknown>>) => {
+    console.log(`📤 CSV upload complete for role: ${currentUser?.role}`);
+    console.log(`Upload result:`, result);
+    
     if (result.successful && result.successful.length > 0) {
       const uploadedFile = result.successful[0] as any;
       
       // Try different possible properties for the upload URL
       const uploadURL = uploadedFile.uploadURL || uploadedFile.url || uploadedFile.response?.uploadURL;
       
+      console.log(`Upload URL from result:`, uploadURL);
+      
       if (uploadURL) {
+        console.log(`🔄 Triggering CSV processing mutation for ${currentUser?.role}`);
         processCSVMutation.mutate(uploadURL);
       } else {
+        console.error("No upload URL found in result:", uploadedFile);
         toast({
           title: t("common.error"),
           description: "Failed to get upload URL from file upload",
@@ -3244,6 +3294,15 @@ export default function Admin() {
           setSelectedDeal(null);
         }}
         deal={selectedDeal}
+      />
+
+      <CSVErrorModal
+        isOpen={csvErrorModalOpen}
+        onClose={() => setCSVErrorModalOpen(false)}
+        errors={csvErrors}
+        errorStats={csvErrorStats}
+        totalProcessed={csvProcessingResult?.totalProcessed}
+        successCount={csvProcessingResult?.successCount}
       />
     </div>
   );

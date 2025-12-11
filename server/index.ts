@@ -27,6 +27,14 @@ const PgSession = connectPgSimple(session);
 const pgPool = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : undefined,
+  connectionTimeoutMillis: 10000, // 10 seconds
+  idleTimeoutMillis: 30000, // 30 seconds
+  max: 10, // Maximum connections for session pool
+});
+
+// Handle pool errors gracefully
+pgPool.on('error', (err) => {
+  console.error('❌ Unexpected error on idle client in session pool:', err);
 });
 
 // Session configuration with PostgreSQL store
