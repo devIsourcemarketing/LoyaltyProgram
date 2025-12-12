@@ -706,7 +706,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     try {
       const limit = req.query.limit ? parseInt(req.query.limit as string) : 5;
-      const topUsers = await storage.getTopUsersByGoals(limit); // Changed to use goals instead of points
+      // Get current user to determine their competitive group
+      const currentUser = await storage.getUser(userId);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Get leaderboard filtered by user's competitive group
+      const topUsers = await storage.getTopUsersByGoals(limit, currentUser);
       res.json(topUsers);
     } catch (error) {
       console.error("Failed to get leaderboard:", error);

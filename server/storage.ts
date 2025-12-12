@@ -167,7 +167,7 @@ export interface IStorage {
       totalPoints: number;
     }>
   >;
-  getTopUsersByGoals(limit?: number): Promise<
+  getTopUsersByGoals(limit?: number, filterByUser?: User): Promise<
     Array<{
       userId: string;
       username: string;
@@ -1162,7 +1162,7 @@ export class DatabaseStorage implements IStorage {
     }));
   }
 
-  async getTopUsersByGoals(limit = 5): Promise<
+  async getTopUsersByGoals(limit = 5, filterByUser?: User): Promise<
     Array<{
       userId: string;
       username: string;
@@ -1171,6 +1171,25 @@ export class DatabaseStorage implements IStorage {
       totalGoals: number;
     }>
   > {
+    // Build competitive group filters if user is provided
+    const userConditions = [eq(users.role, "user")];
+    
+    if (filterByUser) {
+      // Filter by competitive group: region + marketSegment + partnerCategory + regionSubcategory
+      if (filterByUser.region) {
+        userConditions.push(eq(users.region, filterByUser.region));
+      }
+      if (filterByUser.marketSegment) {
+        userConditions.push(eq(users.marketSegment, filterByUser.marketSegment));
+      }
+      if (filterByUser.partnerCategory) {
+        userConditions.push(eq(users.partnerCategory, filterByUser.partnerCategory));
+      }
+      if (filterByUser.regionSubcategory) {
+        userConditions.push(eq(users.regionSubcategory, filterByUser.regionSubcategory));
+      }
+    }
+
     const result = await db
       .select({
         userId: goalsHistory.userId,
@@ -1181,6 +1200,7 @@ export class DatabaseStorage implements IStorage {
       })
       .from(goalsHistory)
       .innerJoin(users, eq(goalsHistory.userId, users.id))
+      .where(and(...userConditions))
       .groupBy(
         goalsHistory.userId,
         users.username,

@@ -64,12 +64,12 @@ interface ReportsData {
 
 // User creation form schema
 const createUserSchema = z.object({
-  username: z.string().min(3, t('common.usernameMinLength')),
-  email: z.string().email(t('common.invalidEmailAddress')),
+  username: z.string().min(3, "Username must be at least 3 characters"),
+  email: z.string().email("Invalid email address"),
   password: z.string().optional(),
-  firstName: z.string().min(1, t('common.firstNameRequired')),
-  lastName: z.string().min(1, t('common.lastNameRequired')),
-  companyName: z.string().min(1, t('common.companyNameRequired')),
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  companyName: z.string().min(1, "Company name is required"),
   partnerCategory: z.string().min(1, "La categoría del partner es requerida"),
   marketSegment: z.string().min(1, "El segmento del mercado es requerido"),
   category: z.enum(["ENTERPRISE", "SMB", "MSSP"], {
@@ -91,11 +91,11 @@ const createUserSchema = z.object({
 
 // User edit form schema (without password)
 const editUserSchema = z.object({
-  username: z.string().min(3, t('common.usernameMinLength')),
-  email: z.string().email(t('common.invalidEmailAddress')),
-  firstName: z.string().min(1, t('common.firstNameRequired')),
-  lastName: z.string().min(1, t('common.lastNameRequired')),
-  companyName: z.string().min(1, t('common.companyNameRequired')),
+  username: z.string().min(3, "Username must be at least 3 characters"),
+  email: z.string().email("Invalid email address"),
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  companyName: z.string().min(1, "Company name is required"),
   partnerCategory: z.string().min(1, "La categoría del partner es requerida"),
   marketSegment: z.string().min(1, "El segmento del mercado es requerido"),
   category: z.enum(["ENTERPRISE", "SMB", "MSSP"], {
