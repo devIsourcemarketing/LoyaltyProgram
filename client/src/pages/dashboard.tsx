@@ -323,7 +323,7 @@ export default function Dashboard() {
                   <div className="flex-1">
                     <div className="text-gray-600 text-sm">{t('dashboard.totalGoalsAccumulated')}</div>
                     <div className="text-2xl font-bold text-gray-900" data-testid="text-total-goals">
-                      {statsLoading ? "..." : stats?.totalGoals?.toFixed(1) || "0"}
+                      {statsLoading ? "..." : Math.round(stats?.totalGoals || 0)}
                     </div>                    
                   </div>
                 </div>
@@ -336,7 +336,7 @@ export default function Dashboard() {
                   <div className="flex-1">
                     <div className="text-gray-600 text-sm">{t('dashboard.monthlyGoals')}</div>
                     <div className="text-2xl font-bold text-gray-900" data-testid="text-monthly-goals">
-                      {statsLoading ? "..." : stats?.monthlyGoals?.toFixed(1) || "0"}
+                      {statsLoading ? "..." : Math.round(stats?.monthlyGoals || 0)}
                     </div>
                     <div className="text-gray-500 text-xs">{t('dashboard.awaitingApproval')}</div>
                   </div>
@@ -566,7 +566,7 @@ export default function Dashboard() {
                         {/* Goals */}
                         <div className="text-right">
                           <div className="text-2xl font-bold text-blue-900 white-text">
-                            {currentUserData.totalGoals.toLocaleString()}
+                            {Math.round(currentUserData.totalGoals)}
                           </div>
                           <div className="text-sm text-blue-700 white-text">
                             {t('dashboard.goals').toLowerCase()}
@@ -714,7 +714,7 @@ export default function Dashboard() {
             <div className="px-6 py-5">
               <div className="flex justify-between items-center">
                 <h3 className="text-xl font-semibold text-white">{t('dashboard.plays')}</h3>
-                <p className="white-text">{t('dashboard.accumulated')} <strong><span className="text-green-600">{statsLoading ? "..." : stats?.totalGoals?.toFixed(1) || "0"} goles</span></strong></p>
+                <p className="white-text">{t('dashboard.accumulated')} <strong><span className="text-green-600">{statsLoading ? "..." : Math.round(stats?.totalGoals || 0)} goles</span></strong></p>
               </div>
             </div>
             <div className="overflow-x-auto">
@@ -760,7 +760,7 @@ export default function Dashboard() {
                       // RENEWAL: cada $2000 = 1 gol
                       const dealValueNum = Number(deal.dealValue);
                       const rate = deal.dealType === 'new_customer' ? 1000 : 2000;
-                      const goals = (dealValueNum / rate).toFixed(1);
+                      const goals = Math.round(dealValueNum / rate);
                       
                       return (
                       <tr key={deal.id} data-testid={`row-deal-${deal.id}`} className="transition-colors">

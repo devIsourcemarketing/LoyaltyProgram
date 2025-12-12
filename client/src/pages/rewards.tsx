@@ -334,7 +334,7 @@ export default function Rewards() {
                         <h3 className={`font-semibold ${isRedeemed ? 'text-gray-500' : 'text-gray-900'}`}>{reward.name}</h3>
                         <p className="text-sm text-gray-600 text-center">
                           <span className={`goal-number ${isRedeemed ? 'text-gray-500' : 'text-green-600'}`}>
-                            {reward.pointsCost.toLocaleString()}
+                            {stats ? Math.min(stats.availablePoints, reward.pointsCost).toLocaleString() : '0'}/{reward.pointsCost.toLocaleString()}
                           </span> Goles
                         </p>
                       </div>
@@ -529,10 +529,10 @@ export default function Rewards() {
                           )}
                           <div className="flex-1">
                             <h3 className="font-semibold text-gray-900" data-testid={`text-reward-name-${userReward.id}`}>
-                              {userReward.rewardName || 'Unknown Reward'}
+                              {userReward.rewardName || t('common.rewardNotFound')}
                             </h3>
                             <p className="text-sm text-gray-600">
-                              {userReward.pointsCost?.toLocaleString()} points • Redeemed: {new Date(userReward.redeemedAt).toLocaleDateString()}
+                              {userReward.pointsCost?.toLocaleString()} {t('dashboard.goals').toLowerCase()} • {t('rewards.redeemed')}: {new Date(userReward.redeemedAt).toLocaleDateString()}
                             </p>
                           
                           {/* Status Information */}
@@ -580,8 +580,8 @@ export default function Rewards() {
                           userReward.status === 'approved' ? 'bg-green-100 text-green-800 green-background white-text' :
                           userReward.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'
                         }`} data-testid={`badge-status-${userReward.id}`}>
-                          {userReward.status === 'approved' ? 'Approved' :
-                           userReward.status === 'pending' ? 'Pending' : 'Rejected'}
+                          {userReward.status === 'approved' ? t('rewards.approved') :
+                           userReward.status === 'pending' ? t('rewards.pending') : t('rewards.rejected')}
                         </Badge>
                       </div>
                     </div>

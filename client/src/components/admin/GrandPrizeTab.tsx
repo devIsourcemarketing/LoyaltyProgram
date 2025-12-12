@@ -937,13 +937,15 @@ export default function GrandPrizeTab() {
                         <p className="font-medium">
                           {entry.user.firstName} {entry.user.lastName}
                         </p>
-                        <p className="text-sm text-muted-foreground">{entry.user.email}</p>
+                        {index > 2 && (
+                          <p className="text-sm text-muted-foreground">{entry.user.email}</p>
+                        )}
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold text-lg">{entry.score.toFixed(2)} pts</p>
+                      <p className="font-semibold text-lg">{Math.round(entry.score)} pts</p>
                       <div className="flex gap-2 text-sm text-muted-foreground">
-                        <span>{entry.points} puntos</span>
+                        <span>{Math.round(entry.points)} puntos</span>
                         <span>•</span>
                         <span>{entry.deals} deals</span>
                       </div>

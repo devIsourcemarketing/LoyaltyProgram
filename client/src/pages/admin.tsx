@@ -1326,13 +1326,15 @@ export default function Admin() {
                         </div>
                         <div className="min-w-0 flex-1">
                           <h4 className="font-medium truncate">{user.firstName} {user.lastName}</h4>
-                          <p className="text-sm text-gray-600 truncate">
-                            {user.email} • {user.region}
-                          </p>
+                          {index > 2 && (
+                            <p className="text-sm text-gray-600 truncate">
+                              {user.email} • {user.region}
+                            </p>
+                          )}
                         </div>
                       </div>
                       <div className="text-left sm:text-right flex-shrink-0 w-full sm:w-auto">
-                        <p className="text-2xl font-bold text-[#29CCB1]">{user.points}</p>
+                        <p className="text-2xl font-bold text-[#29CCB1]">{Math.round(user.points)}</p>
                         <p className="text-xs text-gray-500">{t('points')}</p>
                       </div>
                     </div>
