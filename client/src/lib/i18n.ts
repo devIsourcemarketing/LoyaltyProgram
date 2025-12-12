@@ -1378,7 +1378,7 @@ const translations = {
           duplicateConfig: "A configuration already exists for this region, category, and subcategory combination",
         },
       },
-    },    
+    },
   },
   es: {
     validation: {
@@ -2014,8 +2014,7 @@ const translations = {
           </div>
         `
       }
-    }
-  },
+    },
     dashboard: {
       welcome: "Hola,",
       subtitleWelcome: "La emoción del fútbol también se vive en las ventas.",
@@ -2915,7 +2914,7 @@ const translations = {
           duplicateConfig: "Ya existe una configuración para esta combinación de región, categoría y subcategoría",
         },
       },
-    },    
+    },
   },
   pt: {
     validation: {
