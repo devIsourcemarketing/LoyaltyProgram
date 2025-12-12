@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MessageCircle, HelpCircle, X, Send } from "lucide-react";
+import { MessageCircle, HelpCircle, X, Send, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -35,7 +35,7 @@ import {
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
@@ -50,60 +50,90 @@ type SupportTicketForm = z.infer<typeof supportTicketSchema>;
 export default function SupportButton() {
   const { t } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
-
-  const faqs = [
-    {
-      question: t("support.faq.q1.question"),
-      answer: t("support.faq.q1.answer"),
-    },
-    {
-      question: t("support.faq.q2.question"),
-      answer: t("support.faq.q2.answer"),
-    },
-    {
-      question: t("support.faq.q3.question"),
-      answer: t("support.faq.q3.answer"),
-    },
-    {
-      question: t("support.faq.q4.question"),
-      answer: t("support.faq.q4.answer"),
-    },
-    {
-      question: t("support.faq.q5.question"),
-      answer: t("support.faq.q5.answer"),
-    },
-    {
-      question: t("support.faq.q6.question"),
-      answer: t("support.faq.q6.answer"),
-    },
-    {
-      question: t("support.faq.q7.question"),
-      answer: t("support.faq.q7.answer"),
-    },
-    {
-      question: t("support.faq.q8.question"),
-      answer: t("support.faq.q8.answer"),
-    },
-    {
-      question: t("support.faq.q9.question"),
-      answer: t("support.faq.q9.answer"),
-    },
-    {
-      question: t("support.faq.q10.question"),
-      answer: t("support.faq.q10.answer"),
-    },
-    {
-      question: t("support.faq.q11.question"),
-      answer: t("support.faq.q11.answer"),
-    },
-    {
-      question: t("support.faq.q12.question"),
-      answer: t("support.faq.q12.answer"),
-    },
-  ];
   const [ticketDialogOpen, setTicketDialogOpen] = useState(false);
   const [faqDialogOpen, setFaqDialogOpen] = useState(false);
+  const [termsDialogOpen, setTermsDialogOpen] = useState(false);
   const { toast } = useToast();
+
+  // Get current user to determine region
+  const { data: currentUser } = useQuery({
+    queryKey: ["/api/auth/me"],
+  });
+
+  const userRegion = (currentUser as any)?.region || "NOLA";
+
+  // Region-specific FAQs
+  const getFaqsByRegion = (region: string) => {
+    const baseFaqs = [
+      {
+        question: t("support.faq.q1.question"),
+        answer: t("support.faq.q1.answer"),
+      },
+      {
+        question: t("support.faq.q2.question"),
+        answer: t("support.faq.q2.answer"),
+      },
+      {
+        question: t("support.faq.q3.question"),
+        answer: t("support.faq.q3.answer"),
+      },
+      {
+        question: t("support.faq.q4.question"),
+        answer: t("support.faq.q4.answer"),
+      },
+      {
+        question: t("support.faq.q5.question"),
+        answer: t("support.faq.q5.answer"),
+      },
+      {
+        question: t("support.faq.q6.question"),
+        answer: t("support.faq.q6.answer"),
+      },
+      {
+        question: t("support.faq.q7.question"),
+        answer: t("support.faq.q7.answer"),
+      },
+      {
+        question: t("support.faq.q8.question"),
+        answer: t("support.faq.q8.answer"),
+      },
+      {
+        question: t("support.faq.q9.question"),
+        answer: t("support.faq.q9.answer"),
+      },
+      {
+        question: t("support.faq.q10.question"),
+        answer: t("support.faq.q10.answer"),
+      },
+      {
+        question: t("support.faq.q11.question"),
+        answer: t("support.faq.q11.answer"),
+      },
+      {
+        question: t("support.faq.q12.question"),
+        answer: t("support.faq.q12.answer"),
+      },
+    ];
+
+    // Add region-specific FAQs
+    if (region === "MEXICO") {
+      return [
+        ...baseFaqs,
+        {
+          question: t("support.faq.mexico.q1.question"),
+          answer: t("support.faq.mexico.q1.answer"),
+        },
+        {
+          question: t("support.faq.mexico.q2.question"),
+          answer: t("support.faq.mexico.q2.answer"),
+        },
+      ];
+    }
+
+    return baseFaqs;
+  };
+
+  const faqs = getFaqsByRegion(userRegion);
 
   const form = useForm<SupportTicketForm>({
     resolver: zodResolver(supportTicketSchema),
@@ -145,7 +175,7 @@ export default function SupportButton() {
     <>
       <div className="fixed bottom-6 right-6 z-50">
         {menuOpen && (
-          <div className="absolute bottom-16 right-0 bg-white rounded-lg shadow-lg border border-gray-200 p-2 w-48 mb-2">
+          <div className="absolute bottom-16 right-0 bg-white rounded-lg shadow-lg border border-gray-200 p-2 w-56 mb-2">
             <button
               onClick={() => {
                 setTicketDialogOpen(true);
@@ -167,6 +197,17 @@ export default function SupportButton() {
             >
               <HelpCircle className="h-4 w-4" />
               <span className="text-sm">{t('support.faqTitle')}</span>
+            </button>
+            <button
+              onClick={() => {
+                setTermsDialogOpen(true);
+                setMenuOpen(false);
+              }}
+              className="w-full flex items-center gap-2 px-4 py-2 text-left hover:bg-gray-100 rounded-md transition-colors"
+              data-testid="button-open-terms"
+            >
+              <FileText className="h-4 w-4" />
+              <span className="text-sm">{t('support.termsAndConditions')}</span>
             </button>
           </div>
         )}
@@ -323,6 +364,29 @@ export default function SupportButton() {
                  {t("support.pleaseContact")}
               </button>
             </p>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={termsDialogOpen} onOpenChange={setTermsDialogOpen}>
+        <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto" data-testid="dialog-terms">
+          <DialogHeader>
+            <DialogTitle>{t(`support.terms.${userRegion}.title`)}</DialogTitle>
+            <DialogDescription>
+              {t(`support.terms.${userRegion}.subtitle`)}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 text-sm">
+            <div className="prose prose-sm max-w-none">
+              <div dangerouslySetInnerHTML={{ __html: t(`support.terms.${userRegion}.content`) }} />
+            </div>
+          </div>
+
+          <div className="mt-6 flex justify-end">
+            <Button onClick={() => setTermsDialogOpen(false)}>
+              {t('common.close')}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

@@ -348,7 +348,140 @@ const translations = {
           question: "How can I track my prize shipment?",
           answer: `Once your prize has been approved and shipped, the Kaspersky Cup team will confirm the delivery details, and you will receive an email with the shipping confirmation.
           You can also check the status in the "My Redemptions" section of the platform. There you will see if your request is Pending, Approved, Shipped, or Delivered.`
-        }        
+        },
+        mexico: {
+          q1: {
+            question: "Are there specific categories for Mexico partners?",
+            answer: "Yes, Mexico has specific partner levels (PLATINUM, GOLD 2, SILVER & REGISTERED) that determine your eligibility for certain prizes and Grand Prize categories."
+          },
+          q2: {
+            question: "How do the different partner levels affect my participation?",
+            answer: "Partner levels in Mexico (PLATINUM, GOLD 2, SILVER & REGISTERED) determine which Grand Prize category you compete in. Each level has its own top scorer competition, giving you better chances to win within your category."
+          }
+        }
+      },
+      termsAndConditions: "Terms & Conditions",
+      terms: {
+        NOLA: {
+          title: "Terms & Conditions - NOLA/SOLA",
+          subtitle: "Effective Date: December 2025",
+          content: `<div class="space-y-4">
+            <h3 class="font-semibold text-lg">1. Organization</h3>
+            <p>The Kaspersky Cup program is organized by Kaspersky to recognize and reward the sales performance of its business partners through a goal accumulation system.</p>
+            
+            <h3 class="font-semibold text-lg">2. Duration</h3>
+            <p>The Program begins in December 2025 and ends in April 2026, unless Kaspersky announces an official extension.</p>
+            
+            <h3 class="font-semibold text-lg">3. Participation</h3>
+            <p>Authorized Kaspersky partner salespeople who meet the Program requirements are eligible to participate.</p>
+            
+            <h3 class="font-semibold text-lg">4. Goal Accumulation</h3>
+            <ul class="list-disc pl-6 space-y-1">
+              <li>US$1,000 in new customer sales = 1 goal</li>
+              <li>US$2,000 in renewal sales = 1 goal</li>
+            </ul>
+            
+            <h3 class="font-semibold text-lg">5. Prizes</h3>
+            <p>Monthly prizes are available for redemption with accumulated goals. The Grand Prize will be awarded to top scorers by region and category.</p>
+            
+            <h3 class="font-semibold text-lg">6. Validation</h3>
+            <p>All sales must be registered and validated through the KUDOS platform. Only validated sales will generate goals.</p>
+          </div>`
+        },
+        SOLA: {
+          title: "Terms & Conditions - NOLA/SOLA",
+          subtitle: "Effective Date: December 2025",
+          content: `<div class="space-y-4">
+            <h3 class="font-semibold text-lg">1. Organization</h3>
+            <p>The Kaspersky Cup program is organized by Kaspersky to recognize and reward the sales performance of its business partners through a goal accumulation system.</p>
+            
+            <h3 class="font-semibold text-lg">2. Duration</h3>
+            <p>The Program begins in December 2025 and ends in April 2026, unless Kaspersky announces an official extension.</p>
+            
+            <h3 class="font-semibold text-lg">3. Participation</h3>
+            <p>Authorized Kaspersky partner salespeople who meet the Program requirements are eligible to participate.</p>
+            
+            <h3 class="font-semibold text-lg">4. Goal Accumulation</h3>
+            <ul class="list-disc pl-6 space-y-1">
+              <li>US$1,000 in new customer sales = 1 goal</li>
+              <li>US$2,000 in renewal sales = 1 goal</li>
+            </ul>
+            
+            <h3 class="font-semibold text-lg">5. Prizes</h3>
+            <p>Monthly prizes are available for redemption with accumulated goals. The Grand Prize will be awarded to top scorers by region and category.</p>
+            
+            <h3 class="font-semibold text-lg">6. Validation</h3>
+            <p>All sales must be registered and validated through the KUDOS platform. Only validated sales will generate goals.</p>
+          </div>`
+        },
+        MEXICO: {
+          title: "Términos y Condiciones - México",
+          subtitle: "Fecha de vigencia: Diciembre 2025",
+          content: `<div class="space-y-4">
+            <h3 class="font-semibold text-lg">1. Organización</h3>
+            <p>El programa Kaspersky Cup está organizado por Kaspersky para reconocer y premiar el desempeño en ventas de sus socios comerciales en México a través de un sistema de acumulación de goles.</p>
+            
+            <h3 class="font-semibold text-lg">2. Duración</h3>
+            <p>El Programa inicia en diciembre de 2025 y finaliza en abril de 2026, salvo que Kaspersky anuncie una extensión oficial.</p>
+            
+            <h3 class="font-semibold text-lg">3. Participación - Categorías México</h3>
+            <p>Los vendedores autorizados de partners de Kaspersky en México pueden participar según las siguientes categorías:</p>
+            <ul class="list-disc pl-6 space-y-1">
+              <li><strong>ENTERPRISE:</strong> PLATINUM, GOLD (2)</li>
+              <li><strong>SMB:</strong> PLATINUM, GOLD (2), SILVER & REGISTERED</li>
+            </ul>
+            <p>Cada categoría compite de manera independiente por el Gran Premio.</p>
+            
+            <h3 class="font-semibold text-lg">4. Acumulación de Goles</h3>
+            <ul class="list-disc pl-6 space-y-1">
+              <li>US$1,000 en ventas a nuevos clientes = 1 gol</li>
+              <li>US$2,000 en ventas de renovación = 1 gol</li>
+            </ul>
+            
+            <h3 class="font-semibold text-lg">5. Premios Mensuales</h3>
+            <p>Los premios mensuales están disponibles para canje con goles acumulados. Las cantidades son limitadas y se asignan por orden de solicitud.</p>
+            
+            <h3 class="font-semibold text-lg">6. Gran Premio</h3>
+            <p>Se otorgará al mayor goleador en cada categoría de partner (PLATINUM, GOLD 2, SILVER & REGISTERED) dentro de los segmentos ENTERPRISE y SMB.</p>
+            
+            <h3 class="font-semibold text-lg">7. Validación</h3>
+            <p>Todas las ventas deben registrarse y validarse a través de la plataforma KUDOS. Solo las ventas validadas generarán goles.</p>
+            
+            <h3 class="font-semibold text-lg">8. Consideraciones Especiales para México</h3>
+            <ul class="list-disc pl-6 space-y-1">
+              <li>Los niveles de partner determinan la categoría de competencia</li>
+              <li>Cada nivel tiene su propia competencia de mayor goleador</li>
+              <li>Los premios pueden variar según disponibilidad local</li>
+              <li>Las regulaciones fiscales mexicanas aplican a todos los premios</li>
+            </ul>
+          </div>`
+        },
+        BRASIL: {
+          title: "Termos e Condições - Brasil",
+          subtitle: "Data de vigência: Dezembro 2025",
+          content: `<div class="space-y-4">
+            <h3 class="font-semibold text-lg">1. Organização</h3>
+            <p>O programa Kaspersky Cup é organizado pela Kaspersky para reconhecer e recompensar o desempenho de vendas de seus parceiros comerciais através de um sistema de acumulação de gols.</p>
+            
+            <h3 class="font-semibold text-lg">2. Duração</h3>
+            <p>O Programa inicia em dezembro de 2025 e termina em abril de 2026, a menos que a Kaspersky anuncie uma extensão oficial.</p>
+            
+            <h3 class="font-semibold text-lg">3. Participação</h3>
+            <p>Vendedores autorizados de parceiros Kaspersky que atendam aos requisitos do Programa são elegíveis para participar.</p>
+            
+            <h3 class="font-semibold text-lg">4. Acumulação de Gols</h3>
+            <ul class="list-disc pl-6 space-y-1">
+              <li>US$1.000 em vendas para novos clientes = 1 gol</li>
+              <li>US$2.000 em vendas de renovação = 1 gol</li>
+            </ul>
+            
+            <h3 class="font-semibold text-lg">5. Prêmios</h3>
+            <p>Prêmios mensais estão disponíveis para resgate com gols acumulados. O Grande Prêmio será concedido aos maiores artilheiros por região e categoria.</p>
+            
+            <h3 class="font-semibold text-lg">6. Validação</h3>
+            <p>Todas as vendas devem ser registradas e validadas através da plataforma KUDOS. Apenas vendas validadas gerarão gols.</p>
+          </div>`
+        }
       }
     },
     dashboard: {
@@ -1596,9 +1729,293 @@ const translations = {
           question: "¿Cómo puedo rastrear el envío de mi premio?",
           answer: `Una vez aprobado y enviado su premio, el equipo de Kaspersky Cup le confirmará los datos de entrega y recibirá un correo con la confirmación del envío.
           También puede revisar el estado en la sección “Mis redenciones” de la plataforma. Allí verá si su solicitud está Pendiente, Aprobada, Enviada o Entregada.`
-        }        
+        },
+        mexico: {
+          q1: {
+            question: "¿Cuáles son las categorías de socios en México?",
+            answer: "En México, los socios se dividen en dos segmentos principales:\n\n**ENTERPRISE:**\n- PLATINUM\n- GOLD 2\n\n**SMB (Pequeñas y Medianas Empresas):**\n- PLATINUM\n- GOLD 2\n- SILVER & REGISTERED\n\nCada categoría de socio compite separadamente en el Gran Premio."
+          },
+          q2: {
+            question: "¿Cómo funciona la competencia del Gran Premio para socios en México?",
+            answer: "El Gran Premio tiene competencias separadas para cada categoría de socio:\n\n- Los socios ENTERPRISE PLATINUM compiten entre sí\n- Los socios ENTERPRISE GOLD 2 compiten entre sí\n- Los socios SMB PLATINUM compiten entre sí\n- Los socios SMB GOLD 2 compiten entre sí\n- Los socios SMB SILVER & REGISTERED compiten entre sí\n\nEsto asegura una competencia justa dentro de cada nivel de socio."
+          }
+        }
       }
     },
+    termsAndConditions: "Términos y Condiciones",
+    terms: {
+      NOLA: {
+        title: "Términos y Condiciones - NOLA",
+        subtitle: "Programa de Lealtad - Región Norte de América Latina",
+        content: `
+          <div class="space-y-6">
+            <section>
+              <h3 class="text-lg font-semibold mb-3 text-gray-800">1. Aceptación de Términos</h3>
+              <p class="text-gray-600 leading-relaxed">
+                Al participar en este programa de lealtad, usted acepta cumplir con estos términos y condiciones. 
+                Si no está de acuerdo con alguna parte de estos términos, no debe participar en el programa.
+              </p>
+            </section>
+
+            <section>
+              <h3 class="text-lg font-semibold mb-3 text-gray-800">2. Elegibilidad</h3>
+              <p class="text-gray-600 leading-relaxed">
+                El programa está abierto a todos los socios autorizados en la región NOLA. Los participantes deben 
+                tener 18 años o más y estar en buen estado con la empresa.
+              </p>
+            </section>
+
+            <section>
+              <h3 class="text-lg font-semibold mb-3 text-gray-800">3. Acumulación de Puntos</h3>
+              <p class="text-gray-600 leading-relaxed mb-2">
+                Los puntos se otorgan según el rendimiento de ventas y el logro de objetivos:
+              </p>
+              <ul class="list-disc list-inside text-gray-600 space-y-1 ml-4">
+                <li>Los puntos de las ofertas se otorgan al completar ofertas aprobadas</li>
+                <li>Los puntos de objetivos se otorgan al alcanzar los objetivos mensuales</li>
+                <li>Los puntos pueden tardar hasta 48 horas en reflejarse en su cuenta</li>
+              </ul>
+            </section>
+
+            <section>
+              <h3 class="text-lg font-semibold mb-3 text-gray-800">4. Canje de Recompensas</h3>
+              <p class="text-gray-600 leading-relaxed">
+                Las recompensas pueden canjearse cuando tenga suficientes puntos. Todas las solicitudes de recompensas 
+                están sujetas a aprobación. El procesamiento puede tardar de 5 a 10 días hábiles.
+              </p>
+            </section>
+
+            <section>
+              <h3 class="text-lg font-semibold mb-3 text-gray-800">5. Competencia del Gran Premio</h3>
+              <p class="text-gray-600 leading-relaxed">
+                Los mejores desempeños son elegibles para premios del Gran Premio. Los ganadores se determinan 
+                según los puntos totales acumulados durante el período del programa.
+              </p>
+            </section>
+
+            <section>
+              <h3 class="text-lg font-semibold mb-3 text-gray-800">6. Modificaciones del Programa</h3>
+              <p class="text-gray-600 leading-relaxed">
+                Nos reservamos el derecho de modificar o terminar el programa en cualquier momento con previo aviso. 
+                Los cambios se comunicarán a través de la plataforma.
+              </p>
+            </section>
+          </div>
+        `
+      },
+      SOLA: {
+        title: "Términos y Condiciones - SOLA",
+        subtitle: "Programa de Lealtad - Región Sur de América Latina",
+        content: `
+          <div class="space-y-6">
+            <section>
+              <h3 class="text-lg font-semibold mb-3 text-gray-800">1. Aceptación de Términos</h3>
+              <p class="text-gray-600 leading-relaxed">
+                Al participar en este programa de lealtad, usted acepta cumplir con estos términos y condiciones. 
+                Si no está de acuerdo con alguna parte de estos términos, no debe participar en el programa.
+              </p>
+            </section>
+
+            <section>
+              <h3 class="text-lg font-semibold mb-3 text-gray-800">2. Elegibilidad</h3>
+              <p class="text-gray-600 leading-relaxed">
+                El programa está abierto a todos los socios autorizados en la región SOLA. Los participantes deben 
+                tener 18 años o más y estar en buen estado con la empresa.
+              </p>
+            </section>
+
+            <section>
+              <h3 class="text-lg font-semibold mb-3 text-gray-800">3. Acumulación de Puntos</h3>
+              <p class="text-gray-600 leading-relaxed mb-2">
+                Los puntos se otorgan según el rendimiento de ventas y el logro de objetivos:
+              </p>
+              <ul class="list-disc list-inside text-gray-600 space-y-1 ml-4">
+                <li>Los puntos de las ofertas se otorgan al completar ofertas aprobadas</li>
+                <li>Los puntos de objetivos se otorgan al alcanzar los objetivos mensuales</li>
+                <li>Los puntos pueden tardar hasta 48 horas en reflejarse en su cuenta</li>
+              </ul>
+            </section>
+
+            <section>
+              <h3 class="text-lg font-semibold mb-3 text-gray-800">4. Canje de Recompensas</h3>
+              <p class="text-gray-600 leading-relaxed">
+                Las recompensas pueden canjearse cuando tenga suficientes puntos. Todas las solicitudes de recompensas 
+                están sujetas a aprobación. El procesamiento puede tardar de 5 a 10 días hábiles.
+              </p>
+            </section>
+
+            <section>
+              <h3 class="text-lg font-semibold mb-3 text-gray-800">5. Competencia del Gran Premio</h3>
+              <p class="text-gray-600 leading-relaxed">
+                Los mejores desempeños son elegibles para premios del Gran Premio. Los ganadores se determinan 
+                según los puntos totales acumulados durante el período del programa.
+              </p>
+            </section>
+
+            <section>
+              <h3 class="text-lg font-semibold mb-3 text-gray-800">6. Modificaciones del Programa</h3>
+              <p class="text-gray-600 leading-relaxed">
+                Nos reservamos el derecho de modificar o terminar el programa en cualquier momento con previo aviso. 
+                Los cambios se comunicarán a través de la plataforma.
+              </p>
+            </section>
+          </div>
+        `
+      },
+      MEXICO: {
+        title: "Términos y Condiciones - México",
+        subtitle: "Programa de Lealtad - México",
+        content: `
+          <div class="space-y-6">
+            <section>
+              <h3 class="text-lg font-semibold mb-3 text-gray-800">1. Aceptación de Términos</h3>
+              <p class="text-gray-600 leading-relaxed">
+                Al participar en este programa de lealtad, usted acepta cumplir con estos términos y condiciones. 
+                Si no está de acuerdo con alguna parte de estos términos, no debe participar en el programa.
+              </p>
+            </section>
+
+            <section>
+              <h3 class="text-lg font-semibold mb-3 text-gray-800">2. Elegibilidad</h3>
+              <p class="text-gray-600 leading-relaxed">
+                El programa está abierto a todos los socios autorizados en México. Los participantes deben 
+                tener 18 años o más y estar en buen estado con la empresa.
+              </p>
+            </section>
+
+            <section>
+              <h3 class="text-lg font-semibold mb-3 text-gray-800">3. Categorías de Socios en México</h3>
+              <p class="text-gray-600 leading-relaxed mb-2">
+                Los socios en México se clasifican en dos segmentos:
+              </p>
+              <div class="ml-4 space-y-3">
+                <div>
+                  <p class="font-semibold text-gray-700">ENTERPRISE:</p>
+                  <ul class="list-disc list-inside text-gray-600 ml-4">
+                    <li>PLATINUM</li>
+                    <li>GOLD 2</li>
+                  </ul>
+                </div>
+                <div>
+                  <p class="font-semibold text-gray-700">SMB (Pequeñas y Medianas Empresas):</p>
+                  <ul class="list-disc list-inside text-gray-600 ml-4">
+                    <li>PLATINUM</li>
+                    <li>GOLD 2</li>
+                    <li>SILVER & REGISTERED</li>
+                  </ul>
+                </div>
+              </div>
+            </section>
+
+            <section>
+              <h3 class="text-lg font-semibold mb-3 text-gray-800">4. Acumulación de Puntos</h3>
+              <p class="text-gray-600 leading-relaxed mb-2">
+                Los puntos se otorgan según el rendimiento de ventas y el logro de objetivos:
+              </p>
+              <ul class="list-disc list-inside text-gray-600 space-y-1 ml-4">
+                <li>Los puntos de las ofertas se otorgan al completar ofertas aprobadas</li>
+                <li>Los puntos de objetivos se otorgan al alcanzar los objetivos mensuales</li>
+                <li>Los puntos pueden tardar hasta 48 horas en reflejarse en su cuenta</li>
+              </ul>
+            </section>
+
+            <section>
+              <h3 class="text-lg font-semibold mb-3 text-gray-800">5. Canje de Recompensas</h3>
+              <p class="text-gray-600 leading-relaxed">
+                Las recompensas pueden canjearse cuando tenga suficientes puntos. Todas las solicitudes de recompensas 
+                están sujetas a aprobación. El procesamiento puede tardar de 5 a 10 días hábiles.
+              </p>
+            </section>
+
+            <section>
+              <h3 class="text-lg font-semibold mb-3 text-gray-800">6. Competencia del Gran Premio - Categorías Separadas</h3>
+              <p class="text-gray-600 leading-relaxed mb-2">
+                La competencia del Gran Premio en México funciona con categorías separadas:
+              </p>
+              <ul class="list-disc list-inside text-gray-600 space-y-1 ml-4">
+                <li>Los socios ENTERPRISE PLATINUM compiten entre sí</li>
+                <li>Los socios ENTERPRISE GOLD 2 compiten entre sí</li>
+                <li>Los socios SMB PLATINUM compiten entre sí</li>
+                <li>Los socios SMB GOLD 2 compiten entre sí</li>
+                <li>Los socios SMB SILVER & REGISTERED compiten entre sí</li>
+              </ul>
+              <p class="text-gray-600 leading-relaxed mt-2">
+                Los ganadores se determinan según los puntos totales acumulados durante el período del programa 
+                dentro de cada categoría.
+              </p>
+            </section>
+
+            <section>
+              <h3 class="text-lg font-semibold mb-3 text-gray-800">7. Modificaciones del Programa</h3>
+              <p class="text-gray-600 leading-relaxed">
+                Nos reservamos el derecho de modificar o terminar el programa en cualquier momento con previo aviso. 
+                Los cambios se comunicarán a través de la plataforma.
+              </p>
+            </section>
+          </div>
+        `
+      },
+      BRASIL: {
+        title: "Términos y Condiciones - Brasil",
+        subtitle: "Programa de Lealtad - Brasil",
+        content: `
+          <div class="space-y-6">
+            <section>
+              <h3 class="text-lg font-semibold mb-3 text-gray-800">1. Aceptación de Términos</h3>
+              <p class="text-gray-600 leading-relaxed">
+                Al participar en este programa de lealtad, usted acepta cumplir con estos términos y condiciones. 
+                Si no está de acuerdo con alguna parte de estos términos, no debe participar en el programa.
+              </p>
+            </section>
+
+            <section>
+              <h3 class="text-lg font-semibold mb-3 text-gray-800">2. Elegibilidad</h3>
+              <p class="text-gray-600 leading-relaxed">
+                El programa está abierto a todos los socios autorizados en Brasil. Los participantes deben 
+                tener 18 años o más y estar en buen estado con la empresa.
+              </p>
+            </section>
+
+            <section>
+              <h3 class="text-lg font-semibold mb-3 text-gray-800">3. Acumulación de Puntos</h3>
+              <p class="text-gray-600 leading-relaxed mb-2">
+                Los puntos se otorgan según el rendimiento de ventas y el logro de objetivos:
+              </p>
+              <ul class="list-disc list-inside text-gray-600 space-y-1 ml-4">
+                <li>Los puntos de las ofertas se otorgan al completar ofertas aprobadas</li>
+                <li>Los puntos de objetivos se otorgan al alcanzar los objetivos mensuales</li>
+                <li>Los puntos pueden tardar hasta 48 horas en reflejarse en su cuenta</li>
+              </ul>
+            </section>
+
+            <section>
+              <h3 class="text-lg font-semibold mb-3 text-gray-800">4. Canje de Recompensas</h3>
+              <p class="text-gray-600 leading-relaxed">
+                Las recompensas pueden canjearse cuando tenga suficientes puntos. Todas las solicitudes de recompensas 
+                están sujetas a aprobación. El procesamiento puede tardar de 5 a 10 días hábiles.
+              </p>
+            </section>
+
+            <section>
+              <h3 class="text-lg font-semibold mb-3 text-gray-800">5. Competencia del Gran Premio</h3>
+              <p class="text-gray-600 leading-relaxed">
+                Los mejores desempeños son elegibles para premios del Gran Premio. Los ganadores se determinan 
+                según los puntos totales acumulados durante el período del programa.
+              </p>
+            </section>
+
+            <section>
+              <h3 class="text-lg font-semibold mb-3 text-gray-800">6. Modificaciones del Programa</h3>
+              <p class="text-gray-600 leading-relaxed">
+                Nos reservamos el derecho de modificar o terminar el programa en cualquier momento con previo aviso. 
+                Los cambios se comunicarán a través de la plataforma.
+              </p>
+            </section>
+          </div>
+        `
+      }
+    }
+  },
     dashboard: {
       welcome: "Hola,",
       subtitleWelcome: "La emoción del fútbol también se vive en las ventas.",
@@ -2846,8 +3263,291 @@ const translations = {
           question: "Como posso rastrear o envio do meu prêmio?",
           answer: `Quando o seu prêmio for aprovado e enviado, a equipe do Kaspersky Cup entrará em contato para confirmar os dados de entrega. Depois disso, você receberá um e-mail com a confirmação do envio.
           Você também pode acompanhar o status do seu prêmio na seção “Minhas redensões”, onde poderá ver se ele está como Pendente, Aprovado, Enviado ou Entregue.`
+        },
+        mexico: {
+          q1: {
+            question: "Quais são as categorias de parceiros no México?",
+            answer: "No México, os parceiros são divididos em dois segmentos principais:\n\n**ENTERPRISE:**\n- PLATINUM\n- GOLD 2\n\n**SMB (Pequenas e Médias Empresas):**\n- PLATINUM\n- GOLD 2\n- SILVER & REGISTERED\n\nCada categoria de parceiro compete separadamente no Grande Prêmio."
+          },
+          q2: {
+            question: "Como funciona a competição do Grande Prêmio para parceiros no México?",
+            answer: "O Grande Prêmio tem competições separadas para cada categoria de parceiro:\n\n- Os parceiros ENTERPRISE PLATINUM competem entre si\n- Os parceiros ENTERPRISE GOLD 2 competem entre si\n- Os parceiros SMB PLATINUM competem entre si\n- Os parceiros SMB GOLD 2 competem entre si\n- Os parceiros SMB SILVER & REGISTERED competem entre si\n\nIsso garante uma competição justa dentro de cada nível de parceiro."
+          }
         }
       }      
+    },
+    termsAndConditions: "Termos e Condições",
+    terms: {
+      NOLA: {
+        title: "Termos e Condições - NOLA",
+        subtitle: "Programa de Lealdade - Região Norte da América Latina",
+        content: `
+          <div class="space-y-6">
+            <section>
+              <h3 class="text-lg font-semibold mb-3 text-gray-800">1. Aceitação dos Termos</h3>
+              <p class="text-gray-600 leading-relaxed">
+                Ao participar deste programa de lealdade, você concorda em cumprir estes termos e condições.
+                Se você não concordar com qualquer parte destes termos, não deverá participar do programa.
+              </p>
+            </section>
+
+            <section>
+              <h3 class="text-lg font-semibold mb-3 text-gray-800">2. Elegibilidade</h3>
+              <p class="text-gray-600 leading-relaxed">
+                O programa está aberto a todos os parceiros autorizados na região NOLA. Os participantes devem
+                ter 18 anos ou mais e estar em boa situação com a empresa.
+              </p>
+            </section>
+
+            <section>
+              <h3 class="text-lg font-semibold mb-3 text-gray-800">3. Acumulação de Pontos</h3>
+              <p class="text-gray-600 leading-relaxed mb-2">
+                Os pontos são concedidos com base no desempenho de vendas e no alcance de objetivos:
+              </p>
+              <ul class="list-disc list-inside text-gray-600 space-y-1 ml-4">
+                <li>Pontos de negócios são concedidos ao completar negócios aprovados</li>
+                <li>Pontos de objetivos são concedidos ao alcançar objetivos mensais</li>
+                <li>Os pontos podem levar até 48 horas para aparecer em sua conta</li>
+              </ul>
+            </section>
+
+            <section>
+              <h3 class="text-lg font-semibold mb-3 text-gray-800">4. Resgate de Recompensas</h3>
+              <p class="text-gray-600 leading-relaxed">
+                As recompensas podem ser resgatadas quando você tiver pontos suficientes. Todas as solicitações de recompensas
+                estão sujeitas a aprovação. O processamento pode levar de 5 a 10 dias úteis.
+              </p>
+            </section>
+
+            <section>
+              <h3 class="text-lg font-semibold mb-3 text-gray-800">5. Competição do Grande Prêmio</h3>
+              <p class="text-gray-600 leading-relaxed">
+                Os melhores desempenhos são elegíveis para prêmios do Grande Prêmio. Os vencedores são determinados
+                com base nos pontos totais acumulados durante o período do programa.
+              </p>
+            </section>
+
+            <section>
+              <h3 class="text-lg font-semibold mb-3 text-gray-800">6. Modificações do Programa</h3>
+              <p class="text-gray-600 leading-relaxed">
+                Reservamo-nos o direito de modificar ou encerrar o programa a qualquer momento com aviso prévio.
+                As mudanças serão comunicadas através da plataforma.
+              </p>
+            </section>
+          </div>
+        `
+      },
+      SOLA: {
+        title: "Termos e Condições - SOLA",
+        subtitle: "Programa de Lealdade - Região Sul da América Latina",
+        content: `
+          <div class="space-y-6">
+            <section>
+              <h3 class="text-lg font-semibold mb-3 text-gray-800">1. Aceitação dos Termos</h3>
+              <p class="text-gray-600 leading-relaxed">
+                Ao participar deste programa de lealdade, você concorda em cumprir estes termos e condições.
+                Se você não concordar com qualquer parte destes termos, não deverá participar do programa.
+              </p>
+            </section>
+
+            <section>
+              <h3 class="text-lg font-semibold mb-3 text-gray-800">2. Elegibilidade</h3>
+              <p class="text-gray-600 leading-relaxed">
+                O programa está aberto a todos os parceiros autorizados na região SOLA. Os participantes devem
+                ter 18 anos ou mais e estar em boa situação com a empresa.
+              </p>
+            </section>
+
+            <section>
+              <h3 class="text-lg font-semibold mb-3 text-gray-800">3. Acumulação de Pontos</h3>
+              <p class="text-gray-600 leading-relaxed mb-2">
+                Os pontos são concedidos com base no desempenho de vendas e no alcance de objetivos:
+              </p>
+              <ul class="list-disc list-inside text-gray-600 space-y-1 ml-4">
+                <li>Pontos de negócios são concedidos ao completar negócios aprovados</li>
+                <li>Pontos de objetivos são concedidos ao alcançar objetivos mensais</li>
+                <li>Os pontos podem levar até 48 horas para aparecer em sua conta</li>
+              </ul>
+            </section>
+
+            <section>
+              <h3 class="text-lg font-semibold mb-3 text-gray-800">4. Resgate de Recompensas</h3>
+              <p class="text-gray-600 leading-relaxed">
+                As recompensas podem ser resgatadas quando você tiver pontos suficientes. Todas as solicitações de recompensas
+                estão sujeitas a aprovação. O processamento pode levar de 5 a 10 dias úteis.
+              </p>
+            </section>
+
+            <section>
+              <h3 class="text-lg font-semibold mb-3 text-gray-800">5. Competição do Grande Prêmio</h3>
+              <p class="text-gray-600 leading-relaxed">
+                Os melhores desempenhos são elegíveis para prêmios do Grande Prêmio. Os vencedores são determinados
+                com base nos pontos totais acumulados durante o período do programa.
+              </p>
+            </section>
+
+            <section>
+              <h3 class="text-lg font-semibold mb-3 text-gray-800">6. Modificações do Programa</h3>
+              <p class="text-gray-600 leading-relaxed">
+                Reservamo-nos o direito de modificar ou encerrar o programa a qualquer momento com aviso prévio.
+                As mudanças serão comunicadas através da plataforma.
+              </p>
+            </section>
+          </div>
+        `
+      },
+      MEXICO: {
+        title: "Termos e Condições - México",
+        subtitle: "Programa de Lealdade - México",
+        content: `
+          <div class="space-y-6">
+            <section>
+              <h3 class="text-lg font-semibold mb-3 text-gray-800">1. Aceitação dos Termos</h3>
+              <p class="text-gray-600 leading-relaxed">
+                Ao participar deste programa de lealdade, você concorda em cumprir estes termos e condições.
+                Se você não concordar com qualquer parte destes termos, não deverá participar do programa.
+              </p>
+            </section>
+
+            <section>
+              <h3 class="text-lg font-semibold mb-3 text-gray-800">2. Elegibilidade</h3>
+              <p class="text-gray-600 leading-relaxed">
+                O programa está aberto a todos os parceiros autorizados no México. Os participantes devem
+                ter 18 anos ou mais e estar em boa situação com a empresa.
+              </p>
+            </section>
+
+            <section>
+              <h3 class="text-lg font-semibold mb-3 text-gray-800">3. Categorias de Parceiros no México</h3>
+              <p class="text-gray-600 leading-relaxed mb-2">
+                Os parceiros no México são classificados em dois segmentos:
+              </p>
+              <div class="ml-4 space-y-3">
+                <div>
+                  <p class="font-semibold text-gray-700">ENTERPRISE:</p>
+                  <ul class="list-disc list-inside text-gray-600 ml-4">
+                    <li>PLATINUM</li>
+                    <li>GOLD 2</li>
+                  </ul>
+                </div>
+                <div>
+                  <p class="font-semibold text-gray-700">SMB (Pequenas e Médias Empresas):</p>
+                  <ul class="list-disc list-inside text-gray-600 ml-4">
+                    <li>PLATINUM</li>
+                    <li>GOLD 2</li>
+                    <li>SILVER & REGISTERED</li>
+                  </ul>
+                </div>
+              </div>
+            </section>
+
+            <section>
+              <h3 class="text-lg font-semibold mb-3 text-gray-800">4. Acumulação de Pontos</h3>
+              <p class="text-gray-600 leading-relaxed mb-2">
+                Os pontos são concedidos com base no desempenho de vendas e no alcance de objetivos:
+              </p>
+              <ul class="list-disc list-inside text-gray-600 space-y-1 ml-4">
+                <li>Pontos de negócios são concedidos ao completar negócios aprovados</li>
+                <li>Pontos de objetivos são concedidos ao alcançar objetivos mensais</li>
+                <li>Os pontos podem levar até 48 horas para aparecer em sua conta</li>
+              </ul>
+            </section>
+
+            <section>
+              <h3 class="text-lg font-semibold mb-3 text-gray-800">5. Resgate de Recompensas</h3>
+              <p class="text-gray-600 leading-relaxed">
+                As recompensas podem ser resgatadas quando você tiver pontos suficientes. Todas as solicitações de recompensas
+                estão sujeitas a aprovação. O processamento pode levar de 5 a 10 dias úteis.
+              </p>
+            </section>
+
+            <section>
+              <h3 class="text-lg font-semibold mb-3 text-gray-800">6. Competição do Grande Prêmio - Categorias Separadas</h3>
+              <p class="text-gray-600 leading-relaxed mb-2">
+                A competição do Grande Prêmio no México funciona com categorias separadas:
+              </p>
+              <ul class="list-disc list-inside text-gray-600 space-y-1 ml-4">
+                <li>Os parceiros ENTERPRISE PLATINUM competem entre si</li>
+                <li>Os parceiros ENTERPRISE GOLD 2 competem entre si</li>
+                <li>Os parceiros SMB PLATINUM competem entre si</li>
+                <li>Os parceiros SMB GOLD 2 competem entre si</li>
+                <li>Os parceiros SMB SILVER & REGISTERED competem entre si</li>
+              </ul>
+              <p class="text-gray-600 leading-relaxed mt-2">
+                Os vencedores são determinados com base nos pontos totais acumulados durante o período do programa
+                dentro de cada categoria.
+              </p>
+            </section>
+
+            <section>
+              <h3 class="text-lg font-semibold mb-3 text-gray-800">7. Modificações do Programa</h3>
+              <p class="text-gray-600 leading-relaxed">
+                Reservamo-nos o direito de modificar ou encerrar o programa a qualquer momento com aviso prévio.
+                As mudanças serão comunicadas através da plataforma.
+              </p>
+            </section>
+          </div>
+        `
+      },
+      BRASIL: {
+        title: "Termos e Condições - Brasil",
+        subtitle: "Programa de Lealdade - Brasil",
+        content: `
+          <div class="space-y-6">
+            <section>
+              <h3 class="text-lg font-semibold mb-3 text-gray-800">1. Aceitação dos Termos</h3>
+              <p class="text-gray-600 leading-relaxed">
+                Ao participar deste programa de lealdade, você concorda em cumprir estes termos e condições.
+                Se você não concordar com qualquer parte destes termos, não deverá participar do programa.
+              </p>
+            </section>
+
+            <section>
+              <h3 class="text-lg font-semibold mb-3 text-gray-800">2. Elegibilidade</h3>
+              <p class="text-gray-600 leading-relaxed">
+                O programa está aberto a todos os parceiros autorizados no Brasil. Os participantes devem
+                ter 18 anos ou mais e estar em boa situação com a empresa.
+              </p>
+            </section>
+
+            <section>
+              <h3 class="text-lg font-semibold mb-3 text-gray-800">3. Acumulação de Pontos</h3>
+              <p class="text-gray-600 leading-relaxed mb-2">
+                Os pontos são concedidos com base no desempenho de vendas e no alcance de objetivos:
+              </p>
+              <ul class="list-disc list-inside text-gray-600 space-y-1 ml-4">
+                <li>Pontos de negócios são concedidos ao completar negócios aprovados</li>
+                <li>Pontos de objetivos são concedidos ao alcançar objetivos mensais</li>
+                <li>Os pontos podem levar até 48 horas para aparecer em sua conta</li>
+              </ul>
+            </section>
+
+            <section>
+              <h3 class="text-lg font-semibold mb-3 text-gray-800">4. Resgate de Recompensas</h3>
+              <p class="text-gray-600 leading-relaxed">
+                As recompensas podem ser resgatadas quando você tiver pontos suficientes. Todas as solicitações de recompensas
+                estão sujeitas a aprovação. O processamento pode levar de 5 a 10 dias úteis.
+              </p>
+            </section>
+
+            <section>
+              <h3 class="text-lg font-semibold mb-3 text-gray-800">5. Competição do Grande Prêmio</h3>
+              <p class="text-gray-600 leading-relaxed">
+                Os melhores desempenhos são elegíveis para prêmios do Grande Prêmio. Os vencedores são determinados
+                com base nos pontos totais acumulados durante o período do programa.
+              </p>
+            </section>
+
+            <section>
+              <h3 class="text-lg font-semibold mb-3 text-gray-800">6. Modificações do Programa</h3>
+              <p class="text-gray-600 leading-relaxed">
+                Reservamo-nos o direito de modificar ou encerrar o programa a qualquer momento com aviso prévio.
+                As mudanças serão comunicadas através da plataforma.
+              </p>
+            </section>
+          </div>
+        `
+      }
     },
     dashboard: {
       welcome: "Olá,",
