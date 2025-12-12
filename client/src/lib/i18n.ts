@@ -4345,7 +4345,7 @@ const translations = {
         },
       },
     },
-  },
+  }
 };
 
 export type Language = keyof typeof translations;
