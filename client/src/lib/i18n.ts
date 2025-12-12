@@ -4344,7 +4344,7 @@ const translations = {
           duplicateConfig: "Já existe uma configuração para esta combinação de região, categoria e subcategoria",
         },
       },
-    },    
+    },
   },
 };
 
