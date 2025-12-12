@@ -21,17 +21,17 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { LanguageSelector } from "@/components/LanguageSelector";
 
 const loginSchema = z.object({
-  username: z.string().min(1, "Username is required"),
-  password: z.string().min(1, "Password is required"),
+  username: z.string().min(1, "validation.usernameRequired"),
+  password: z.string().min(1, "validation.passwordRequired"),
 });
 
 const registerSchema = z.object({
-  username: z.string().min(3, "Username must be at least 3 characters"),
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-  firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
-  country: z.string().min(1, "Country is required"),
+  username: z.string().min(3, "validation.usernameMinCharacters"),
+  email: z.string().email("validation.emailInvalid"),
+  password: z.string().min(6, "validation.passwordMinCharacters"),
+  firstName: z.string().min(1, "validation.firstNameRequired"),
+  lastName: z.string().min(1, "validation.lastNameRequired"),
+  country: z.string().min(1, "validation.countryRequired"),
 });
 
 type LoginForm = z.infer<typeof loginSchema>;
@@ -91,7 +91,7 @@ export default function Login() {
     onError: (error: any) => {
       toast({
         title: t("common.error"),
-        description: error.message || "Login failed",
+        description: error.message || t("common.loginFailed"),
         variant: "destructive",
       });
     },
@@ -110,7 +110,7 @@ export default function Login() {
     onError: (error: any) => {
       toast({
         title: t("common.error"),
-        description: error.message || "Registration failed",
+        description: error.message || t("common.registrationFailed"),
         variant: "destructive",
       });
     },
@@ -150,7 +150,7 @@ export default function Login() {
       
       // Si hay otro error, lanzar excepción
       if (!response.ok) {
-        throw new Error(data.message || "Failed to send magic link");
+        throw new Error(data.message || t("common.failedToSendMagicLink"));
       }
       
       return data;
@@ -161,8 +161,8 @@ export default function Login() {
         // Redirigir a página de registro passwordless con el email
         setLocation(`/passwordless-register?email=${encodeURIComponent(data.email)}`);
         toast({
-          title: "Registro requerido",
-          description: "No existe una cuenta con este email. Por favor, complete su registro.",
+          title: t('common.registrationRequired'),
+          description: t('common.registrationRequiredDesc'),
           variant: "default",
         });
         return;
@@ -173,8 +173,8 @@ export default function Login() {
         setIsAdminEmail(true);
         loginForm.setValue("username", data.email);
         toast({
-          title: "Cuenta de administrador",
-          description: "Por favor, ingrese su contraseña para continuar.",
+          title: t("common.adminAccount"),
+          description: t("common.pleaseEnterPasswordToContinue"),
           variant: "default",
         });
         return;
@@ -201,7 +201,7 @@ export default function Login() {
     onError: (error: any) => {
       toast({
         title: t("common.error"),
-        description: error.message || "Failed to send magic link",
+        description: error.message || t("common.failedToSendMagicLink"),
         variant: "destructive",
       });
     },
@@ -251,7 +251,7 @@ export default function Login() {
     if (!emailForLogin || !emailForLogin.includes('@')) {
       toast({
         title: t("common.error"),
-        description: "Por favor ingrese un email válido",
+        description: t("common.pleaseEnterValidEmail"),
         variant: "destructive",
       });
       return;
@@ -498,7 +498,7 @@ export default function Login() {
                     name="firstName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>First Name</FormLabel>
+                        <FormLabel>{t('auth.firstName')}</FormLabel>
                         <FormControl>
                           <Input
                             placeholder="John"
@@ -519,7 +519,7 @@ export default function Login() {
                     name="lastName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Last Name</FormLabel>
+                        <FormLabel>{t('auth.lastName')}</FormLabel>
                         <FormControl>
                           <Input
                             placeholder="Smith"
@@ -583,7 +583,7 @@ export default function Login() {
                       <FormControl>
                         <Input
                           type="password"
-                          placeholder="Create a password"
+                          placeholder={t("auth.passwordPlaceholder")}
                           data-testid="input-register-password"
                           value={field.value}
                           onChange={field.onChange}
@@ -605,7 +605,7 @@ export default function Login() {
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger data-testid="select-country">
-                            <SelectValue placeholder="Select your country" />
+                            <SelectValue placeholder={t('auth.selectCountry')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -626,7 +626,7 @@ export default function Login() {
                   disabled={registerMutation.isPending}
                   data-testid="button-register"
                 >
-                  {registerMutation.isPending ? "Creating account..." : "Create Account"}
+                  {registerMutation.isPending ? t('common.creatingAccount') : t('common.createAccount')}
                 </Button>
               </form>
             </Form>

@@ -323,7 +323,7 @@ export default function Dashboard() {
                   <div className="flex-1">
                     <div className="text-gray-600 text-sm">{t('dashboard.totalGoalsAccumulated')}</div>
                     <div className="text-2xl font-bold text-gray-900" data-testid="text-total-goals">
-                      {statsLoading ? "..." : Math.round(stats?.totalGoals || 0)}
+                      {statsLoading ? t('dashboard.loading') : Math.round(stats?.totalGoals || 0)}
                     </div>                    
                   </div>
                 </div>
@@ -336,7 +336,7 @@ export default function Dashboard() {
                   <div className="flex-1">
                     <div className="text-gray-600 text-sm">{t('dashboard.monthlyGoals')}</div>
                     <div className="text-2xl font-bold text-gray-900" data-testid="text-monthly-goals">
-                      {statsLoading ? "..." : Math.round(stats?.monthlyGoals || 0)}
+                      {statsLoading ? t('dashboard.loading') : Math.round(stats?.monthlyGoals || 0)}
                     </div>
                     <div className="text-gray-500 text-xs">{t('dashboard.awaitingApproval')}</div>
                   </div>
@@ -350,7 +350,7 @@ export default function Dashboard() {
                   <div className="flex-1">
                     <div className="text-gray-600 text-sm">{t('dashboard.redeemedRewards')}</div>
                     <div className="text-2xl font-bold text-gray-900" data-testid="text-redeemed-rewards">
-                      {statsLoading ? "..." : stats?.redeemedRewards || "0"}
+                      {statsLoading ? t('dashboard.loading') : stats?.redeemedRewards || "0"}
                     </div>
                     <div className="text-gray-500 text-xs">{t('dashboard.lifetimeTotal')}</div>
                   </div>
@@ -714,7 +714,7 @@ export default function Dashboard() {
             <div className="px-6 py-5">
               <div className="flex justify-between items-center">
                 <h3 className="text-xl font-semibold text-white">{t('dashboard.plays')}</h3>
-                <p className="white-text">{t('dashboard.accumulated')} <strong><span className="text-green-600">{statsLoading ? "..." : Math.round(stats?.totalGoals || 0)} goles</span></strong></p>
+                <p className="white-text">{t('dashboard.accumulated')} <strong><span className="text-green-600">{statsLoading ? t('dashboard.loading') : Math.round(stats?.totalGoals || 0)} {t('dashboard.goals')}</span></strong></p>
               </div>
             </div>
             <div className="overflow-x-auto">
@@ -741,9 +741,6 @@ export default function Dashboard() {
                         {t('dashboard.value').toUpperCase()}
                       </th>
                       <th className="px-6 py-4 text-left text-sm font-semibold text-white uppercase tracking-wider">
-                        {t('deals.points').toUpperCase()}
-                      </th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-white uppercase tracking-wider">
                         {t('dashboard.saleDate').toUpperCase()}
                       </th>
                       <th className="px-6 py-4 text-left text-sm font-semibold text-white uppercase tracking-wider">
@@ -755,46 +752,36 @@ export default function Dashboard() {
                     {recentDeals
                       .slice((dealsPage - 1) * dealsPerPage, dealsPage * dealsPerPage)
                       .map((deal) => {
-                      // Calcular goles según el tipo de deal:
-                      // NEW_CLIENT: cada $1000 = 1 gol
-                      // RENEWAL: cada $2000 = 1 gol
-                      const dealValueNum = Number(deal.dealValue);
-                      const rate = deal.dealType === 'new_customer' ? 1000 : 2000;
-                      const goals = Math.round(dealValueNum / rate);
-                      
                       return (
-                      <tr key={deal.id} data-testid={`row-deal-${deal.id}`} className="transition-colors">
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-white font-medium">
-                          {deal.productName}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-white">
-                          {formatCurrency(deal.dealValue)}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-white font-medium">
-                          {goals}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-white">
-                          {new Date(deal.closeDate).toLocaleDateString('es-ES', { 
-                            year: 'numeric', 
-                            month: '2-digit', 
-                            day: '2-digit' 
-                          })}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-white">
-                          {new Date(deal.createdAt).toLocaleDateString('es-ES', { 
-                            year: 'numeric', 
-                            month: '2-digit', 
-                            day: '2-digit' 
-                          })}
-                        </td>
-                      </tr>
+                        <tr key={deal.id} data-testid={`row-deal-${deal.id}`} className="transition-colors">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-white font-medium">
+                            {deal.productName}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-white">
+                            {formatCurrency(deal.dealValue)}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-white">
+                            {new Date(deal.closeDate).toLocaleDateString('es-ES', {
+                              year: 'numeric',
+                              month: '2-digit',
+                              day: '2-digit'
+                            })}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-white">
+                            {new Date(deal.createdAt).toLocaleDateString('es-ES', {
+                              year: 'numeric',
+                              month: '2-digit',
+                              day: '2-digit'
+                            })}
+                          </td>
+                        </tr>
                       );
                     })}
                   </tbody>
                 </table>
               ) : (
                 <div className="p-6 text-center text-white/70" data-testid="text-no-deals">
-                  No deals found. Register your first deal to get started!
+                  {t('dashboard.noDealsFound')}
                 </div>
               )}
             </div>
@@ -817,7 +804,7 @@ export default function Dashboard() {
                     {t('dashboard.previous')}
                   </Button>
                   <div className="flex items-center gap-2 px-3 text-gray-900">
-                    Página {dealsPage} de {Math.ceil(recentDeals.length / dealsPerPage)}
+                      {t('dashboard.page')} {dealsPage} {t('dashboard.of')} {Math.ceil(recentDeals.length / dealsPerPage)}
                   </div>
                   <Button
                     variant="outline"

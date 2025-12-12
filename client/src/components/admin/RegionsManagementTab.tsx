@@ -726,7 +726,7 @@ export default function RegionsManagementTab() {
                           {rewards?.find((r: any) => r.id === region.rewardId)?.name || t("admin.assignedReward")}
                         </span>
                       ) : (
-                        <span className="text-muted-foreground text-sm">Sin premio</span>
+                        <span className="text-muted-foreground text-sm">{t('common.noReward')}</span>
                       )}
                     </TableCell>
                     <TableCell className="text-sm">
@@ -854,9 +854,9 @@ export default function RegionsManagementTab() {
                 ) : !regions || regions.length === 0 ? (
                   <div className="text-center py-12">
                     <Globe className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">No hay regiones configuradas</h3>
+                    <h3 className="text-lg font-semibold mb-2">{t('common.noRegionsConfigured')}</h3>
                     <p className="text-muted-foreground mb-4">
-                      Primero debes crear configuraciones regionales en la pestaña "Configuraciones"
+                      {t('common.createRegionalConfigFirst')}
                     </p>
                   </div>
                 ) : (
@@ -865,8 +865,8 @@ export default function RegionsManagementTab() {
                       <TableRow>
                         <TableHead>{t("admin.region")}</TableHead>
                         <TableHead>{t("admin.configuration")}</TableHead>
-                        <TableHead>Reward Actual</TableHead>
-                        <TableHead>Cambiar Reward</TableHead>
+                        <TableHead>{t('common.currentReward')}</TableHead>
+                        <TableHead>{t('common.changeReward')}</TableHead>
                         <TableHead>{t("admin.status")}</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -896,7 +896,7 @@ export default function RegionsManagementTab() {
                                 </div>
                               </div>
                             ) : (
-                              <span className="text-gray-500 text-sm">Sin reward asignado</span>
+                              <span className="text-gray-500 text-sm">{t('common.noRewardAssigned')}</span>
                             )}
                           </TableCell>
                           <TableCell>
@@ -914,7 +914,7 @@ export default function RegionsManagementTab() {
                                 <SelectValue placeholder={t("admin.selectReward")} />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="NONE">Sin reward</SelectItem>
+                                <SelectItem value="NONE">{t('common.noReward')}</SelectItem>
                                 {rewards && rewards.length > 0 ? (
                                   rewards.map((reward: any) => (
                                     <SelectItem key={reward.id} value={reward.id}>
@@ -922,7 +922,7 @@ export default function RegionsManagementTab() {
                                     </SelectItem>
                                   ))
                                 ) : (
-                                  <SelectItem value="NO_REWARDS" disabled>No hay rewards disponibles</SelectItem>
+                                  <SelectItem value="NO_REWARDS" disabled>{t('common.noRewardsAvailable')}</SelectItem>
                                 )}
                               </SelectContent>
                             </Select>
@@ -1488,7 +1488,7 @@ export default function RegionsManagementTab() {
                       ) : (
                         <>
                           <Calendar className="h-4 w-4 text-blue-500" />
-                          <span>Con fecha de caducidad</span>
+                          <span>{t('common.withExpirationDate')}</span>
                         </>
                       )}
                     </Label>

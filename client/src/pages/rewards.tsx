@@ -58,7 +58,7 @@ export default function Rewards() {
       queryClient.invalidateQueries({ queryKey: ["/api/users/stats"] });
     },
     onError: (error: any) => {
-      const errorMessage = error.message || "Failed to redeem reward";
+      const errorMessage = error.message || t("common.failedToRedeemReward");
       const isAlreadyPending = errorMessage.includes("already have a pending redemption");
       
       toast({
@@ -75,7 +75,7 @@ export default function Rewards() {
     if (!stats || stats.availablePoints < reward.pointsCost) {
       toast({
         title: t("rewards.insufficientPoints"),
-        description: `You need ${reward.pointsCost.toLocaleString()} points to redeem this reward.`,
+        description: t("common.youNeedPointsToRedeem", { points: reward.pointsCost.toLocaleString() }),
         variant: "destructive",
       });
       return;

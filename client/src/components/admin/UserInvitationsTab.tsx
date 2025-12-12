@@ -331,7 +331,7 @@ export default function UserInvitationsTab() {
                 </Button>
 
                 <div>
-                  <Label htmlFor="csvFile">Archivo CSV</Label>
+                  <Label htmlFor="csvFile">{t('common.csvFile')}</Label>
                   <Input
                     id="csvFile"
                     type="file"

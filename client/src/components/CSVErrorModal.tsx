@@ -76,8 +76,8 @@ export function CSVErrorModal({
             {totalProcessed > 0 && (
               <div className="mt-2 space-y-1">
                 <p className="text-sm">
-                  <strong>{successCount}</strong> de <strong>{totalProcessed}</strong> deals importados 
-                  (<strong>{successRate}%</strong> de éxito)
+                  <strong>{successCount}</strong> {t('common.of')} <strong>{totalProcessed}</strong> {t('common.dealsImported')} 
+                  (<strong>{successRate}%</strong> {t('common.successRate')})
                 </p>
                 <p className="text-sm text-red-600">
                   <strong>{errorCount}</strong> error{errorCount !== 1 ? 'es' : ''} encontrado{errorCount !== 1 ? 's' : ''}

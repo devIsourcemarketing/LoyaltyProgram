@@ -128,8 +128,8 @@ export default function Sidebar({ className }: SidebarProps) {
             {currentUser.role === "super-admin" ? (
               <>
                 <Globe className="h-4 w-4 text-blue-600" />
-                <span className="font-medium text-gray-700">Todas las Regiones</span>
-                <Badge variant="secondary" className="ml-auto text-xs">Super Admin</Badge>
+                <span className="font-medium text-gray-700">{t('common.allRegionsLabel')}</span>
+                <Badge variant="secondary" className="ml-auto text-xs">{t('common.superAdmin')}</Badge>
               </>
             ) : currentUser.regionInfo ? (
               <>

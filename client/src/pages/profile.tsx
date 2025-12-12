@@ -28,19 +28,19 @@ interface UserProfile {
 
 // Schema de validación para información personal
 const profileSchema = z.object({
-  firstName: z.string().min(2, "First name must be at least 2 characters"),
-  lastName: z.string().min(2, "Last name must be at least 2 characters"),
-  email: z.string().email("Invalid email address"),
-  country: z.string().min(2, "Country is required"),
+  firstName: z.string().min(2, "validation.firstNameMinCharacters"),
+  lastName: z.string().min(2, "validation.lastNameMinCharacters"),
+  email: z.string().email("validation.emailInvalid"),
+  country: z.string().min(2, "validation.countryRequired"),
 });
 
 // Schema de validación para cambio de contraseña
 const passwordSchema = z.object({
-  currentPassword: z.string().min(1, "Current password is required"),
-  newPassword: z.string().min(6, "New password must be at least 6 characters"),
+  currentPassword: z.string().min(1, "validation.currentPasswordRequired"),
+  newPassword: z.string().min(6, "validation.newPasswordMinCharacters"),
   confirmPassword: z.string(),
 }).refine((data) => data.newPassword === data.confirmPassword, {
-  message: "Passwords don't match",
+  message: "validation.passwordsDontMatch",
   path: ["confirmPassword"],
 });
 
@@ -64,7 +64,7 @@ export default function ProfilePage() {
     if (error || (!isLoading && !user)) {
       toast({
         title: t("admin.sessionExpired"),
-        description: "Please log in again",
+        description: t("common.pleaseLogInAgain"),
         variant: "destructive",
       });
       setLocation("/login");
@@ -110,7 +110,7 @@ export default function ProfilePage() {
       });
 
       if (!response.ok) {
-        let errorMessage = "Failed to update profile";
+        let errorMessage = "common.failedToUpdateProfile";
         try {
           const error = await response.json();
           errorMessage = error.message || errorMessage;
@@ -156,7 +156,7 @@ export default function ProfilePage() {
       });
 
       if (!response.ok) {
-        let errorMessage = "Failed to change password";
+        let errorMessage = "common.failedToChangePassword";
         try {
           const error = await response.json();
           errorMessage = error.message || errorMessage;
@@ -213,9 +213,9 @@ export default function ProfilePage() {
       </div>
 
       <div className="mb-8">
-        <h1 className="text-3xl font-bold">My Profile</h1>
+        <h1 className="text-3xl font-bold">{t('profile.myProfile')}</h1>
         <p className="text-muted-foreground mt-2">
-          Manage your account settings and personal information
+          {t('profile.manageAccountSettings')}
         </p>
       </div>
 
@@ -235,9 +235,9 @@ export default function ProfilePage() {
         <TabsContent value="profile">
           <Card>
             <CardHeader>
-              <CardTitle>Personal Information</CardTitle>
+              <CardTitle>{t('profile.personalInfo')}</CardTitle>
               <CardDescription>
-                Update your personal details and contact information
+                {t('profile.personalInfoDescription')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -332,7 +332,7 @@ export default function ProfilePage() {
                       id="country"
                       {...registerProfile("country")}
                       className="pl-10"
-                      placeholder="United States"
+                      placeholder={t("profile.countryPlaceholder")}
                     />
                   </div>
                   {profileErrors.country && (
@@ -379,9 +379,9 @@ export default function ProfilePage() {
         <TabsContent value="security">
           <Card>
             <CardHeader>
-              <CardTitle>Change Password</CardTitle>
+              <CardTitle>{t('profile.changePassword')}</CardTitle>
               <CardDescription>
-                Update your password to keep your account secure
+                {t('profile.changePasswordDescription')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -403,7 +403,7 @@ export default function ProfilePage() {
                     id="currentPassword"
                     type="password"
                     {...registerPassword("currentPassword")}
-                    placeholder="Enter your current password"
+                    placeholder={t("profile.currentPasswordPlaceholder")}
                   />
                   {passwordErrors.currentPassword && (
                     <p className="text-sm text-red-500 mt-1">
@@ -421,7 +421,7 @@ export default function ProfilePage() {
                     id="newPassword"
                     type="password"
                     {...registerPassword("newPassword")}
-                    placeholder="Enter new password (min. 6 characters)"
+                    placeholder={t("profile.newPasswordPlaceholder")}
                   />
                   {passwordErrors.newPassword && (
                     <p className="text-sm text-red-500 mt-1">

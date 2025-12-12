@@ -79,15 +79,15 @@ export default function PasswordlessLogin() {
           </div>
 
           <CardTitle className="text-center text-2xl">
-            {status === "loading" && "Activating Your Account..."}
-            {status === "success" && "Welcome to Loyalty Program!"}
-            {status === "error" && "Activation Failed"}
+            {status === "loading" && t('common.activatingAccount')}
+            {status === "success" && t('common.welcomeToProgram')}
+            {status === "error" && t('common.activationFailed')}
           </CardTitle>
 
           <CardDescription className="text-center">
-            {status === "loading" && "Please wait while we set up your account"}
-            {status === "success" && "Your account is ready. Redirecting..."}
-            {status === "error" && "There was a problem with your invitation"}
+            {status === "loading" && t('common.pleaseWaitSetup')}
+            {status === "success" && t('common.accountReadyRedirecting')}
+            {status === "error" && t('common.problemWithInvitation')}
           </CardDescription>
         </CardHeader>
 
@@ -106,15 +106,15 @@ export default function PasswordlessLogin() {
             <div className="mt-6 space-y-2">
               <div className="flex items-center space-x-2">
                 <div className="h-2 w-2 rounded-full bg-primary-600 animate-pulse"></div>
-                <p className="text-sm text-muted-foreground">Verifying invitation...</p>
+                <p className="text-sm text-muted-foreground">{t('auth.verifyingInvitationStatus')}</p>
               </div>
               <div className="flex items-center space-x-2">
                 <div className="h-2 w-2 rounded-full bg-primary-600 animate-pulse delay-100"></div>
-                <p className="text-sm text-muted-foreground">Creating your account...</p>
+                <p className="text-sm text-muted-foreground">{t('auth.creatingYourAccount')}</p>
               </div>
               <div className="flex items-center space-x-2">
                 <div className="h-2 w-2 rounded-full bg-primary-600 animate-pulse delay-200"></div>
-                <p className="text-sm text-muted-foreground">Setting up access...</p>
+                <p className="text-sm text-muted-foreground">{t('auth.settingUpAccess')}</p>
               </div>
             </div>
           )}

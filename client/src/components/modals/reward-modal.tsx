@@ -264,11 +264,11 @@ export default function RewardModal({ isOpen, onClose, reward }: RewardModalProp
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Reward Name</FormLabel>
+                    <FormLabel>{t('rewards.rewardName')}</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
-                        placeholder="$100 Amazon Gift Card"
+                        placeholder={t('rewards.rewardNamePlaceholder')}
                         data-testid="input-reward-name"
                       />
                     </FormControl>
@@ -282,12 +282,12 @@ export default function RewardModal({ isOpen, onClose, reward }: RewardModalProp
                 name="pointsCost"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Points Cost</FormLabel>
+                    <FormLabel>{t('rewards.pointsCost')}</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
                         type="number"
-                        placeholder="10000"
+                        placeholder={t('rewards.pointsCostPlaceholder')}
                         data-testid="input-points-cost"
                       />
                     </FormControl>
@@ -306,7 +306,7 @@ export default function RewardModal({ isOpen, onClose, reward }: RewardModalProp
                   <FormControl>
                     <Textarea
                       {...field}
-                      placeholder="Detailed description of the reward..."
+                      placeholder={t('rewards.descriptionPlaceholder')}
                       className="h-24"
                       data-testid="textarea-description"
                     />
@@ -355,12 +355,12 @@ export default function RewardModal({ isOpen, onClose, reward }: RewardModalProp
                 name="stockQuantity"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Stock Quantity (Optional)</FormLabel>
+                    <FormLabel>{t('rewards.stockQuantity')}</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
                         type="number"
-                        placeholder="100"
+                        placeholder={t('rewards.stockPlaceholder')}
                         data-testid="input-stock-quantity"
                       />
                     </FormControl>
@@ -379,7 +379,7 @@ export default function RewardModal({ isOpen, onClose, reward }: RewardModalProp
                       <Input
                         {...field}
                         type="number"
-                        placeholder="15"
+                        placeholder={t('rewards.displayOrderPlaceholder')}
                         data-testid="input-estimated-delivery-days"
                       />
                     </FormControl>
@@ -421,8 +421,8 @@ export default function RewardModal({ isOpen, onClose, reward }: RewardModalProp
                           onClick={() => fileInputRef.current?.click()}
                         >
                           <ImageIcon className="w-12 h-12 text-gray-400 mb-2" />
-                          <p className="text-sm text-gray-600 mb-1">Click para subir imagen</p>
-                          <p className="text-xs text-gray-400">PNG, JPG o WEBP (máx 2MB)</p>
+                          <p className="text-sm text-gray-600 mb-1">{t('common.clickToUploadImage')}</p>
+                          <p className="text-xs text-gray-400">{t('common.imageFormatAndSize')}</p>
                         </div>
                       )}
 
@@ -446,7 +446,7 @@ export default function RewardModal({ isOpen, onClose, reward }: RewardModalProp
                           className="w-full"
                         >
                           <Upload className="w-4 h-4 mr-2" />
-                          {isUploading ? "Subiendo..." : "Subir Imagen"}
+                          {isUploading ? t('common.uploading') : t('common.uploadImage')}
                         </Button>
                       )}
                     </div>
@@ -462,9 +462,9 @@ export default function RewardModal({ isOpen, onClose, reward }: RewardModalProp
               render={({ field }) => (
                 <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                   <div className="space-y-0.5">
-                    <FormLabel className="text-base">Active Status</FormLabel>
+                    <FormLabel className="text-base">{t('rewards.activeStatus')}</FormLabel>
                     <div className="text-sm text-gray-500">
-                      Inactive rewards won't be visible to users
+                      {t('rewards.activeStatusDescription')}
                     </div>
                   </div>
                   <FormControl>
@@ -488,8 +488,8 @@ export default function RewardModal({ isOpen, onClose, reward }: RewardModalProp
                 data-testid="button-submit-reward"
               >
                 {createRewardMutation.isPending 
-                  ? (isEditing ? "Updating..." : "Creating...") 
-                  : (isEditing ? "Update Reward" : "Create Reward")
+                  ? (isEditing ? t('common.updating') : t('common.creating')) 
+                  : (isEditing ? t('common.updateReward') : t('common.createReward'))
                 }
               </Button>
             </div>

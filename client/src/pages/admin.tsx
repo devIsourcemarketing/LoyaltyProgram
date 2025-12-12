@@ -64,12 +64,12 @@ interface ReportsData {
 
 // User creation form schema
 const createUserSchema = z.object({
-  username: z.string().min(3, "Username must be at least 3 characters"),
-  email: z.string().email("Invalid email address"),
+  username: z.string().min(3, t('common.usernameMinLength')),
+  email: z.string().email(t('common.invalidEmailAddress')),
   password: z.string().optional(),
-  firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
-  companyName: z.string().min(1, "El nombre de la empresa es requerido"),
+  firstName: z.string().min(1, t('common.firstNameRequired')),
+  lastName: z.string().min(1, t('common.lastNameRequired')),
+  companyName: z.string().min(1, t('common.companyNameRequired')),
   partnerCategory: z.string().min(1, "La categoría del partner es requerida"),
   marketSegment: z.string().min(1, "El segmento del mercado es requerido"),
   category: z.enum(["ENTERPRISE", "SMB", "MSSP"], {
@@ -91,11 +91,11 @@ const createUserSchema = z.object({
 
 // User edit form schema (without password)
 const editUserSchema = z.object({
-  username: z.string().min(3, "Username must be at least 3 characters"),
-  email: z.string().email("Invalid email address"),
-  firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
-  companyName: z.string().min(1, "El nombre de la empresa es requerido"),
+  username: z.string().min(3, t('common.usernameMinLength')),
+  email: z.string().email(t('common.invalidEmailAddress')),
+  firstName: z.string().min(1, t('common.firstNameRequired')),
+  lastName: z.string().min(1, t('common.lastNameRequired')),
+  companyName: z.string().min(1, t('common.companyNameRequired')),
   partnerCategory: z.string().min(1, "La categoría del partner es requerida"),
   marketSegment: z.string().min(1, "El segmento del mercado es requerido"),
   category: z.enum(["ENTERPRISE", "SMB", "MSSP"], {
@@ -401,7 +401,7 @@ export default function Admin() {
     onError: (error: any) => {
       toast({
         title: t("common.error"),
-        description: error.message || "Failed to approve deal",
+        description: error.message || t('common.failedToApproveDeal'),
         variant: "destructive",
       });
     },
@@ -423,7 +423,7 @@ export default function Admin() {
     onError: (error: any) => {
       toast({
         title: t("common.error"),
-        description: error.message || "Failed to reject deal",
+        description: error.message || t('common.failedToRejectDeal'),
         variant: "destructive",
       });
     },
@@ -445,7 +445,7 @@ export default function Admin() {
     onError: (error: any) => {
       toast({
         title: t("common.error"),
-        description: error.message || "Failed to delete deal",
+        description: error.message || t('common.failedToDeleteDeal'),
         variant: "destructive",
       });
     },
@@ -465,7 +465,7 @@ export default function Admin() {
     onError: (error: any) => {
       toast({
         title: t("common.error"),
-        description: error.message || "Failed to update user role",
+        description: error.message || t('common.failedToUpdateUserRole'),
         variant: "destructive",
       });
     },
@@ -512,7 +512,7 @@ export default function Admin() {
     onError: (error: any) => {
       toast({
         title: t("common.error"),
-        description: error.message || "Failed to create user",
+        description: error.message || t('common.failedToCreateUser'),
         variant: "destructive",
       });
     },
@@ -562,7 +562,7 @@ export default function Admin() {
     onError: (error: any) => {
       toast({
         title: t("common.error"),
-        description: error.message || "Failed to update user",
+        description: error.message || t('common.failedToUpdateUser'),
         variant: "destructive",
       });
     },
@@ -626,7 +626,7 @@ export default function Admin() {
     onError: (error: any) => {
       toast({
         title: t("common.error"),
-        description: error.message || "Failed to delete user",
+        description: error.message || t('common.failedToDeleteUser'),
         variant: "destructive",
       });
     },
@@ -652,7 +652,7 @@ export default function Admin() {
     onError: (error: any) => {
       toast({
         title: t("common.error"),
-        description: error.message || "Failed to process users CSV file",
+        description: error.message || t('common.failedToProcessCSV'),
         variant: "destructive",
       });
     },
@@ -696,7 +696,7 @@ export default function Admin() {
     onError: (error: any) => {
       toast({
         title: t("common.error"),
-        description: error.message || "Failed to approve user",
+        description: error.message || t('common.failedToApproveUser'),
         variant: "destructive",
       });
     },
@@ -719,7 +719,7 @@ export default function Admin() {
     onError: (error: any) => {
       toast({
         title: t("common.error"),
-        description: error.message || "Failed to reject user",
+        description: error.message || t('common.failedToRejectUser'),
         variant: "destructive",
       });
     },
@@ -740,7 +740,7 @@ export default function Admin() {
     onError: (error: any) => {
       toast({
         title: t("common.error"),
-        description: error.message || "Failed to update shipment status",
+        description: error.message || t('common.failedToUpdateShipment'),
         variant: "destructive",
       });
     },
@@ -769,7 +769,7 @@ export default function Admin() {
     onError: (error: any) => {
       toast({
         title: t("common.error"),
-        description: error.message || "Failed to approve redemption",
+        description: error.message || t('common.failedToApproveRedemption'),
         variant: "destructive",
       });
     },
@@ -790,7 +790,7 @@ export default function Admin() {
     onError: (error: any) => {
       toast({
         title: t("common.error"),
-        description: error.message || "Failed to reject redemption",
+        description: error.message || t('common.failedToRejectRedemption'),
         variant: "destructive",
       });
     },
@@ -819,7 +819,7 @@ export default function Admin() {
     onError: (error: any) => {
       toast({
         title: t("common.error"),
-        description: error.message || "Failed to delete reward",
+        description: error.message || t('common.failedToDeleteReward'),
         variant: "destructive",
       });
     },
@@ -914,7 +914,7 @@ export default function Admin() {
       console.error("User role:", currentUser?.role);
       toast({
         title: t("common.error"),
-        description: `Failed to get upload URL: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        description: `${t('common.failedToGetUploadURL')}: ${error instanceof Error ? error.message : t('common.unknownError')}`,
         variant: "destructive",
       });
       throw error;
@@ -1190,7 +1190,7 @@ export default function Admin() {
           <CardContent className="pt-6">
             <div className="text-center">
               <X className="h-12 w-12 text-red-500 mx-auto mb-4" />
-              <h2 className="text-xl font-bold text-gray-900 mb-2">Access Denied</h2>
+              <h2 className="text-xl font-bold text-gray-900 mb-2">{t('common.accessDeniedTitle')}</h2>
               <p className="text-gray-600">
                 {t('admin.noPermissionAdminPanel')}
               </p>
@@ -1719,7 +1719,7 @@ export default function Admin() {
                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                   <FormControl>
                                     <SelectTrigger data-testid="select-role">
-                                      <SelectValue placeholder="Select a role" />
+                                      <SelectValue placeholder={t('common.selectRole')} />
                                     </SelectTrigger>
                                   </FormControl>
                                   <SelectContent>
@@ -1801,7 +1801,7 @@ export default function Admin() {
                             disabled={createUserMutation.isPending}
                             data-testid="button-submit-create"
                           >
-                            {createUserMutation.isPending ? "Creating..." : "Create User"}
+                            {createUserMutation.isPending ? t('common.creating') : t('common.createUser')}
                           </Button>
                         </div>
                       </form>
@@ -2147,7 +2147,7 @@ export default function Admin() {
                                 <Select onValueChange={field.onChange} value={field.value}>
                                   <FormControl>
                                     <SelectTrigger data-testid="select-edit-role">
-                                      <SelectValue placeholder="Select a role" />
+                                      <SelectValue placeholder={t('common.selectRole')} />
                                     </SelectTrigger>
                                   </FormControl>
                                   <SelectContent>
@@ -2174,12 +2174,12 @@ export default function Admin() {
                                 <Select onValueChange={(value) => field.onChange(value === "true")} value={field.value ? "true" : "false"}>
                                   <FormControl>
                                     <SelectTrigger data-testid="select-edit-status">
-                                      <SelectValue placeholder="Select status" />
+                                      <SelectValue placeholder={t('common.selectStatus')} />
                                     </SelectTrigger>
                                   </FormControl>
                                   <SelectContent>
-                                    <SelectItem value="true">Active</SelectItem>
-                                    <SelectItem value="false">Inactive</SelectItem>
+                                    <SelectItem value="true">{t('common.active')}</SelectItem>
+                                    <SelectItem value="false">{t('common.inactive')}</SelectItem>
                                   </SelectContent>
                                 </Select>
                                 <FormMessage />
@@ -2249,7 +2249,7 @@ export default function Admin() {
                             disabled={editUserMutation.isPending}
                             data-testid="button-submit-edit"
                           >
-                            {editUserMutation.isPending ? "Updating..." : "Update User"}
+                            {editUserMutation.isPending ? t('common.updating') : t('common.updateUser')}
                           </Button>
                         </div>
                       </form>
@@ -2625,7 +2625,7 @@ export default function Admin() {
           <Card className="shadow-sm hover:shadow-md transition-shadow border border-gray-200 rounded-xl overflow-hidden">
             <CardHeader>
               <div className="flex justify-between items-center">
-                <CardTitle>Deal Management</CardTitle>
+                <CardTitle>{t('common.dealManagement')}</CardTitle>
                 <CSVUploader
                   onGetUploadParameters={handleGetCSVUploadParameters}
                   onComplete={handleCSVUploadComplete}
@@ -2688,7 +2688,7 @@ export default function Admin() {
                               <div className="text-sm font-medium text-gray-900">
                                 {deal.userFirstName && deal.userLastName 
                                   ? `${deal.userFirstName} ${deal.userLastName}`
-                                  : deal.userName || 'Unknown User'}
+                                  : deal.userName || t('common.unknownUser')}
                               </div>
                             </div>
                           </td>

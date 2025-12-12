@@ -22,8 +22,8 @@ type RegionHierarchy = Record<string, {
 }>;
 
 const registerSchema = z.object({
-  username: z.string().min(3, "Username must be at least 3 characters"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  username: z.string().min(3, "validation.usernameMinCharacters"),
+  password: z.string().min(6, "validation.passwordMinCharacters"),
   confirmPassword: z.string(),
   country: z.string().optional(),
   city: z.string().optional(),
@@ -31,7 +31,7 @@ const registerSchema = z.object({
   category: z.string().min(1, "validation.categoryRequired"),
   subcategory: z.string().optional(),
 }).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
+  message: "validation.passwordsDontMatch",
   path: ["confirmPassword"],
 });
 
@@ -62,7 +62,7 @@ export default function RegisterWithInvite() {
     queryKey: ["/api/region-hierarchy"],
     queryFn: async () => {
       const response = await fetch("/api/region-hierarchy");
-      if (!response.ok) throw new Error("Failed to load region hierarchy");
+      if (!response.ok) throw new Error("common.failedToLoadRegionHierarchy");
       return response.json();
     },
   });
@@ -258,14 +258,14 @@ export default function RegisterWithInvite() {
       console.log("📄 Datos de respuesta:", result);
 
       if (!response.ok) {
-        throw new Error(result.message || "Error al completar el registro");
+        throw new Error(result.message || t("common.registrationError"));
       }
 
       toast({
         title: t("auth.registrationCompleted"),
         description: result.regionAutoAssigned 
-          ? `Su cuenta está lista. Se le asignó automáticamente la región ${result.assignedRegion} desde donde fue invitado. Ya puede iniciar sesión.`
-          : result.message || t("auth.accountReady"),
+          ? t("common.regionAutoAssigned", { region: result.assignedRegion })
+          : result.message || t("common.accountReady"),
       });
 
       console.log("✅ Registro exitoso, redirigiendo al login...");
@@ -276,8 +276,8 @@ export default function RegisterWithInvite() {
     } catch (error: any) {
       console.error("❌ Error en registro:", error);
       toast({
-        title: "Error",
-        description: error.message || "No se pudo completar el registro",
+        title: t("common.error"),
+        description: error.message || t("common.couldNotCompleteRegistration"),
         variant: "destructive",
       });
     } finally {
@@ -357,7 +357,7 @@ export default function RegisterWithInvite() {
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
-              <Label htmlFor="username">Nombre de Usuario *</Label>
+              <Label htmlFor="username">{t('auth.usernameLabel')} *</Label>
               <Input
                 id="username"
                 type="text"
@@ -554,10 +554,10 @@ export default function RegisterWithInvite() {
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Completando registro...
+                  {t('common.completingRegistration')}
                 </>
               ) : (
-                "Completar Registro"
+                t('common.completeRegistration')
               )}
             </Button>
           </form>
