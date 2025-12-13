@@ -19,12 +19,15 @@ console.log('   FROM_EMAIL:', FROM_EMAIL);
 console.log('   APP_URL:', APP_URL);
 
 // Inicializar cliente de Brevo
-const apiInstance = new brevo.TransactionalEmailsApi();
+let apiInstance: brevo.TransactionalEmailsApi;
 if (BREVO_API_KEY) {
+  apiInstance = new brevo.TransactionalEmailsApi();
   apiInstance.setApiKey(brevo.TransactionalEmailsApiApiKeys.apiKey, BREVO_API_KEY);
   console.log('✅ Cliente Brevo inicializado correctamente');
 } else {
   console.warn('⚠️  BREVO_API_KEY no configurada - los emails no se enviarán');
+  // Create a dummy instance to prevent undefined errors
+  apiInstance = new brevo.TransactionalEmailsApi();
 }
 
 /**
@@ -45,6 +48,7 @@ const CLOUDINARY_BASE = 'https://res.cloudinary.com/dk3ow5puw/image/upload';
  */
 function getEmailImageURLs(emailType: string, lang: EmailLanguage = 'es') {
   // Map language codes to folder names in Cloudinary
+  // English uses Spanish images as fallback since they share similar visual content
   const langFolder = lang === 'pt' ? 'português' : 'español';
   const basePath = `${CLOUDINARY_BASE}/loyalty-program/emails/${emailType}/${langFolder}`;
   
