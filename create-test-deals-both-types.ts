@@ -27,22 +27,22 @@ async function createTestDeals() {
       {
         dealType: "new_customer" as const,
         productName: "NEW CLIENT - Deal #12345",
-        dealValue: "50000.00",
-        expectedGoals: 50.0,
+        dealValue: "50000",
+        expectedGoals: 50,
         closeDate: new Date("2025-12-01")
       },
       {
         dealType: "new_customer" as const,
         productName: "NEW CLIENT - Deal #12346",
-        dealValue: "100000.00",
-        expectedGoals: 100.0,
+        dealValue: "100000",
+        expectedGoals: 100,
         closeDate: new Date("2025-12-02")
       },
       {
         dealType: "new_customer" as const,
         productName: "NEW CLIENT - Deal #12347",
-        dealValue: "25000.00",
-        expectedGoals: 25.0,
+        dealValue: "25000",
+        expectedGoals: 25,
         closeDate: new Date("2025-12-03")
       },
       
@@ -50,29 +50,29 @@ async function createTestDeals() {
       {
         dealType: "renewal" as const,
         productName: "RENEWAL - Deal #23456",
-        dealValue: "100000.00",
-        expectedGoals: 50.0,
+        dealValue: "100000",
+        expectedGoals: 50,
         closeDate: new Date("2025-12-01")
       },
       {
         dealType: "renewal" as const,
         productName: "RENEWAL - Deal #23457",
-        dealValue: "160000.00",
-        expectedGoals: 80.0,
+        dealValue: "160000",
+        expectedGoals: 80,
         closeDate: new Date("2025-12-02")
       },
       {
         dealType: "renewal" as const,
         productName: "RENEWAL - Deal #23458",
-        dealValue: "200000.00",
-        expectedGoals: 100.0,
+        dealValue: "200000",
+        expectedGoals: 100,
         closeDate: new Date("2025-12-03")
       },
       {
         dealType: "renewal" as const,
         productName: "RENEWAL - Deal #23459",
-        dealValue: "80000.00",
-        expectedGoals: 40.0,
+        dealValue: "80000",
+        expectedGoals: 40,
         closeDate: new Date("2025-12-04")
       },
     ];

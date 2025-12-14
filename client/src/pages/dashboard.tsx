@@ -305,7 +305,7 @@ export default function Dashboard() {
               {/* Left side - Welcome Message */}
               <div className="flex-1 flex flex-col justify-center">
                 <h1 className="text-4xl lg:text-5xl font-bold mb-2 text-white leading-tight" data-testid="text-welcome">
-                  {t('dashboard.welcome')}<br />{user.firstName} {user.lastName}!
+                  {t('dashboard.welcome')}<br />{user.firstName}!
                 </h1>
                 <p className="sub-text-welcome font-normal text-[#ffffff]">
                   {t('dashboard.subtitleWelcome')}            
@@ -362,7 +362,7 @@ export default function Dashboard() {
             <div className="relative z-10 p-8 min-h-[400px] flex items-center">
               <div>
                 <h1 className="text-4xl font-bold mb-2 text-white" data-testid="text-welcome">
-                  {t('dashboard.welcome')}, {user.firstName} {user.lastName}!
+                  {t('dashboard.welcome')}, {user.firstName}!
                 </h1>
                 <p className="text-white text-lg" data-testid="text-admin-role">
                   <span className="font-medium">{t('dashboard.systemAdministrator')}</span>
@@ -558,9 +558,7 @@ export default function Dashboard() {
                             </h3>
                             <Badge className="bg-blue-600 text-white white-background text-green-600">{t('dashboard.you')}</Badge>
                           </div>
-                          <p className="text-sm text-blue-700 white-text">
-                            @{currentUserData.username}
-                          </p>
+                          {/* Username intentionally hidden on dashboard */}
                         </div>
 
                         {/* Goals */}
@@ -569,7 +567,7 @@ export default function Dashboard() {
                             {Math.round(currentUserData.totalGoals)}
                           </div>
                           <div className="text-sm text-blue-700 white-text">
-                            {t('dashboard.goals').toLowerCase()}
+                            {t('dashboard.goals').toUpperCase()}
                           </div>
                         </div>
                       </div>
